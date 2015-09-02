@@ -173,9 +173,10 @@ void Checker::processLogLines(string & line){
 VOID Checker::testing() {
   for(auto it = writes.begin(); it != writes.end(); it++)
   {
-     cout << it->first << ": {" << it->second.size();
+     cout << it->first << ": Bucket {" << it->second.size();
      cout <<"} "<< endl;
   }
+  cout << "Total Addresses: " << writes.size() << endl;
 
   // testing
   cout << "====================" << endl;
@@ -186,5 +187,6 @@ VOID Checker::testing() {
         cout << *x << " ";
       cout << "}" << endl;
   }
+  
 
 }
