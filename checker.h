@@ -1,3 +1,18 @@
+/////////////////////////////////////////////////////////////////
+//  ADFinspec: a lightweight non-determinism checking 
+//          tool for ADF applications
+//
+//    (c) 2015 - Hassan Salehe Matar & MSRC at Koc University
+//      Copying or using this code by any means whatsoever 
+//      without consent of the owner is strictly prohibited.
+//   
+//   Contact: hmatar-at-ku-dot-edu-dot-tr
+//
+/////////////////////////////////////////////////////////////////
+
+// this files redifines data types for redability and WORE (Write-Once-Reuse-Everywhere)
+// Defines the ADF Checker class
+
 #ifndef _CHECKER_HPP_
 #define _CHECKER_HPP_
 
