@@ -1,8 +1,22 @@
+/////////////////////////////////////////////////////////////////
+//  ADFinspec: a lightweight non-determinism checking 
+//          tool for ADF applications
+//
+//    (c) 2015 - Hassan Salehe Matar & MSRC at Koc University
+//      Copying or using this code by any means whatsoever 
+//      without consent of the owner is strictly prohibited.
+//   
+//   Contact: hmatar-at-ku-dot-edu-dot-tr
+//
+/////////////////////////////////////////////////////////////////
+
+/*
+This is a logger for all events in an ADF application
+*/
+
+
 #ifndef LOGGER_H
 #define LOGGER_H
-/*
-This is a logger for all events in an SDFA application
-*/
 
 #include <iostream>
 #include <fstream>
