@@ -1,4 +1,4 @@
-#  This is a tool to detect non-determinism in ADF applications. # 
+#  This is a tool to detect non-determinism in ADF applications. 
 
 ### Copyright notice: ###
 
