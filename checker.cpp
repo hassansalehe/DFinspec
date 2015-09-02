@@ -194,7 +194,7 @@ VOID Checker::reportConflicts() {
   cout << "                                                            " << endl;
   cout << "        Non-determinism checking report                     " << endl;
   cout << "                                                            " << endl;
-  cout << " The following pairs " << conflictTable.size() <<" have conflicts: " << endl;
+  cout << " The following " << conflictTable.size() <<" task pairs have conflicts: " << endl;
 
   for(auto it = conflictTable.begin(); it != conflictTable.end(); ++it) {
     cout << "    "<< it->first.first << " ("<< it->second.task1Name<<")  <--> ";
@@ -224,6 +224,13 @@ VOID Checker::testing() {
         cout << *x << " ";
       cout << "}" << endl;
   }
-  
-
 }
+
+
+// implementation of the checker destructor
+// frees the memory dynamically generated for S-bags
+Checker::~Checker() {
+ for(auto it = p_bags.begin(); it != p_bags.end(); it++)
+   delete it->second;
+}
+

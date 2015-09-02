@@ -80,6 +80,7 @@ class Checker {
   VOID processLogLines(string & line);
   VOID reportConflicts();
   VOID testing();
+  ~Checker();
 
   private:
     unordered_map <INTEGER, PSbag> p_bags; // hold bags of tasks
