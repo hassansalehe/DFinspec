@@ -26,6 +26,8 @@
 #include <cctype>
 #include <vector>
 #include <set>
+#include <map>
+
 
 using namespace std;
 
@@ -62,6 +64,13 @@ typedef struct Write {
   Write(INTEGER tskId, VALUE val):wrtTaskId(tskId), value(val) {}
 } Write;
 
+typedef struct Report {
+  string task1Name;
+
+  string  task2Name;
+  set<ADDRESS> addresses;
+} Report;
+
 typedef Sbag * PSbag;
 
 class Checker {
@@ -69,12 +78,14 @@ class Checker {
   VOID addTaskNode(string & logLine);
   VOID saveWrite(INTEGER taskId, ADDRESS addr, VALUE value);
   VOID processLogLines(string & line);
+  VOID reportConflicts();
   VOID testing();
 
   private:
     unordered_map <INTEGER, PSbag> p_bags; // hold bags of tasks
     unordered_map<INTEGER, Task> graph;  // in and out edges
     unordered_map<ADDRESS, vector<Write>> writes; // for writes
+    map<pair<INTEGER, INTEGER>, Report> conflictTable;
 };
 
 

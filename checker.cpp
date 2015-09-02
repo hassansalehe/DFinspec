@@ -60,12 +60,17 @@ void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value) {
          if(lastWrt.value == value) // 4.1 same value written
            return; // no determinism error, just return
          else { // 4.2 this is definitely determinism error
-            cout << "Determinism error with " << lastWrt.wrtTaskId << "(";
-            cout << p_bags[lastWrt.wrtTaskId]->name << ") my id is " << taskId;
-            cout << "(" << p_bags[taskId]->name<< "){";
-            for(auto z = p_bags[taskId]->HB.begin(); z != p_bags[taskId]->HB.end(); z++)
-               cout<< *z << " " ;
-            cout << "}"<< endl;
+
+            // code for recording errors
+            auto key = make_pair(lastWrt.wrtTaskId, taskId);
+            if(conflictTable.find(key) != conflictTable.end())
+              conflictTable[key].addresses.insert(addr);
+            else {
+              conflictTable[key] = Report();
+              conflictTable[key].task1Name = p_bags[lastWrt.wrtTaskId]->name;
+              conflictTable[key].task2Name = p_bags[taskId]->name;
+              conflictTable[key].addresses.insert(addr);  
+            }
             return;
          }
       }
@@ -183,6 +188,24 @@ void Checker::processLogLines(string & line){
       saveWrite(taskID, address, val);
     }
 }
+
+VOID Checker::reportConflicts() {
+  cout << "============================================================" << endl;
+  cout << "                                                            " << endl;
+  cout << "        Non-determinism checking report                     " << endl;
+  cout << "                                                            " << endl;
+  cout << " The following pairs " << conflictTable.size() <<" have conflicts: " << endl;
+
+  for(auto it = conflictTable.begin(); it != conflictTable.end(); ++it) {
+    cout << "    "<< it->first.first << " ("<< it->second.task1Name<<")  <--> ";
+    cout << it->first.second << " (" << it->second.task2Name << ")";
+    cout << " on "<< it->second.addresses.size() << " memory addresses" << endl;
+  }
+
+  cout << "                                                            " << endl;
+  cout << "============================================================" << endl;
+}
+
 
 VOID Checker::testing() {
   for(auto it = writes.begin(); it != writes.end(); it++)
