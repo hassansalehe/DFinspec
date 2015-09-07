@@ -12,7 +12,7 @@
 
 
 ### Prerequisites: ###
-g++ 4.7 and later.
+g++ 4.7 or later.
 
 ### How to compile the tool: ###
   Under the main directory, on the console/terminal run the command "make".

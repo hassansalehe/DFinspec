@@ -12,7 +12,7 @@
 
 CXX = g++
 CXXFLGS = -std=c++11
-DEPS = checker.h
+DEPS = checker.h defs.h
 OBJ = checker.o main.o
 TOOL = ADFinspec
 

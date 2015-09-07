@@ -28,17 +28,9 @@
 #include <set>
 #include <map>
 
+#include "defs.h"
 
 using namespace std;
-
-typedef        void        VOID;
-typedef      void *        ADDRESS;
-typedef    ofstream        FILEPTR;
-typedef    long int        INTEGER;
-typedef    long int        VALUE;
-typedef const char*        STRING;
-typedef vector<int>        INTVECTOR;
-typedef unordered_set<int> INTSET;
 
 // a bag to hold the tasks that happened-before
 typedef struct Sbag {
