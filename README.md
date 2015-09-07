@@ -12,7 +12,9 @@
 
 
 ### Prerequisites: ###
-g++ 4.7 or later.
+One of the following compilers is required.
+  g++ 4.7 or later.
+  clang++ 3.3. or later
 
 ### How to compile the tool: ###
   Under the main directory, on the console/terminal run the command "make".

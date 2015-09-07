@@ -10,8 +10,18 @@
 #//
 #/////////////////////////////////////////////////////////////////
 
-CXX = g++
-CXXFLGS = -std=c++11
+# determine a compiler to use
+ERR = $(shell which clang >/dev/null; echo $$?)
+ifeq "$(ERR)" "0"
+  CXX = clang++
+else
+  ERR = $(shell which g++ >/dev/null; echo $$?)
+  ifeq "$(ERR)" "0"
+    CXX = g++
+  endif
+endif
+
+CXXFLGS = -O3 -std=c++11
 DEPS = checker.h defs.h
 OBJ = checker.o main.o
 TOOL = ADFinspec
