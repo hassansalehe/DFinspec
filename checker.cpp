@@ -192,6 +192,12 @@ void Checker::processLogLines(string & line){
 VOID Checker::reportConflicts() {
   cout << "============================================================" << endl;
   cout << "                                                            " << endl;
+  cout << "                    Summary                                 " << endl;
+  cout << "                                                            " << endl;
+  cout << " Total number of tasks: " <<  graph.size() << "             " << endl;
+  cout << "                                                            " << endl;
+  cout << "                                                            " << endl;
+  cout << "                                                            " << endl;
   cout << "        Non-determinism checking report                     " << endl;
   cout << "                                                            " << endl;
   cout << " The following " << conflictTable.size() <<" task pairs have conflicts: " << endl;
