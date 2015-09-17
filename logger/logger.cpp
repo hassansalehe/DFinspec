@@ -95,6 +95,19 @@ VOID INS::Finalize() {
     //pthread_mutex_unlock(&g_lock);
 }
 
+VOID INS::TransactionBegin(INTEGER taskID)
+{
+  guardLock.lock();
+  logger << taskID << " " << funcNames[taskID] << " TM ST " << endl;
+  guardLock.unlock();
+}
+
+VOID INS::TransactionEnd(INTEGER taskID) 
+{
+  guardLock.lock();
+  logger << taskID << " "<< funcNames[taskID] << " TM ED" << endl;
+  guardLock.unlock();
+}
 
 // called when a task starts execution. retrieves parent task id
 VOID INS::TaskStartLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value,  STRING taskName) 
