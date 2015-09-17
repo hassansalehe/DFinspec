@@ -35,7 +35,6 @@ using namespace std;
 // a bag to hold the tasks that happened-before
 typedef struct Sbag {
   int outStr;
-  string name;
   INTSET HB;
 
   Sbag(): outStr(0){}
@@ -43,8 +42,9 @@ typedef struct Sbag {
 
 // for constructing happans-before between tasks
 typedef struct Task {
-  INTSET inEdges;
-  INTSET outEdges;
+  string name;     // name of the task
+  INTSET inEdges;  // incoming data streams
+  INTSET outEdges; // outgoing data streams
 } Task;
 
 // represents last write, 

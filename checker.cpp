@@ -67,8 +67,8 @@ void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value) {
               conflictTable[key].addresses.insert(addr);
             else {
               conflictTable[key] = Report();
-              conflictTable[key].task1Name = p_bags[lastWrt.wrtTaskId]->name;
-              conflictTable[key].task2Name = p_bags[taskId]->name;
+              conflictTable[key].task1Name = graph[lastWrt.wrtTaskId].name;
+              conflictTable[key].task2Name = graph[taskId].name;
               conflictTable[key].addresses.insert(addr);  
             }
             return;
@@ -78,6 +78,8 @@ void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value) {
   }
 }
 
+// Adds a new task node in the simple happens-before graph
+// @params: logLine, a log entry the contains the task ids
 void Checker:: addTaskNode(string & logLine) { 
     stringstream ssin(logLine); 
     int sibId;
@@ -125,7 +127,10 @@ void Checker::processLogLines(string & line){
             if(graph.find(taskID) != graph.end()) {
               newTask->outStr = graph[taskID].outEdges.size();
             }
-            newTask->name = taskName;
+            else //put it in the simple HB graph
+	      graph[taskID] = Task();
+
+	    graph[taskID].name = taskName; // save the name of the task
             p_bags[taskID] = newTask;
           }
         }
@@ -168,7 +173,7 @@ void Checker::processLogLines(string & line){
               if(!aBag->outStr) 
                 p_bags.erase(*inEdg);
             }
-            taskBag->name = taskName;
+            graph[taskID].name = taskName; // set the name of the task
             p_bags[taskID] = taskBag; // 3. add the bag to p_bags
           }
         }
