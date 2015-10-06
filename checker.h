@@ -71,6 +71,7 @@ class Checker {
   VOID saveWrite(INTEGER taskId, ADDRESS addr, VALUE value);
   VOID processLogLines(string & line);
   VOID reportConflicts();
+  VOID printHBGraph();
   VOID testing();
   ~Checker();
 

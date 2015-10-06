@@ -20,8 +20,8 @@ else
     CXX = g++
   endif
 endif
-
-CXXFLGS = -O3 -std=c++11
+CXX = g++
+CXXFLGS = -g -O3 -std=c++11
 DEPS = checker.h defs.h
 OBJ = checker.o main.o
 TOOL = ADFinspec

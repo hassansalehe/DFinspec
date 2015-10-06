@@ -218,6 +218,25 @@ VOID Checker::reportConflicts() {
 }
 
 
+VOID Checker::printHBGraph() {
+  FILEPTR flowGraph;
+  flowGraph.open("flowGraph.sif",  ofstream::out | ofstream::trunc);
+  
+  if( ! flowGraph.is_open() ) {
+    cout << "Failed to write to file the graph structure" << endl;
+    exit(-1);
+  }
+
+  for(auto it = graph.begin(); it != graph.end(); it++)
+    for(auto out = it->second.outEdges.begin(); out != it->second.outEdges.end(); out++) {
+       flowGraph << it->first << "_" << it->second.name << " pp ";
+       flowGraph << *out << "_" << graph[*out].name << endl;
+    }
+  if(flowGraph.is_open())
+    flowGraph.close();  
+}
+
+
 VOID Checker::testing() {
   for(auto it = writes.begin(); it != writes.end(); it++)
   {

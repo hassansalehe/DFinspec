@@ -54,6 +54,7 @@ int main(int argc, char * argv[])
   // testing writes
   // aChecker.testing();
   aChecker.reportConflicts();
+  aChecker.printHBGraph(); 
 
   return 0;
 }
