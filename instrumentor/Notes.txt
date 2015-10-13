@@ -1,0 +1,1 @@
+I noticed that the "DataLayout" is a very important concept in the LLVM instrumentation. I think it holds all the inforamation for data layout like the data types, data sizes, etc.
