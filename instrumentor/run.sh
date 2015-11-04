@@ -9,7 +9,8 @@ cmake ..
 make
 #make VERBOSE=1
 cd ..
-rm *.o 
+rm *.o
+# this needs modification 
 BENCHS=/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks
 
 #clang++ -Xclang -load -Xclang build/monitor/libADFInstrumentationPass.so -c example.cpp -o sparse_algebra_adf.o
