@@ -1,0 +1,418 @@
+#include <cstdlib>
+#include <cstdio>
+#include <getopt.h>
+#include <cstring>
+#include <iostream>
+
+#include "adf.h"
+
+using namespace std;
+
+typedef char mychar;
+
+char *input_file_name;
+
+int num_blocks = 25;
+int block_size = 50;
+
+/*
+======================================================================
+	Settings
+======================================================================
+*/
+
+class Settings
+{
+public:
+    char* dwarfName;
+    char* inputFile;
+	char* resultFile;
+
+	Settings(char *input_file);
+	~Settings();
+	void PrintStringSettings();
+
+private:
+	static const int maxArraySize = 5000;
+};
+
+
+Settings::Settings(char *input_file)
+{
+	dwarfName = new char[maxArraySize];
+    inputFile = new char[maxArraySize];
+	resultFile = new char[maxArraySize];
+
+	dwarfName[0] = inputFile[0] = resultFile[0] = '\0';
+
+	sprintf(dwarfName, "%s", "FiniteStateMachine");
+	sprintf(inputFile, "%s", input_file);
+	sprintf(resultFile, "result_seq.txt");
+
+}
+
+Settings::~Settings()
+{
+	delete[] dwarfName;
+	delete[] inputFile;
+	delete[] resultFile;
+}
+
+void Settings::PrintStringSettings()
+{
+	char* stringSettings = new char[maxArraySize];
+	stringSettings[0] = '\0';
+
+	sprintf(stringSettings, "%s%s", stringSettings, "Kernel settings summary: ");
+	sprintf(stringSettings, "%s%s", stringSettings, "\nDwarf name        : ");
+	sprintf(stringSettings, "%s%s", stringSettings, dwarfName);
+	sprintf(stringSettings, "%s%s", stringSettings, "\nInputFile         : ");
+	sprintf(stringSettings, "%s%s", stringSettings, inputFile);
+	sprintf(stringSettings, "%s%s", stringSettings, "\nResultFile        : ");
+	sprintf(stringSettings, "%s%s", stringSettings, resultFile);
+
+	printf("%s\n", stringSettings);
+
+	delete[] stringSettings;
+}
+
+
+/*
+======================================================================
+	Configurator
+======================================================================
+*/
+
+class Configurator
+{
+public:
+	Configurator(char *input_file) { settings = new Settings(input_file); }
+	~Configurator() { delete settings; }
+	void GetContent(float ***matrix);
+	void WriteSettings() { settings -> PrintStringSettings(); }
+	void Close();
+
+private:
+	Settings* settings;
+};
+
+
+
+void genmat (float *M[])
+{
+	int  init_val, i, j, ii, jj;
+	bool null_entry;
+	float *p;
+
+	init_val = 1325;
+
+	/* generating the structure */
+	for (ii=0; ii < num_blocks; ii++)
+	{
+		for (jj=0; jj < num_blocks; jj++)
+		{
+			/* computing null entries */
+			null_entry=false;
+			if ((ii<jj) && (ii%3 !=0)) null_entry = true;
+			if ((ii>jj) && (jj%3 !=0)) null_entry = true;
+			if (ii%2==1) null_entry = true;
+			if (jj%2==1) null_entry = true;
+			if (ii==jj) null_entry = false;
+			if (ii==jj-1) null_entry = false;
+			if (ii-1 == jj) null_entry = false;
+			/* allocating matrix */
+			if (null_entry == false){
+				M[ii*num_blocks+jj] =  new float[block_size*block_size];
+				if ((M[ii*num_blocks+jj] == NULL))
+				{
+					printf("Error: Out of memory\n");
+
+				}
+				/* initializing matrix */
+				p = M[ii*num_blocks+jj];
+				for (i = 0; i < block_size; i++)
+				{
+					for (j = 0; j < block_size; j++)
+					{
+						init_val = (3125 * init_val) % 65536;
+						(*p) = (float)((init_val - 32768.0) / 16384.0);
+						p++;
+					}
+				}
+			}
+			else
+			{
+				M[ii*num_blocks+jj] = NULL;
+			}
+		}
+	}
+}
+
+
+
+
+void Configurator :: GetContent(float ***matrix)
+{
+	*matrix = new float*[num_blocks*num_blocks];
+	genmat(*matrix);
+}
+
+void Configurator :: Close()
+{
+}
+
+
+
+/*
+======================================================================
+	Solver
+======================================================================
+*/
+
+
+class Solver
+{
+public:
+	Solver(Configurator* configurator);
+	~Solver();
+	void Solve();
+	void Finish();
+
+private:
+	Configurator	 *dwarfConfigurator;
+	float 			**matrix;
+
+	float *allocate_clean_block();
+	void lu0(float *diag);
+	void bdiv(float *diag, float *row);
+	void bmod(float *row, float *col, float *inner);
+	void fwd(float *diag, float *col);
+
+};
+
+Solver::Solver(Configurator* configurator)
+{
+	matrix = NULL;
+
+	dwarfConfigurator = configurator;							// process settings from the command line
+	dwarfConfigurator -> WriteSettings();
+	dwarfConfigurator -> GetContent(&matrix);
+}
+
+Solver::~Solver()
+{
+	delete [] matrix;
+}
+
+/***********************************************************************
+ * allocate_clean_block:
+ **********************************************************************/
+float * Solver::allocate_clean_block()
+{
+  int i,j;
+  float *p, *q;
+
+  p = new float [block_size*block_size];
+  q=p;
+  if (p!=NULL){
+     for (i = 0; i < block_size; i++)
+        for (j = 0; j < block_size; j++){(*p)=0.0; p++;}
+
+  }
+  else {
+      printf("Error: Out of memory\n");
+  }
+  return (q);
+}
+/***********************************************************************
+ * lu0:
+ **********************************************************************/
+void Solver::lu0(float *diag)
+{
+   int i, j, k;
+
+   for (k=0; k<block_size; k++)
+      for (i=k+1; i<block_size; i++)
+      {
+         diag[i*block_size+k] = diag[i*block_size+k] / diag[k*block_size+k];
+         for (j=k+1; j<block_size; j++)
+            diag[i*block_size+j] = diag[i*block_size+j] - diag[i*block_size+k] * diag[k*block_size+j];
+      }
+}
+
+/***********************************************************************
+ * bdiv:
+ **********************************************************************/
+void Solver::bdiv(float *diag, float *row)
+{
+   int i, j, k;
+   for (i=0; i<block_size; i++)
+      for (k=0; k<block_size; k++)
+      {
+         row[i*block_size+k] = row[i*block_size+k] / diag[k*block_size+k];
+         for (j=k+1; j<block_size; j++)
+            row[i*block_size+j] = row[i*block_size+j] - row[i*block_size+k]*diag[k*block_size+j];
+      }
+}
+/***********************************************************************
+ * bmod:
+ **********************************************************************/
+void Solver::bmod(float *row, float *col, float *inner)
+{
+   int i, j, k;
+   for (i=0; i<block_size; i++)
+      for (j=0; j<block_size; j++)
+         for (k=0; k<block_size; k++)
+            inner[i*block_size+j] = inner[i*block_size+j] - row[i*block_size+k]*col[k*block_size+j];
+}
+/***********************************************************************
+ * fwd:
+ **********************************************************************/
+void Solver::fwd(float *diag, float *col)
+{
+   int i, j, k;
+   for (j=0; j<block_size; j++)
+      for (k=0; k<block_size; k++)
+         for (i=k+1; i<block_size; i++)
+            col[i*block_size+j] = col[i*block_size+j] - diag[i*block_size+k]*col[k*block_size+j];
+}
+
+
+
+void Solver::Solve()
+{
+   int ii, jj, kk;
+
+   printf("\nComputing SparseLU Factorization (%dx%d matrix with %dx%d blocks) \n",
+           num_blocks,num_blocks,block_size,block_size);
+
+   for (kk=0; kk<num_blocks; kk++)
+   {
+      lu0(matrix[kk*num_blocks+kk]);
+      for (jj=kk+1; jj<num_blocks; jj++)
+         if (matrix[kk*num_blocks+jj] != NULL)
+         {
+            fwd(matrix[kk*num_blocks+kk], matrix[kk*num_blocks+jj]);
+         }
+      for (ii=kk+1; ii<num_blocks; ii++)
+         if (matrix[ii*num_blocks+kk] != NULL)
+         {
+            bdiv (matrix[kk*num_blocks+kk], matrix[ii*num_blocks+kk]);
+         }
+      for (ii=kk+1; ii<num_blocks; ii++)
+         if (matrix[ii*num_blocks+kk] != NULL)
+            for (jj=kk+1; jj<num_blocks; jj++)
+               if (matrix[kk*num_blocks+jj] != NULL)
+               {
+                     if (matrix[ii*num_blocks+jj]==NULL) matrix[ii*num_blocks+jj] = allocate_clean_block();
+                     bmod(matrix[ii*num_blocks+kk], matrix[kk*num_blocks+jj], matrix[ii*num_blocks+jj]);
+               }
+   }
+}
+
+// Problem results output
+void Solver::Finish()
+{
+	dwarfConfigurator -> Close();
+}
+
+
+
+/*
+====================================================================================
+	ParseCommandLine
+====================================================================================
+*/
+
+void ParseCommandLine(int argc, char **argv)
+{
+	char c;
+
+	input_file_name = (char*) "no file - input generated";
+
+	while ((c = getopt (argc, argv, "hf:b:s:")) != -1)
+		switch (c) {
+			case 'h':
+				printf("\nFinite State Machine - ADF benchmark application\n"
+				"\n"
+				"Usage:\n"
+				"   finite_state_machine_seq [options ...]\n"
+				"\n"
+				"Options:\n"
+				"   -h\n"
+				"        Print this help message.\n"
+				"   -f <filename>\n"
+				"        Input file name.\n"
+				"   -b <num_blocks>\n"
+				"        Number of blocks in the row.\n"
+				"   -s <block_size>\n"
+				"        Size of the block.\n"
+				"\n"
+				);
+				exit (0);
+			case 'f':
+				input_file_name = optarg;
+				break;
+			case 'b':
+				num_blocks = atoi(optarg);
+				break;
+			case 's':
+				block_size = atoi(optarg);
+				break;
+			case '?':
+				if (optopt == 'c')
+					fprintf (stderr, "Option -%c requires an argument.\n", optopt);
+				else if (isprint (optopt))
+					fprintf (stderr, "Unknown option `-%c'.\n", optopt);
+				else
+					fprintf (stderr, "Unknown option character `\\x%x'.\n", optopt);
+				exit(1);
+			default:
+				exit(1);
+		}
+
+	if(input_file_name == NULL) {
+		printf("missing input file!\n");
+		exit(1);
+	}
+
+	if(num_blocks < 5)
+		num_blocks = 5;
+
+	if(block_size < 25)
+		block_size = 25;
+
+	printf ("\nStarting sequential Finite State Machine.\n");
+	printf ("Input file %s\n", input_file_name);
+	printf ("Matrix with %d x %d blocks of size %d\n", num_blocks, num_blocks, block_size);
+	printf ("=====================================================\n\n");
+}
+
+
+/*
+======================================================================
+	main
+======================================================================
+*/
+
+
+int main(int argc, char** argv)
+{
+	ParseCommandLine(argc, argv);
+
+	sequential_init();
+
+	Configurator dwarfConfigurator(input_file_name);
+	Solver solver(&dwarfConfigurator);					// create new Solver (current problem with initial data)
+
+	solver.Solve();										// Solve the current problem
+
+	sequential_terminate();
+
+	solver.Finish();									// write results
+
+	return 0;
+}
+
+
+

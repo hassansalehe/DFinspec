@@ -1,0 +1,334 @@
+
+Compiling ADF library
+====================================
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src/adf.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf/adf.o
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src/buffer.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf/buffer.o
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src/common.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf/common.o
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src/statistics.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf/statistics.o
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src/taskqueue.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf/taskqueue.o
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src/testscheduler.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf/testscheduler.o
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src/threadpool.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf/threadpool.o
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src/worksteal.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf/worksteal.o
+ar rcs /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib/libadf.a /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf/adf.o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf/buffer.o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf/common.o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf/statistics.o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf/taskqueue.o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf/testscheduler.o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf/threadpool.o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf/worksteal.o
+
+Compiling ADF library for debugging
+====================================
+
+g++ -c -Wall -O0 -g -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src/adf.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf_debug/adf.o
+g++ -c -Wall -O0 -g -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src/buffer.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf_debug/buffer.o
+g++ -c -Wall -O0 -g -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src/common.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf_debug/common.o
+g++ -c -Wall -O0 -g -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src/statistics.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf_debug/statistics.o
+g++ -c -Wall -O0 -g -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src/taskqueue.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf_debug/taskqueue.o
+g++ -c -Wall -O0 -g -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src/testscheduler.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf_debug/testscheduler.o
+g++ -c -Wall -O0 -g -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src/threadpool.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf_debug/threadpool.o
+g++ -c -Wall -O0 -g -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src/worksteal.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf_debug/worksteal.o
+ar rcs /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib/libadf_debug.a /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf_debug/adf.o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf_debug/buffer.o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf_debug/common.o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf_debug/statistics.o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf_debug/taskqueue.o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf_debug/testscheduler.o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf_debug/threadpool.o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/adf_debug/worksteal.o
+
+
+Compiling ADF applications
+=============================
+
+
+branch_bound_adf
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/branch_bound/branch_bound_adf.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/branch_bound/branch_bound_adf.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/branch_bound/branch_bound_adf /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/branch_bound/branch_bound_adf.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf -lpthread -lsfftw
+
+dense_algebra_adf
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/dense_algebra/dense_algebra_adf.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/dense_algebra/dense_algebra_adf.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/dense_algebra/dense_algebra_adf /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/dense_algebra/dense_algebra_adf.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf -lpthread -lsfftw
+
+finite_state_machine_adf
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/finite_state_machine/finite_state_machine_adf.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/finite_state_machine/finite_state_machine_adf.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/finite_state_machine/finite_state_machine_adf /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/finite_state_machine/finite_state_machine_adf.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf -lpthread -lsfftw
+
+graph_models_adf
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/graph_models/graph_models_adf.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/graph_models/graph_models_adf.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/graph_models/graph_models_adf /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/graph_models/graph_models_adf.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf -lpthread -lsfftw
+
+map_reduce_adf
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/map_reduce/map_reduce_adf.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/map_reduce/map_reduce_adf.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/map_reduce/map_reduce_adf /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/map_reduce/map_reduce_adf.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf -lpthread -lsfftw
+
+sparse_algebra_adf
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/sparse_algebra/sparse_algebra_adf.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/sparse_algebra/sparse_algebra_adf.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/sparse_algebra/sparse_algebra_adf /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/sparse_algebra/sparse_algebra_adf.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf -lpthread -lsfftw
+
+spectral_methods_adf
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/spectral_methods/spectral_methods_adf.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/spectral_methods/spectral_methods_adf.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/spectral_methods/spectral_methods_adf /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/spectral_methods/spectral_methods_adf.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf -lpthread -lsfftw
+
+structured_grid_adf
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/structured_grid/structured_grid_adf.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/structured_grid/structured_grid_adf.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/structured_grid/structured_grid_adf /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/structured_grid/structured_grid_adf.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf -lpthread -lsfftw
+
+unstructured_grid_adf
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/unstructured_grid/unstructured_grid_adf.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/unstructured_grid/unstructured_grid_adf.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/unstructured_grid/unstructured_grid_adf /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/unstructured_grid/unstructured_grid_adf.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf -lpthread -lsfftw
+
+
+Compiling ADF_OPENMP library
+====================================
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fopenmp -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src/common.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/omp/common.o
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fopenmp -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src/statistics.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/omp/statistics.o
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fopenmp -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src/adf.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/omp/adf.o
+ar rcs /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib/libadf_omp.a /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/omp/common.o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/omp/statistics.o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/omp/adf.o
+
+
+Compiling OpenMP applications
+=============================
+
+
+branch_bound_omp
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fopenmp -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc  -DADF_STM -DOPENMP -std=c++11 -fopenmp -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/branch_bound/branch_bound_omp.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/branch_bound/branch_bound_omp.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/branch_bound/branch_bound_omp /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/branch_bound/branch_bound_omp.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -fopenmp -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -fopenmp -lsfftw
+
+dense_algebra_omp
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fopenmp -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc  -DADF_STM -DOPENMP -std=c++11 -fopenmp -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/dense_algebra/dense_algebra_omp.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/dense_algebra/dense_algebra_omp.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/dense_algebra/dense_algebra_omp /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/dense_algebra/dense_algebra_omp.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -fopenmp -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -fopenmp -lsfftw
+
+finite_state_machine_omp
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fopenmp -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc  -DADF_STM -DOPENMP -std=c++11 -fopenmp -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/finite_state_machine/finite_state_machine_omp.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/finite_state_machine/finite_state_machine_omp.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/finite_state_machine/finite_state_machine_omp /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/finite_state_machine/finite_state_machine_omp.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -fopenmp -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -fopenmp -lsfftw
+
+graph_models_omp
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fopenmp -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc  -DADF_STM -DOPENMP -std=c++11 -fopenmp -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/graph_models/graph_models_omp.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/graph_models/graph_models_omp.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/graph_models/graph_models_omp /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/graph_models/graph_models_omp.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -fopenmp -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -fopenmp -lsfftw
+
+map_reduce_omp
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fopenmp -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc  -DADF_STM -DOPENMP -std=c++11 -fopenmp -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/map_reduce/map_reduce_omp.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/map_reduce/map_reduce_omp.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/map_reduce/map_reduce_omp /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/map_reduce/map_reduce_omp.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -fopenmp -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -fopenmp -lsfftw
+
+sparse_algebra_omp
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fopenmp -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc  -DADF_STM -DOPENMP -std=c++11 -fopenmp -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/sparse_algebra/sparse_algebra_omp.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/sparse_algebra/sparse_algebra_omp.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/sparse_algebra/sparse_algebra_omp /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/sparse_algebra/sparse_algebra_omp.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -fopenmp -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -fopenmp -lsfftw
+
+spectral_methods_omp
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fopenmp -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc  -DADF_STM -DOPENMP -std=c++11 -fopenmp -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/spectral_methods/spectral_methods_omp.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/spectral_methods/spectral_methods_omp.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/spectral_methods/spectral_methods_omp /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/spectral_methods/spectral_methods_omp.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -fopenmp -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -fopenmp -lsfftw
+
+structured_grid_omp
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fopenmp -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc  -DADF_STM -DOPENMP -std=c++11 -fopenmp -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/structured_grid/structured_grid_omp.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/structured_grid/structured_grid_omp.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/structured_grid/structured_grid_omp /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/structured_grid/structured_grid_omp.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -fopenmp -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -fopenmp -lsfftw
+
+unstructured_grid_omp
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fopenmp -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc  -DADF_STM -DOPENMP -std=c++11 -fopenmp -fgnu-tm -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/unstructured_grid/unstructured_grid_omp.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/unstructured_grid/unstructured_grid_omp.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/unstructured_grid/unstructured_grid_omp /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/unstructured_grid/unstructured_grid_omp.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -fopenmp -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -fopenmp -lsfftw
+
+
+Compiling TBB applications
+=============================
+
+
+branch_bound_tbb
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fgnu-tm -I/opt/intel/tbb-4.1/include/ -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/branch_bound/branch_bound_tbb.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/branch_bound/branch_bound_tbb.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/branch_bound/branch_bound_tbb /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/branch_bound/branch_bound_tbb.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -ltbb -lpthread -lsfftw
+
+dense_algebra_tbb
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fgnu-tm -I/opt/intel/tbb-4.1/include/ -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/dense_algebra/dense_algebra_tbb.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/dense_algebra/dense_algebra_tbb.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/dense_algebra/dense_algebra_tbb /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/dense_algebra/dense_algebra_tbb.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -ltbb -lpthread -lsfftw
+
+finite_state_machine_tbb
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fgnu-tm -I/opt/intel/tbb-4.1/include/ -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/finite_state_machine/finite_state_machine_tbb.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/finite_state_machine/finite_state_machine_tbb.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/finite_state_machine/finite_state_machine_tbb /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/finite_state_machine/finite_state_machine_tbb.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -ltbb -lpthread -lsfftw
+
+graph_models_tbb
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fgnu-tm -I/opt/intel/tbb-4.1/include/ -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/graph_models/graph_models_tbb.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/graph_models/graph_models_tbb.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/graph_models/graph_models_tbb /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/graph_models/graph_models_tbb.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -ltbb -lpthread -lsfftw
+
+map_reduce_tbb
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fgnu-tm -I/opt/intel/tbb-4.1/include/ -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/map_reduce/map_reduce_tbb.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/map_reduce/map_reduce_tbb.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/map_reduce/map_reduce_tbb /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/map_reduce/map_reduce_tbb.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -ltbb -lpthread -lsfftw
+
+sparse_algebra_tbb
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fgnu-tm -I/opt/intel/tbb-4.1/include/ -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/sparse_algebra/sparse_algebra_tbb.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/sparse_algebra/sparse_algebra_tbb.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/sparse_algebra/sparse_algebra_tbb /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/sparse_algebra/sparse_algebra_tbb.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -ltbb -lpthread -lsfftw
+
+spectral_methods_tbb
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fgnu-tm -I/opt/intel/tbb-4.1/include/ -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/spectral_methods/spectral_methods_tbb.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/spectral_methods/spectral_methods_tbb.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/spectral_methods/spectral_methods_tbb /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/spectral_methods/spectral_methods_tbb.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -ltbb -lpthread -lsfftw
+
+structured_grid_tbb
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fgnu-tm -I/opt/intel/tbb-4.1/include/ -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/structured_grid/structured_grid_tbb.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/structured_grid/structured_grid_tbb.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/structured_grid/structured_grid_tbb /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/structured_grid/structured_grid_tbb.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -ltbb -lpthread -lsfftw
+
+unstructured_grid_tbb
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fgnu-tm -I/opt/intel/tbb-4.1/include/ -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/unstructured_grid/unstructured_grid_tbb.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/unstructured_grid/unstructured_grid_tbb.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/unstructured_grid/unstructured_grid_tbb /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/unstructured_grid/unstructured_grid_tbb.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -ltbb -lpthread -lsfftw
+
+branch_bound_tbb_flow
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fgnu-tm -I/opt/intel/tbb-4.1/include/ -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/branch_bound/branch_bound_tbb_flow.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/branch_bound/branch_bound_tbb_flow.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/branch_bound/branch_bound_tbb_flow /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/branch_bound/branch_bound_tbb_flow.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -ltbb -lpthread -lsfftw
+
+dense_algebra_tbb_flow
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fgnu-tm -I/opt/intel/tbb-4.1/include/ -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/dense_algebra/dense_algebra_tbb_flow.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/dense_algebra/dense_algebra_tbb_flow.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/dense_algebra/dense_algebra_tbb_flow /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/dense_algebra/dense_algebra_tbb_flow.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -ltbb -lpthread -lsfftw
+
+finite_state_machine_tbb_flow
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fgnu-tm -I/opt/intel/tbb-4.1/include/ -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/finite_state_machine/finite_state_machine_tbb_flow.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/finite_state_machine/finite_state_machine_tbb_flow.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/finite_state_machine/finite_state_machine_tbb_flow /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/finite_state_machine/finite_state_machine_tbb_flow.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -ltbb -lpthread -lsfftw
+
+graph_models_tbb_flow
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fgnu-tm -I/opt/intel/tbb-4.1/include/ -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/graph_models/graph_models_tbb_flow.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/graph_models/graph_models_tbb_flow.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/graph_models/graph_models_tbb_flow /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/graph_models/graph_models_tbb_flow.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -ltbb -lpthread -lsfftw
+
+map_reduce_tbb_flow
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fgnu-tm -I/opt/intel/tbb-4.1/include/ -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/map_reduce/map_reduce_tbb_flow.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/map_reduce/map_reduce_tbb_flow.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/map_reduce/map_reduce_tbb_flow /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/map_reduce/map_reduce_tbb_flow.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -ltbb -lpthread -lsfftw
+
+sparse_algebra_tbb_flow
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fgnu-tm -I/opt/intel/tbb-4.1/include/ -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/sparse_algebra/sparse_algebra_tbb_flow.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/sparse_algebra/sparse_algebra_tbb_flow.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/sparse_algebra/sparse_algebra_tbb_flow /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/sparse_algebra/sparse_algebra_tbb_flow.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -ltbb -lpthread -lsfftw
+
+spectral_methods_tbb_flow
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fgnu-tm -I/opt/intel/tbb-4.1/include/ -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/spectral_methods/spectral_methods_tbb_flow.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/spectral_methods/spectral_methods_tbb_flow.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/spectral_methods/spectral_methods_tbb_flow /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/spectral_methods/spectral_methods_tbb_flow.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -ltbb -lpthread -lsfftw
+
+structured_grid_tbb_flow
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fgnu-tm -I/opt/intel/tbb-4.1/include/ -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/structured_grid/structured_grid_tbb_flow.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/structured_grid/structured_grid_tbb_flow.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/structured_grid/structured_grid_tbb_flow /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/structured_grid/structured_grid_tbb_flow.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -ltbb -lpthread -lsfftw
+
+unstructured_grid_tbb_flow
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl  -DADF_STM -DOPENMP -std=c++11 -fgnu-tm -I/opt/intel/tbb-4.1/include/ -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/atomic_ops -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/tmmisc /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/unstructured_grid/unstructured_grid_tbb_flow.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/unstructured_grid/unstructured_grid_tbb_flow.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/unstructured_grid/unstructured_grid_tbb_flow /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/unstructured_grid/unstructured_grid_tbb_flow.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -litm -ladf_omp -ltbb -lpthread -lsfftw
+
+
+Compiling ADF_SEQUENTIAL library
+====================================
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl -DSEQUENTIAL  /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src/common.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/seq/common.o
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl -DSEQUENTIAL  /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src/statistics.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/seq/statistics.o
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl -DSEQUENTIAL  /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src/adf.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/seq/adf.o
+ar rcs /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib/libadf_seq.a /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/seq/common.o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/seq/statistics.o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/obj/seq/adf.o
+
+
+Compiling sequential applications
+=============================
+
+
+branch_bound_seq
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl -DSEQUENTIAL  -DSEQUENTIAL  /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/branch_bound/branch_bound_seq.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/branch_bound/branch_bound_seq.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/branch_bound/branch_bound_seq /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/branch_bound/branch_bound_seq.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -ladf_seq -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -ladf_seq -lsfftw
+
+dense_algebra_seq
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl -DSEQUENTIAL  -DSEQUENTIAL  /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/dense_algebra/dense_algebra_seq.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/dense_algebra/dense_algebra_seq.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/dense_algebra/dense_algebra_seq /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/dense_algebra/dense_algebra_seq.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -ladf_seq -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -ladf_seq -lsfftw
+
+finite_state_machine_seq
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl -DSEQUENTIAL  -DSEQUENTIAL  /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/finite_state_machine/finite_state_machine_seq.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/finite_state_machine/finite_state_machine_seq.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/finite_state_machine/finite_state_machine_seq /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/finite_state_machine/finite_state_machine_seq.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -ladf_seq -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -ladf_seq -lsfftw
+
+graph_models_seq
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl -DSEQUENTIAL  -DSEQUENTIAL  /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/graph_models/graph_models_seq.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/graph_models/graph_models_seq.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/graph_models/graph_models_seq /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/graph_models/graph_models_seq.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -ladf_seq -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -ladf_seq -lsfftw
+
+map_reduce_seq
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl -DSEQUENTIAL  -DSEQUENTIAL  /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/map_reduce/map_reduce_seq.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/map_reduce/map_reduce_seq.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/map_reduce/map_reduce_seq /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/map_reduce/map_reduce_seq.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -ladf_seq -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -ladf_seq -lsfftw
+
+sparse_algebra_seq
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl -DSEQUENTIAL  -DSEQUENTIAL  /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/sparse_algebra/sparse_algebra_seq.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/sparse_algebra/sparse_algebra_seq.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/sparse_algebra/sparse_algebra_seq /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/sparse_algebra/sparse_algebra_seq.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -ladf_seq -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -ladf_seq -lsfftw
+
+spectral_methods_seq
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl -DSEQUENTIAL  -DSEQUENTIAL  /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/spectral_methods/spectral_methods_seq.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/spectral_methods/spectral_methods_seq.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/spectral_methods/spectral_methods_seq /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/spectral_methods/spectral_methods_seq.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -ladf_seq -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -ladf_seq -lsfftw
+
+structured_grid_seq
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl -DSEQUENTIAL  -DSEQUENTIAL  /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/structured_grid/structured_grid_seq.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/structured_grid/structured_grid_seq.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/structured_grid/structured_grid_seq /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/structured_grid/structured_grid_seq.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -ladf_seq -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -ladf_seq -lsfftw
+
+unstructured_grid_seq
+-------------------
+
+g++ -c -Wall -O3 -Wno-unused-but-set-variable -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/src -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include -I/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/include/stm_stl -DSEQUENTIAL  -DSEQUENTIAL  /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/unstructured_grid/unstructured_grid_seq.cpp -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/unstructured_grid/unstructured_grid_seq.o
+g++ -o /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/unstructured_grid/unstructured_grid_seq /home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/dwarfs/unstructured_grid/unstructured_grid_seq.o -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -ladf_seq -L/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/benchmarks/lib -ladf_seq -lsfftw

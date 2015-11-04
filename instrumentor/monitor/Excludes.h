@@ -53,19 +53,81 @@ namespace INS {
      "adf_create_task" 
    };
 
-   bool DontInstrument(StringRef &name) const {
-     //errs() << name << "\n";
+   bool DontInstrument(StringRef name) {
      int status = -1;
      string name_(name.str());
      char* d =abi::__cxa_demangle(name_.c_str(), nullptr, nullptr, &status);
       if(! status) {
        StringRef ab(d);
        string dname(d);
-       if(dname.find("fwd(") != string::npos) {
-         errs() << ab << "\n";
+       //errs() << ab << "\n";
+       if(dname.find("_call(") != string::npos||dname.find("_create(") != string::npos) {
          return false;
        }
      }
-     return true;
+      return false;
+     //return true;
+   }
+   
+   StringRef demangleName(StringRef name)
+   {
+      int status = -1;
+      string name_(name.str());
+      char* d =abi::__cxa_demangle(name_.c_str(), nullptr, nullptr, &status);
+      if(! status) {
+        StringRef ab(d);
+        return ab;
+      }
+      return name;
+   }
+
+   string Demangle(StringRef name) 
+   {
+      int status = -1;
+      char* d =abi::__cxa_demangle(name.str().c_str(), nullptr, nullptr, &status);
+      if(! status) {
+        string dname(d);
+        return dname;
+      }
+      return string("");
+   }
+
+   bool isTaskBodyFunction(StringRef name) {
+    
+     int status = -1;
+     char* d =abi::__cxa_demangle(name.str().c_str(), nullptr, nullptr, &status);
+     if(! status) {
+       string dname(d);
+       //if(dname.find("std::function<void (token_s*)>::function") != string::npos 
+       //            || dname.find("create_task") != string::npos || dname.find("luTask") != string::npos)
+       if(dname.find("::operator()(token_s*) const") != string::npos)
+         return true;
+     }
+     return false;
+   }
+
+   bool isLLVMCall(StringRef name) {
+      if(name.find("llvm") != StringRef::npos)
+        return true;
+      return false;
+     /*int status = -1;
+     char* d =abi::__cxa_demangle(name.str().c_str(), nullptr, nullptr, &status);
+     if(! status) {
+       string dname(d);
+       errs() << "What: " << name << "\n";
+       errs() << "But how: " << dname << "\n";
+       if(dname.find("llvm") != string::npos) {
+         errs() << "Da eeeH: " <<  name << "\n";
+         return true;  
+       }
+     }
+     else
+       errs() << "Failed: " << name << "\n";
+     return false;*/
+   }
+
+   bool isPassTokenFunc(StringRef name) {
+
+     return name.find("adf_pass_token") !=StringRef::npos;
    }
 }
