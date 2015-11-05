@@ -4,7 +4,7 @@ using namespace std;
 extern "C" {
 
 // callbacks at creation of task
-void AdfCreateTask(void **intokens);
+void AdfCreateTask(void **intokens, void* fn);
 
 // callbacks for tokens
 void regInToken(void * tokenAddr, unsigned long size);
@@ -28,9 +28,9 @@ void toolVptrLoad(void *addr, void * value);
 void hassanFun(void * addr, int value);
 };
 
-void AdfCreateTask(void**intokens) {
+void AdfCreateTask(void**intokens, void* fn) {
    if(intokens)
-     cout << "IN-TOKEN: " << *intokens << endl;
+     cout << "IN-TOKEN: " << *intokens << " Function: "<< fn<<  endl;
 }
 
 void regInToken(void * tokenAddr, unsigned long size)
@@ -55,12 +55,12 @@ void hassanFun(void * addr, int value) {
 }
 
 void taskStartFunc(void* addr) {
-  cout << "Task started, (return address : " << addr <<")"<< endl;
+  cout << "Task_Started, (return address : " << addr <<")"<< endl;
 }
 
 
 void taskFinishFunc(void* addr) {
-  cout << "Task Ended: (" << addr << ")"<< endl;
+  cout << "Task_Ended: (" << addr << ")"<< endl;
 }
 
 void toolVptrUpdate(void *addr, void * value) {

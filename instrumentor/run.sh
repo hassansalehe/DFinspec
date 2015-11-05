@@ -1,7 +1,7 @@
 #!/bin/bash
 export LLVM_DIR=/usr/bin/llvm-3.8/share/llvm/cmake
 HOME=`pwd`
-#mkdir -p instrumentor/build/
+mkdir -p build
 cd build/
 #rm -rf *
 rm monitor/libADFInstrumentationPass.so

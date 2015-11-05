@@ -352,7 +352,7 @@ static bool isAtomic(Instruction *I) {
   bool isTaskBody = INS::isTaskBodyFunction( F.getName() );
   
   if(isTaskBody) { 
-     errs() << "BODY: "<< INS::demangleName(F.getName()) << "\n";
+     errs() << "BODY: " << &F << " " << INS::demangleName(F.getName()) << "\n";
      errs() << "PARENT: " << F.getParent()->getName() << "\n";
      getInTokens(F);
   }else
@@ -446,11 +446,37 @@ static bool isAtomic(Instruction *I) {
           {
             IRBuilder<> IRB(&Inst);
             IRB.CreateCall(AdfCreateTask,
-              {IRB.CreatePointerCast(M->getArgOperand(2), IRB.getInt8PtrTy())//,
-               //IRB.CreatePointerCast(M->getArgOperand(1), IRB.getInt8PtrTy()),
+              {IRB.CreatePointerCast(M->getArgOperand(2), IRB.getInt8PtrTy()),
+               IRB.CreatePointerCast(M->getArgOperand(3), IRB.getInt8PtrTy())//,
                //IRB.CreateIntCast(M->getArgOperand(2), IntptrTy, false)
               });
 
+              auto xx = calledF->arg_begin();
+              int o=0;
+              for(;xx != calledF->arg_end(); xx++)
+              {
+                   o++;
+                   Value *x = xx; 
+                   errs() << "ARG: ";
+                   x->dump();
+                   if(o==4) {
+		     CallInst * CI = dyn_cast<CallInst>(x);
+		     if(CI) {
+		      Function *fn = dyn_cast<Function>(CI->getCalledFunction()->stripPointerCasts());
+		      if(fn) {
+			errs() <<"GGG" << x << "\n";
+			IRBuilder<> F_IRB(fn->getEntryBlock().getFirstNonPHI());
+			
+			F_IRB.CreateCall(taskStartFunc, 
+			  {F_IRB.CreatePointerCast(M->getArgOperand(2), F_IRB.getInt8PtrTy())
+			  });
+		      }
+		     }
+                   }
+
+                   //if(isa<IntegerType>(&*xx))
+                   //errs() << x->getType()->getName() << "\n"; 
+              }
           }
         }
 
