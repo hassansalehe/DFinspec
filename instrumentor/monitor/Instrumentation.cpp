@@ -72,6 +72,9 @@ namespace {
      Function *regInToken;
      Function *regOutToken;
 
+     // callback for task creation
+     Function *AdfCreateTask;
+
 //   // Accesses sizes are powers of two: 1, 2, 4, 8, 16.
    static const size_t kNumberOfAccessSizes = 5;
   Function *TsanRead[kNumberOfAccessSizes];
@@ -117,12 +120,16 @@ static RegisterStandardPasses
   // Initialize the callbacks.
 
 
-// callbacks for tokens collection
-regInToken = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
+  // callbacks for tokens collection
+  regInToken = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
       "regInToken", IRB.getVoidTy(), IRB.getInt8PtrTy(),  IRB.getInt8Ty(), nullptr));
 
-regOutToken = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
+  regOutToken = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
       "regOutToken", IRB.getVoidTy(), IRB.getInt8PtrTy(),  IRB.getInt8PtrTy(), IntptrTy, nullptr));
+
+  // callback for task creation
+ AdfCreateTask = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
+      "AdfCreateTask", IRB.getVoidTy(), IRB.getInt8PtrTy(),  nullptr));
 
 
   taskStartFunc = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
@@ -435,13 +442,14 @@ static bool isAtomic(Instruction *I) {
           errs() << "  INVOKE: " << INS::demangleName(calledF->getName()) << "\n";
           if(!calledF)
             continue;
-          if(isTaskBody && INS::isPassTokenFunc(calledF->getName()))
+          if(INS::isTaskCreationFunc(calledF->getName()))
           {
             IRBuilder<> IRB(&Inst);
-            IRB.CreateCall(regOutToken,
-              {IRB.CreatePointerCast(M->getArgOperand(0), IRB.getInt8PtrTy()),
-               IRB.CreatePointerCast(M->getArgOperand(1), IRB.getInt8PtrTy()),
-               IRB.CreateIntCast(M->getArgOperand(2), IntptrTy, false)});
+            IRB.CreateCall(AdfCreateTask,
+              {IRB.CreatePointerCast(M->getArgOperand(2), IRB.getInt8PtrTy())//,
+               //IRB.CreatePointerCast(M->getArgOperand(1), IRB.getInt8PtrTy()),
+               //IRB.CreateIntCast(M->getArgOperand(2), IntptrTy, false)
+              });
 
           }
         }

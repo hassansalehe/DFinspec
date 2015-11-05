@@ -2,6 +2,10 @@
 using namespace std;
 
 extern "C" {
+
+// callbacks at creation of task
+void AdfCreateTask(void **intokens);
+
 // callbacks for tokens
 void regInToken(void * tokenAddr, unsigned long size);
 void regOutToken(void * bufferAddr, void * tokenAddr, unsigned long size);
@@ -24,6 +28,11 @@ void toolVptrLoad(void *addr, void * value);
 void hassanFun(void * addr, int value);
 };
 
+void AdfCreateTask(void**intokens) {
+   if(intokens)
+     cout << "IN-TOKEN: " << *intokens << endl;
+}
+
 void regInToken(void * tokenAddr, unsigned long size)
 {
    long int token = -1;
@@ -37,7 +46,7 @@ void regOutToken(void * bufferAddr, void * tokenAddr, unsigned long size)
    long int token = -1;
    if( size == sizeof(int))
      token = *(static_cast<int *>(tokenAddr));
-   cout << "Out Token: " << token << " addr: " << *(static_cast<int *>(bufferAddr)) << endl;
+   cout << "Out Token: " << token << " addr: " << (static_cast<int *>(bufferAddr)) << endl;
 }
 
 

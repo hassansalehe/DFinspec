@@ -130,4 +130,9 @@ namespace INS {
 
      return name.find("adf_pass_token") !=StringRef::npos;
    }
+
+   bool isTaskCreationFunc(StringRef name) {
+
+     return name.find("adf_create_task") != StringRef::npos;
+   }
 }
