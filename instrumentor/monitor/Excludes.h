@@ -1,3 +1,6 @@
+#ifndef EXCLUDES_H_P_P
+#define EXCLUDES_H_P_P
+
 #include "llvm/IR/Function.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/InstrTypes.h"
@@ -136,3 +139,5 @@ namespace INS {
      return name.find("adf_create_task") != StringRef::npos;
    }
 }
+
+#endif
