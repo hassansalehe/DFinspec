@@ -78,7 +78,7 @@ OMPAPPS_OPT = $(addsuffix _omp_opt, $(APPS_COMMON))
 # dwarfs
 # -------------------------------------------
 
-DWARFS_COMMON = $(DWARFDIR)/sparse_algebra/sparse_algebra
+DWARFS_COMMON = #$(DWARFDIR)/sparse_algebra/sparse_algebra
 #		$(DWARFDIR)/branch_bound/branch_bound                      \
 #		$(DWARFDIR)/dense_algebra/dense_algebra                            \
 #		$(DWARFDIR)/finite_state_machine/finite_state_machine              \
