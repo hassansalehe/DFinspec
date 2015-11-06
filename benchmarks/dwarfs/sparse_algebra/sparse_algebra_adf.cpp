@@ -794,10 +794,10 @@ void ParseCommandLine(int argc, char **argv)
 	}
 
 	if(num_blocks < 4)
-		num_blocks = 4;
+		num_blocks = 3;//4;
 
 	if(block_size < 16)
-		block_size = 16;
+		block_size = 2;//16;
 
 	printf ("\nStarting ADF Sparse Algebra.\n");
 	printf ("Input file %s\n", input_file_name);
