@@ -29,24 +29,40 @@ void hassanFun(void * addr, int value);
 };
 
 void AdfCreateTask(void**intokens, void* fn) {
-   if(intokens)
-     cout << "IN-TOKEN: " << *intokens << " Function: "<< fn<<  endl;
+//   if(intokens)
+//     cout << "IN-TOKEN: " << *intokens << " Function: "<< fn<<  endl;
 }
+
+long int getTokenValue(void *addr, unsigned long size)
+{
+  if( size == sizeof(char) )
+     return *(static_cast<char *>(addr));
+  
+  if( size == sizeof(short) )
+     return *(static_cast<short *>(addr));
+
+  if( size == sizeof(int) )
+     return *(static_cast<int *>(addr));
+  
+  if( size == sizeof(long) )
+     return *(static_cast<long *>(addr));
+
+   if( size == sizeof(long long) )
+     return *(static_cast<long long *>(addr));
+   return -1;
+}
+
 
 void regInToken(void * tokenAddr, unsigned long size)
 {
-   long int token = -1;
-   if( size == sizeof(int) )
-     token = *(static_cast<int *>(tokenAddr));
-   cout << "In  Token: " << token << " addr: " << tokenAddr << endl;
+   long int token = getTokenValue(tokenAddr, size);
+   cout << "InToken: " << token << " addr: " << tokenAddr << endl;
 }
 
 void regOutToken(void * bufferAddr, void * tokenAddr, unsigned long size)
 {
-   long int token = -1;
-   if( size == sizeof(int))
-     token = *(static_cast<int *>(tokenAddr));
-   cout << "Out Token: " << token << " addr: " << (static_cast<int *>(bufferAddr)) << endl;
+   long int token = getTokenValue(tokenAddr, size);
+   cout << "OutToken: " << token << " addr: " << bufferAddr << endl;
 }
 
 
