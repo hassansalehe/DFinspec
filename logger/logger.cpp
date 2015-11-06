@@ -24,6 +24,9 @@
 std::mutex guardLock;
 
 ////pthread_mutex_t g_lock;
+#ifdef __cplusplus
+extern "C" { // callbacks should not be mangled
+#endif
 
 // static attributes redefined
 FILEPTR INS::logger;
@@ -179,5 +182,10 @@ VOID INS::Write(INTEGER taskID, ADDRESS addr, INTEGER value)
   logger << taskID << " " << funcNames[taskID] << " WR "<< addr << " " << value << endl;
   guardLock.unlock();
 }
+
+#ifdef __cplusplus
+} // end extern "C"
+#endif
+
 #endif
 

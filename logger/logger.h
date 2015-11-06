@@ -27,6 +27,10 @@ This is a logger for all events in an ADF application
 
 using namespace std;
 
+#ifdef __cplusplus
+extern "C" { // callbacks should not be mangled
+#endif
+
 typedef        void  VOID;
 typedef      void *  ADDRESS;
 typedef    ofstream  FILEPTR;
@@ -34,7 +38,6 @@ typedef    long int  INTEGER;
 typedef const char*  STRING;
 typedef    set<int>  INTSET;
 typedef vector<int>  INTVECTOR;
-
 
 class INS {
 
@@ -79,5 +82,9 @@ class INS {
     // keeping track of the last reader from a memory location
     static unordered_map<ADDRESS, INTEGER> lastReader;
 };
+
+#ifdef __cplusplus
+} // end extern "C"
+#endif
 
 #endif
