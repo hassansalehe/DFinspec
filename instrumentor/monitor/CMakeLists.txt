@@ -1,6 +1,6 @@
 add_library(ADFInstrumentationPass MODULE
     # List your source files here.
-    Instrumentation.cpp
+    AdfInstrumentor.cpp
 )
 
 add_library(ADFTokenDetectorPass MODULE

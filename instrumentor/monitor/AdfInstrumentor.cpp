@@ -49,7 +49,7 @@ namespace {
    bool runOnFunction(Function &F) override;
    bool doInitialization(Module &M) override;
    static char ID;  // Instrumentation Pass identification, replacement for typeid.
- 
+
  private:
    void initializeCallbacks(Module &M);
    bool instrumentLoadOrStore(Instruction *I, const DataLayout &DL);
@@ -60,16 +60,16 @@ namespace {
                                       const DataLayout &DL);
    bool addrPointsToConstantData(Value *Addr);
    int getMemoryAccessFuncIndex(Value *Addr, const DataLayout &DL);
- 
+
    Type *IntptrTy;
    IntegerType *OrdTy;
 //   // Callbacks to run-time library are computed in doInitialization.
-     Function *taskStartFunc;
-     Function *taskFinishFunc;
+     Function *INS_TaskStartFunc;
+     Function *INS_TaskFinishFunc;
 
      // callbacks for registering tokens
-     Function *regInToken;
-     //Function *regOutToken;
+     Function *INS_RegInToken;
+     //Function *INS_RegOutToken;
 
      // callback for task creation
      Function *AdfCreateTask;
@@ -77,7 +77,7 @@ namespace {
 //   // Accesses sizes are powers of two: 1, 2, 4, 8, 16.
    static const size_t kNumberOfAccessSizes = 5;
   Function *TsanRead[kNumberOfAccessSizes];
-  Function *TsanWrite[kNumberOfAccessSizes];
+  Function *INS_MemWrite[kNumberOfAccessSizes];
   Function *TsanUnalignedRead[kNumberOfAccessSizes];
   Function *TsanUnalignedWrite[kNumberOfAccessSizes];
   Function *TsanAtomicLoad[kNumberOfAccessSizes];
@@ -92,14 +92,14 @@ namespace {
 //   Function *TsanCtorFunction;
  };
  }  // namespace
-// 
+//
  char AdfSanitizer::ID = 0;
-// 
+//
  const char *AdfSanitizer::getPassName() const {
    return "AdfSanitizer";
  }
- 
-// 
+
+//
 // FunctionPass *llvm::createAdfSanitizerPass() {
 //   return new AdfSanitizer();
 // }
@@ -113,41 +113,41 @@ static void registerAdfSanitizer(const PassManagerBuilder &,
 static RegisterStandardPasses
   RegisterMyPass(PassManagerBuilder::EP_EarlyAsPossible,
                  registerAdfSanitizer);
- 
+
  void AdfSanitizer::initializeCallbacks(Module &M) {
    IRBuilder<> IRB(M.getContext());
   // Initialize the callbacks.
 
 
   // callbacks for tokens collection
-  regInToken = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
-      "regInToken", IRB.getVoidTy(), IRB.getInt8PtrTy(),  IRB.getInt8Ty(), nullptr));
+  INS_RegInToken = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
+      "INS_RegInToken", IRB.getVoidTy(), IRB.getInt8PtrTy(),  IRB.getInt8Ty(), nullptr));
 
-  //regOutToken = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
-  //    "regOutToken", IRB.getVoidTy(), IRB.getInt8PtrTy(),  IRB.getInt8PtrTy(), IntptrTy, nullptr));
+  //INS_RegOutToken = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
+  //    "INS_RegOutToken", IRB.getVoidTy(), IRB.getInt8PtrTy(),  IRB.getInt8PtrTy(), IntptrTy, nullptr));
 
   // callback for task creation
  AdfCreateTask = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
       "AdfCreateTask", IRB.getVoidTy(), IRB.getInt8PtrTy(),  nullptr));
 
 
-  taskStartFunc = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
-      "taskStartFunc", IRB.getVoidTy(), IRB.getInt8PtrTy(), nullptr));
-  taskFinishFunc = checkSanitizerInterfaceFunction(
-      M.getOrInsertFunction("taskFinishFunc", IRB.getVoidTy(), nullptr));
+  INS_TaskStartFunc = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
+      "INS_TaskStartFunc", IRB.getVoidTy(), IRB.getInt8PtrTy(), nullptr));
+  INS_TaskFinishFunc = checkSanitizerInterfaceFunction(
+      M.getOrInsertFunction("INS_TaskFinishFunc", IRB.getVoidTy(), nullptr));
   OrdTy = IRB.getInt32Ty();
   for (size_t i = 0; i < kNumberOfAccessSizes; ++i) {
     const unsigned ByteSize = 1U << i;
     const unsigned BitSize = ByteSize * 8;
     std::string ByteSizeStr = utostr(ByteSize);
     std::string BitSizeStr = utostr(BitSize);
-    SmallString<32> ReadName("AdfMemRead" + ByteSizeStr);
+    SmallString<32> ReadName("INS_AdfMemRead" + ByteSizeStr);
     TsanRead[i] = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
         ReadName, IRB.getVoidTy(), IRB.getInt8PtrTy(), nullptr));
 
-    SmallString<32> WriteName("AdfMemWrite" + ByteSizeStr);
-    TsanWrite[i] = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
-        WriteName, IRB.getVoidTy(), IRB.getInt8PtrTy(), nullptr));
+    SmallString<32> WriteName("INS_AdfMemWrite" + ByteSizeStr);
+    INS_MemWrite[i] = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
+        WriteName, IRB.getVoidTy(), IRB.getInt8PtrTy(), IRB.getInt8PtrTy(), nullptr));
 
     SmallString<64> UnalignedReadName("__tsan_unaligned_read" + ByteSizeStr);
     TsanUnalignedRead[i] =
@@ -225,7 +225,7 @@ static RegisterStandardPasses
 
  }
 
- 
+
  bool AdfSanitizer::doInitialization(Module &M) {
    errs() << "Hi my student "<< M.getName()<< "\n";
    //for (Function &F : M)
@@ -239,9 +239,9 @@ static RegisterStandardPasses
 //   std::tie(TsanCtorFunction, std::ignore) = createSanitizerCtorAndInitFunctions(
 //       M, kTsanModuleCtorName, kTsanInitName, /*InitArgTypes=*/{},
 //       /*InitArgs=*/{});
-// 
+//
 //   appendToGlobalCtors(M, TsanCtorFunction, 0);
-// 
+//
 //   return true;
    return false;
  }
@@ -251,7 +251,7 @@ static bool isVtableAccess(Instruction *I) {
     return Tag->isTBAAVtableAccess();
   return false;
 }
- 
+
 bool AdfSanitizer::addrPointsToConstantData(Value *Addr) {
   // If this is a GEP, just analyze its pointer operand.
   if (GetElementPtrInst *GEP = dyn_cast<GetElementPtrInst>(Addr))
@@ -345,30 +345,31 @@ static bool isAtomic(Instruction *I) {
      return false;
 
   bool isTaskBody = INS::isTaskBodyFunction( F.getName() );
-  
-  if(isTaskBody) { 
+/*
+  if(isTaskBody) {
      errs() << "BODY: " << &F << " " << INS::demangleName(F.getName()) << "\n";
      errs() << "PARENT: " << F.getParent()->getName() << "\n";
   }else
      errs() << "START: "<< INS::demangleName(F.getName()) << "\n";
+*/
   //else return false;
-   /*  
+   /*
    if ( isTaskBodyFunction(F) ) {
        instrumentReturns(F);
-       instrumentOutTokens();       
-       
+       instrumentOutTokens();
+
    }
-  //SymbolTableList<Argument> attSet = 
+  //SymbolTableList<Argument> attSet =
 
   auto xx = F.arg_begin();
   for(;xx != F.arg_end();xx++)
   {
-     Value *x = xx; 
+     Value *x = xx;
      x->dump();
      //if(isa<IntegerType>(&*xx))
-        //errs() << x->getType() << "\n"; 
+        //errs() << x->getType() << "\n";
   }
-  errs() << "ARGUMENT LENGTH " << F.arg_size() << "\n"; 
+  errs() << "ARGUMENT LENGTH " << F.arg_size() << "\n";
 //   if (&F == TsanCtorFunction)
 //     return false;
 //   errs() << F.getName() << "\n";
@@ -387,7 +388,7 @@ static bool isAtomic(Instruction *I) {
 //   // Traverse all instructions, collect loads/stores/returns, check for calls.
   for (auto &BB : F) {
     for (auto &Inst : BB) {
-      Inst.dump();
+      //Inst.dump();
       if (isAtomic(&Inst))
         AtomicAccesses.push_back(&Inst);
       else if (isa<LoadInst>(Inst) || isa<StoreInst>(Inst))
@@ -402,20 +403,20 @@ static bool isAtomic(Instruction *I) {
           CallInst *M = dyn_cast<CallInst>(&Inst);
           Function *calledF = M->getCalledFunction();
           if(calledF)
-          errs() << "  CALL: " << INS::demangleName(calledF->getName()) << "\n";
+          //errs() << "  CALL: " << INS::demangleName(calledF->getName()) << "\n";
           if(!calledF)
             continue;
           /*
           if(isTaskBody && INS::isPassTokenFunc(calledF->getName()))
           {
             IRBuilder<> IRB(&Inst);
-            IRB.CreateCall(regOutToken,
+            IRB.CreateCall(INS_RegOutToken,
               {IRB.CreatePointerCast(M->getArgOperand(0), IRB.getInt8PtrTy()),
                IRB.CreatePointerCast(M->getArgOperand(1), IRB.getInt8PtrTy()),
                IRB.CreateIntCast(M->getArgOperand(2), IntptrTy, false)});
 
-          } 
-          if(calledF && calledF->arg_begin() != calledF->arg_end() && ! INS::isTaskBodyFunction(calledF->getName())) { 
+          }
+          if(calledF && calledF->arg_begin() != calledF->arg_end() && ! INS::isTaskBodyFunction(calledF->getName())) {
             IRBuilder<> IRB(&Inst);
             if(calledF->arg_size() >= 2 && !INS::isLLVMCall(calledF->getName())) {
               errs() << "A CALL INSTRUCTION TO "<< INS::demangleName(calledF->getName()) << "\n";
@@ -432,8 +433,8 @@ static bool isAtomic(Instruction *I) {
         {
           InvokeInst *M = dyn_cast<InvokeInst>(&Inst);
           Function *calledF = M->getCalledFunction();
-          if(calledF)
-          errs() << "  INVOKE: " << INS::demangleName(calledF->getName()) << "\n";
+          //if(calledF)
+          //errs() << "  INVOKE: " << INS::demangleName(calledF->getName()) << "\n";
           if(!calledF)
             continue;
           if(INS::isTaskCreationFunc(calledF->getName()))
@@ -450,9 +451,9 @@ static bool isAtomic(Instruction *I) {
               for(;xx != calledF->arg_end(); xx++)
               {
                    o++;
-                   Value *x = xx; 
+                   Value *x = xx;
                    errs() << "ARG: ";
-                   x->dump();
+                   //x->dump();
                    if(o==4) {
 		     CallInst * CI = dyn_cast<CallInst>(x);
 		     if(CI) {
@@ -460,8 +461,8 @@ static bool isAtomic(Instruction *I) {
 		      if(fn) {
 			errs() <<"GGG" << x << "\n";
 			IRBuilder<> F_IRB(fn->getEntryBlock().getFirstNonPHI());
-			
-			F_IRB.CreateCall(taskStartFunc, 
+
+			F_IRB.CreateCall(INS_TaskStartFunc,
 			  {F_IRB.CreatePointerCast(M->getArgOperand(2), F_IRB.getInt8PtrTy())
 			  });
 		      }
@@ -469,7 +470,7 @@ static bool isAtomic(Instruction *I) {
                    }
 
                    //if(isa<IntegerType>(&*xx))
-                   //errs() << x->getType()->getName() << "\n"; 
+                   //errs() << x->getType()->getName() << "\n";
               }
           }
         }
@@ -478,8 +479,8 @@ static bool isAtomic(Instruction *I) {
           MemIntrinCalls.push_back(&Inst);
           CallInst *M = dyn_cast<MemIntrinsic>(&Inst);
           Function *calledF = M->getCalledFunction();
-          if(calledF)
-          errs() << "  MEM CALL: " << INS::demangleName(calledF->getName()) << "\n";
+          //if(calledF)
+          //errs() << "  MEM CALL: " << INS::demangleName(calledF->getName()) << "\n";
 
         }
         HasCalls = true;
@@ -508,19 +509,19 @@ static bool isAtomic(Instruction *I) {
 
   //!HASSAN if (ClInstrumentMemIntrinsics && SanitizeFunction)
     for (auto Inst : MemIntrinCalls) {
-      
+
       MemTransferInst *M = dyn_cast<MemTransferInst>(Inst);
       if (isTaskBody && M) {
 	IRBuilder<> IRB(Inst);
-	errs() << "memTransfer HHHHHHHHHHHHHHHHH";
-	Inst->dump();
-	// for accessing tokens 
-	IRB.CreateCall(regInToken,
+	//errs() << "memTransfer HHHHHHHHHHHHHHHHH";
+	//Inst->dump();
+	// for accessing tokens
+	IRB.CreateCall(INS_RegInToken,
 	    {//IRB.CreatePointerCast(M->getArgOperand(0), IRB.getInt8PtrTy()),
 	    IRB.CreatePointerCast(M->getArgOperand(1), IRB.getInt8PtrTy()),
 	    IRB.CreateIntCast(M->getArgOperand(2), IntptrTy, false)});
       }
-      
+
       Res |= instrumentMemIntrinsic(Inst);
     }
 
@@ -530,11 +531,11 @@ static bool isAtomic(Instruction *I) {
     IRBuilder<> IRB(F.getEntryBlock().getFirstNonPHI());
     Value *ReturnAddress = IRB.CreateCall(Intrinsic::getDeclaration(F.getParent(), Intrinsic::returnaddress),
                                          IRB.getInt32(0));
-    IRB.CreateCall(taskStartFunc, ReturnAddress);
+    IRB.CreateCall(INS_TaskStartFunc, ReturnAddress);
     if(isTaskBody) {  // instrument returns of a task body to track when it finishes.
       for (auto RetInst : RetVec) {
         IRBuilder<> IRBRet(RetInst);
-        IRBRet.CreateCall(taskFinishFunc, {});
+        IRBRet.CreateCall(INS_TaskFinishFunc, {});
       }
     }
     Res = true;
@@ -548,12 +549,13 @@ bool AdfSanitizer::instrumentLoadOrStore(Instruction *I, const DataLayout &DL) {
   Value *Addr = IsWrite
       ? cast<StoreInst>(I)->getPointerOperand()
       : cast<LoadInst>(I)->getPointerOperand();
+
   int Idx = getMemoryAccessFuncIndex(Addr, DL);
  if (Idx < 0)
     return false;
   // HASSAN
-  if (Idx >= 3) I->dump();
-  
+  //if (Idx >= 3) I->dump();
+
   if (IsWrite && isVtableAccess(I)) {
    // DEBUG(dbgs() << "  VPTR : " << *I << "\n");
     Value *StoredValue = cast<StoreInst>(I)->getValueOperand();
@@ -578,17 +580,27 @@ bool AdfSanitizer::instrumentLoadOrStore(Instruction *I, const DataLayout &DL) {
     //NumInstrumentedVtableReads++;
     return true;
   }
-  const unsigned Alignment = IsWrite
-      ? cast<StoreInst>(I)->getAlignment()
-      : cast<LoadInst>(I)->getAlignment();
+  const unsigned Alignment = IsWrite ? cast<StoreInst>(I)->getAlignment() : cast<LoadInst>(I)->getAlignment();
   Type *OrigTy = cast<PointerType>(Addr->getType())->getElementType();
   const uint32_t TypeSize = DL.getTypeStoreSizeInBits(OrigTy);
   Value *OnAccessFunc = nullptr;
   if (Alignment == 0 || Alignment >= 8 || (Alignment % (TypeSize / 8)) == 0)
-    OnAccessFunc = IsWrite ? TsanWrite[Idx] : TsanRead[Idx];
+    OnAccessFunc = IsWrite ? INS_MemWrite[Idx] : TsanRead[Idx];
   else
     OnAccessFunc = IsWrite ? TsanUnalignedWrite[Idx] : TsanUnalignedRead[Idx];
-  IRB.CreateCall(OnAccessFunc, IRB.CreatePointerCast(Addr, IRB.getInt8PtrTy()));
+
+  if(IsWrite)
+  {
+
+    I->dump();
+    Value *Val = cast<StoreInst>(I)->getValueOperand();
+    IRB.CreateCall(OnAccessFunc,
+		 {IRB.CreatePointerCast(Addr, IRB.getInt8PtrTy()),
+		   IRB.CreatePointerCast(Val, Val->getType())});
+
+  }else
+    IRB.CreateCall(OnAccessFunc,
+		 {IRB.CreatePointerCast(Addr, IRB.getInt8PtrTy())});
   //if (IsWrite) NumInstrumentedWrites++;
   //else         NumInstrumentedReads++;
   return true;
@@ -626,7 +638,7 @@ bool AdfSanitizer::instrumentMemIntrinsic(Instruction *I) {
         {IRB.CreatePointerCast(M->getArgOperand(0), IRB.getInt8PtrTy()),
          IRB.CreateIntCast(M->getArgOperand(1), IRB.getInt32Ty(), false),
          IRB.CreateIntCast(M->getArgOperand(2), IntptrTy, false)});
-    
+
     I->eraseFromParent();
   } else if (MemTransferInst *M = dyn_cast<MemTransferInst>(I)) {
     IRB.CreateCall(
@@ -647,7 +659,7 @@ bool AdfSanitizer::instrumentMemIntrinsic(Instruction *I) {
 // // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2011/n3242.pdf
 // // The following page contains more background information:
 // // http://www.hpl.hp.com/personal/Hans_Boehm/c++mm/
-// 
+//
 bool AdfSanitizer::instrumentAtomic(Instruction *I, const DataLayout &DL) {
   IRBuilder<> IRB(I);
   if (LoadInst *LI = dyn_cast<LoadInst>(I)) {
@@ -663,7 +675,7 @@ bool AdfSanitizer::instrumentAtomic(Instruction *I, const DataLayout &DL) {
 //                      createOrdering(&IRB, LI->getOrdering())};
 //     CallInst *C = CallInst::Create(TsanAtomicLoad[Idx], Args);
 //     ReplaceInstWithInst(I, C);
-// 
+//
    } else if (StoreInst *SI = dyn_cast<StoreInst>(I)) {
 //     Value *Addr = SI->getPointerOperand();
 //     int Idx = getMemoryAccessFuncIndex(Addr, DL);
@@ -711,10 +723,10 @@ bool AdfSanitizer::instrumentAtomic(Instruction *I, const DataLayout &DL) {
 //                      createOrdering(&IRB, CASI->getFailureOrdering())};
 //     CallInst *C = IRB.CreateCall(TsanAtomicCAS[Idx], Args);
 //     Value *Success = IRB.CreateICmpEQ(C, CASI->getCompareOperand());
-// 
+//
 //     Value *Res = IRB.CreateInsertValue(UndefValue::get(CASI->getType()), C, 0);
 //     Res = IRB.CreateInsertValue(Res, Success, 1);
-// 
+//
 //     I->replaceAllUsesWith(Res);
 //     I->eraseFromParent();
    } else if (FenceInst *FI = dyn_cast<FenceInst>(I)) {
