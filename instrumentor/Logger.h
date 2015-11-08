@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////
-//  ADFinspec: a lightweight non-determinism checking 
+//  ADFinspec: a lightweight non-determinism checking
 //          tool for ADF applications
 //
 //    (c) 2015 - Hassan Salehe Matar & MSRC at Koc University
-//      Copying or using this code by any means whatsoever 
+//      Copying or using this code by any means whatsoever
 //      without consent of the owner is strictly prohibited.
-//   
+//
 //   Contact: hmatar-at-ku-dot-edu-dot-tr
 //
 /////////////////////////////////////////////////////////////////
@@ -26,10 +26,6 @@ This is a logger for all events in an ADF application
 #include <set>
 
 using namespace std;
-
-#ifdef __cplusplus
-extern "C" { // callbacks should not be mangled
-#endif
 
 typedef        void  VOID;
 typedef      void *  ADDRESS;
@@ -82,9 +78,5 @@ class INS {
     // keeping track of the last reader from a memory location
     static unordered_map<ADDRESS, INTEGER> lastReader;
 };
-
-#ifdef __cplusplus
-} // end extern "C"
-#endif
 
 #endif

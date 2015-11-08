@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////
-//  ADFinspec: a lightweight non-determinism checking 
+//  ADFinspec: a lightweight non-determinism checking
 //          tool for ADF applications
 //
 //    (c) 2015 - Hassan Salehe Matar & MSRC at Koc University
-//      Copying or using this code by any means whatsoever 
+//      Copying or using this code by any means whatsoever
 //      without consent of the owner is strictly prohibited.
-//   
+//
 //   Contact: hmatar-at-ku-dot-edu-dot-tr
 //
 /////////////////////////////////////////////////////////////////
@@ -24,9 +24,6 @@
 std::mutex guardLock;
 
 ////pthread_mutex_t g_lock;
-#ifdef __cplusplus
-extern "C" { // callbacks should not be mangled
-#endif
 
 // static attributes redefined
 FILEPTR INS::logger;
@@ -50,9 +47,9 @@ VOID INS::Init() {
 
   taskIDSeed = 0;
 
-  if(! logger.is_open()) 
+  if(! logger.is_open())
     logger.open("Tracelog.txt",  ofstream::out | ofstream::trunc);
-  if(! HBlogger.is_open()) 
+  if(! HBlogger.is_open())
     HBlogger.open("HBlog.txt",  ofstream::out | ofstream::trunc);
   if(! logger.is_open() || ! HBlogger.is_open())
   {
@@ -60,6 +57,7 @@ VOID INS::Init() {
     cerr << "Exiting ..." << endl;
     exit(EXIT_FAILURE);
   }
+
 }
 
 
@@ -105,7 +103,7 @@ VOID INS::TransactionBegin(INTEGER taskID)
   guardLock.unlock();
 }
 
-VOID INS::TransactionEnd(INTEGER taskID) 
+VOID INS::TransactionEnd(INTEGER taskID)
 {
   guardLock.lock();
   logger << taskID << " "<< funcNames[taskID] << " TM ED" << endl;
@@ -113,7 +111,7 @@ VOID INS::TransactionEnd(INTEGER taskID)
 }
 
 // called when a task starts execution. retrieves parent task id
-VOID INS::TaskStartLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value,  STRING taskName) 
+VOID INS::TaskStartLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value,  STRING taskName)
 {
   guardLock.lock();
     //pthread_mutex_lock(&g_lock);
@@ -125,13 +123,13 @@ VOID INS::TaskStartLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value,  STRIN
 
     logger << taskID << " " << taskName << " ST " << parentID << endl;
     HBlogger << taskID << " " << parentID << endl;
-   
-    // there is a happens before between taskID and parentID: 
+
+    // there is a happens before between taskID and parentID:
     //parentID ---happens-before---> taskID
     if(HB.find(taskID) == HB.end())
       HB[taskID] = INTSET();
     HB[taskID].insert(parentID);
-    
+
     // take the happens-before of the parentID
     if(HB.find(parentID) != HB.end())
       HB[taskID].insert(HB[parentID].begin(), HB[parentID].end());
@@ -139,7 +137,7 @@ VOID INS::TaskStartLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value,  STRIN
     //for(INTSET::iterator pID = HB[taskID].begin(); pID != HB[taskID].end(); pID++)
     //  logger << *pID << " ";
     //logger << endl;
-  } 
+  }
   else {
     logger << taskID << " " << taskName << " ST " << endl;
     }
@@ -148,16 +146,16 @@ VOID INS::TaskStartLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value,  STRIN
 }
 
 
-// called before the task terminates. stores the buffer address and 
+// called before the task terminates. stores the buffer address and
 //the value stored in the buffer for the succeeding task
 VOID INS::TaskEndLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value) {
-  
+
   guardLock.lock();
     //pthread_mutex_lock(&g_lock);
 
   idMap[make_pair(bufLocAddr, value)] = taskID;
   logger << taskID << " " << funcNames[taskID] << " ED" << endl;
-    
+
   guardLock.unlock();
     //pthread_mutex_unlock(&g_lock);
 }
@@ -169,7 +167,6 @@ VOID INS::Read(INTEGER taskID, ADDRESS addr, INTEGER value)
   guardLock.lock();
 
   logger << taskID << " " << funcNames[taskID] << " RD "<< addr << " " << value << endl;
-
   guardLock.unlock();
     //pthread_mutex_unlock(&g_lock);
 }
@@ -182,10 +179,6 @@ VOID INS::Write(INTEGER taskID, ADDRESS addr, INTEGER value)
   logger << taskID << " " << funcNames[taskID] << " WR "<< addr << " " << value << endl;
   guardLock.unlock();
 }
-
-#ifdef __cplusplus
-} // end extern "C"
-#endif
 
 #endif
 

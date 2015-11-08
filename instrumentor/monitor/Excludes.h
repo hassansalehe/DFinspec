@@ -36,7 +36,7 @@ using namespace llvm;
 using namespace std;
 
 namespace INS {
-   StringRef blackList[] = 
+   StringRef blackList[] =
    {
      "Settings::Settings(char*)",
      "Settings::~Settings()",
@@ -53,7 +53,7 @@ namespace INS {
 
    StringRef whiteList[] =
    {
-     "adf_create_task" 
+     "adf_create_task"
    };
 
    bool DontInstrument(StringRef name) {
@@ -64,14 +64,14 @@ namespace INS {
        StringRef ab(d);
        string dname(d);
        //errs() << ab << "\n";
-       if(dname.find("_call(") != string::npos||dname.find("_create(") != string::npos) {
-         return false;
+       if(dname.find("genmat") != string::npos) {
+         return true;
        }
      }
       return false;
      //return true;
    }
-   
+
    StringRef demangleName(StringRef name)
    {
       int status = -1;
@@ -84,7 +84,7 @@ namespace INS {
       return name;
    }
 
-   string Demangle(StringRef name) 
+   string Demangle(StringRef name)
    {
       int status = -1;
       char* d =abi::__cxa_demangle(name.str().c_str(), nullptr, nullptr, &status);
@@ -96,12 +96,12 @@ namespace INS {
    }
 
    bool isTaskBodyFunction(StringRef name) {
-    
+
      int status = -1;
      char* d =abi::__cxa_demangle(name.str().c_str(), nullptr, nullptr, &status);
      if(! status) {
        string dname(d);
-       //if(dname.find("std::function<void (token_s*)>::function") != string::npos 
+       //if(dname.find("std::function<void (token_s*)>::function") != string::npos
        //            || dname.find("create_task") != string::npos || dname.find("luTask") != string::npos)
        if(dname.find("::operator()(token_s*) const") != string::npos)
          return true;
@@ -121,7 +121,7 @@ namespace INS {
        errs() << "But how: " << dname << "\n";
        if(dname.find("llvm") != string::npos) {
          errs() << "Da eeeH: " <<  name << "\n";
-         return true;  
+         return true;
        }
      }
      else
@@ -138,6 +138,14 @@ namespace INS {
 
      return name.find("adf_create_task") != StringRef::npos;
    }
+
+   bool isRuntimeInitializer(StringRef name){
+     return name.find("InitRuntime")!= StringRef::npos;
+   }
+
+  bool isRuntimeTerminator(StringRef name) {
+     return name.find("TerminateRuntime") != StringRef::npos;
+  }
 }
 
 #endif
