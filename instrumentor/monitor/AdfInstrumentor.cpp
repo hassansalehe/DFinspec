@@ -344,15 +344,18 @@ static bool isAtomic(Instruction *I) {
   if (INS::DontInstrument(F.getName()))
      return false;
 
+  bool Res = false;
+  bool HasCalls = false;
   bool isTaskBody = INS::isTaskBodyFunction( F.getName() );
-/*
+
   if(isTaskBody) {
-     errs() << "BODY: " << &F << " " << INS::demangleName(F.getName()) << "\n";
-     errs() << "PARENT: " << F.getParent()->getName() << "\n";
-  }else
-     errs() << "START: "<< INS::demangleName(F.getName()) << "\n";
-*/
-  //else return false;
+    IRBuilder<> IRB(F.getEntryBlock().getFirstNonPHI());
+    IRB.CreateCall(INS_TaskStartFunc, {IRB.CreatePointerCast(F.arg_begin(), IRB.getInt8PtrTy())});
+
+    Res = true;
+  }
+
+//else return false;
    /*
    if ( isTaskBodyFunction(F) ) {
        instrumentReturns(F);
@@ -380,8 +383,7 @@ static bool isAtomic(Instruction *I) {
   SmallVector<Instruction*, 8> LocalLoadsAndStores;
   SmallVector<Instruction*, 8> AtomicAccesses;
   SmallVector<Instruction*, 8> MemIntrinCalls;
-  bool Res = false;
-  bool HasCalls = false;
+
 //   bool SanitizeFunction = F.hasFnAttribute(Attribute::SanitizeThread);
   const DataLayout &DL = F.getParent()->getDataLayout();
 
@@ -452,7 +454,7 @@ static bool isAtomic(Instruction *I) {
               {
                    o++;
                    Value *x = xx;
-                   errs() << "ARG: ";
+                   //errs() << "ARG: ";
                    //x->dump();
                    if(o==4) {
 		     CallInst * CI = dyn_cast<CallInst>(x);
@@ -460,11 +462,6 @@ static bool isAtomic(Instruction *I) {
 		      Function *fn = dyn_cast<Function>(CI->getCalledFunction()->stripPointerCasts());
 		      if(fn) {
 			errs() <<"GGG" << x << "\n";
-			IRBuilder<> F_IRB(fn->getEntryBlock().getFirstNonPHI());
-
-			F_IRB.CreateCall(INS_TaskStartFunc,
-			  {F_IRB.CreatePointerCast(M->getArgOperand(2), F_IRB.getInt8PtrTy())
-			  });
 		      }
 		     }
                    }
@@ -531,7 +528,7 @@ static bool isAtomic(Instruction *I) {
     IRBuilder<> IRB(F.getEntryBlock().getFirstNonPHI());
     Value *ReturnAddress = IRB.CreateCall(Intrinsic::getDeclaration(F.getParent(), Intrinsic::returnaddress),
                                          IRB.getInt32(0));
-    IRB.CreateCall(INS_TaskStartFunc, ReturnAddress);
+    //IRB.CreateCall(INS_TaskStartFunc, ReturnAddress);
     if(isTaskBody) {  // instrument returns of a task body to track when it finishes.
       for (auto RetInst : RetVec) {
         IRBuilder<> IRBRet(RetInst);
@@ -592,7 +589,6 @@ bool AdfSanitizer::instrumentLoadOrStore(Instruction *I, const DataLayout &DL) {
   if(IsWrite)
   {
 
-    I->dump();
     Value *Val = cast<StoreInst>(I)->getValueOperand();
     IRB.CreateCall(OnAccessFunc,
 		 {IRB.CreatePointerCast(Addr, IRB.getInt8PtrTy()),
