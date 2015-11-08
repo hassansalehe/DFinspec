@@ -111,17 +111,27 @@ VOID INS::TransactionEnd(INTEGER taskID)
 }
 
 // called when a task starts execution. retrieves parent task id
-VOID INS::TaskStartLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value,  STRING taskName)
+VOID INS::TaskStartLog(INTEGER taskID, STRING taskName)
 {
   guardLock.lock();
     //pthread_mutex_lock(&g_lock);
+  funcNames[taskID] = taskName;
+  logger << taskID << " " << funcNames[taskID] << " ST " << endl;
+
+  guardLock.unlock();
+}
+
+// called when a task starts execution. retrieves parent task id
+VOID INS::TaskInTokenLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value)
+{
+  guardLock.lock();
 
   INTEGER parentID = -1;
-  funcNames[taskID] = taskName;
-  if(bufLocAddr) { // dependent through a streaming buffer
+
+ if(bufLocAddr) { // dependent through a streaming buffer
     parentID = idMap[make_pair(bufLocAddr, value)];
 
-    logger << taskID << " " << taskName << " ST " << parentID << endl;
+    logger << taskID << " " << funcNames[taskID] << " ST " << parentID << endl;
     HBlogger << taskID << " " << parentID << endl;
 
     // there is a happens before between taskID and parentID:
@@ -139,8 +149,8 @@ VOID INS::TaskStartLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value,  STRIN
     //logger << endl;
   }
   else {
-    logger << taskID << " " << taskName << " ST " << endl;
-    }
+    logger << taskID << " " << funcNames[taskID] << " ST " << endl;
+  }
   guardLock.unlock();
    //pthread_mutex_unlock(&g_lock);
 }

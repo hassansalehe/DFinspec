@@ -33,14 +33,14 @@ void INS_Fini() {
   INS::Finalize();
 }
 
-void INS_TaskStartFunc(void* argAddr) {
+void INS_TaskStartFunc(void* taskName) {
   Thread2Task t2t;
   t2t.threadID = (unsigned int)pthread_self();
   t2t.taskID = INS::GenTaskID();
   t2t.active = true;
   thr2TaskMap[t2t.threadID] = t2t;
-  cout << "Task_Started, (threadID: "<< t2t.threadID << ", taskID : " << thr2TaskMap[t2t.threadID].taskID <<") addr: "<< argAddr<< endl;
-  INS::TaskStartLog(t2t.taskID, NULL, 0, "A");
+  cout << "Task_Started, (threadID: "<< t2t.threadID << ", taskID : " << thr2TaskMap[t2t.threadID].taskID <<") name: "<< (char *)taskName<< endl;
+  INS::TaskStartLog(t2t.taskID, (char*)taskName);
 
 }
 
@@ -63,8 +63,7 @@ void INS_RegInToken(void * tokenAddr, unsigned long size)
   if( t2t != thr2TaskMap.end() && t2t->second.active)
   {
     INTEGER value = getMemoryValue(tokenAddr, size);
-    STRING taskName = "A";
-    INS::TaskStartLog(t2t->second.taskID, tokenAddr, value, taskName);
+    INS::TaskInTokenLog(t2t->second.taskID, tokenAddr, value);
     cout << "InToken: " << value << " addr: " << tokenAddr << endl;
   }
 }

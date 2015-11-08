@@ -349,8 +349,14 @@ static bool isAtomic(Instruction *I) {
   bool isTaskBody = INS::isTaskBodyFunction( F.getName() );
 
   if(isTaskBody) {
+    StringRef name = INS::demangleName(F.getName());
+    auto idx = name.find('(');
+    if(idx != StringRef::npos)
+      name = name.substr(0, idx);
+    
     IRBuilder<> IRB(F.getEntryBlock().getFirstNonPHI());
-    IRB.CreateCall(INS_TaskStartFunc, {IRB.CreatePointerCast(F.arg_begin(), IRB.getInt8PtrTy())});
+    Value *taskName = IRB.CreateGlobalStringPtr(name, "taskName");
+    IRB.CreateCall(INS_TaskStartFunc, {IRB.CreatePointerCast(taskName, IRB.getInt8PtrTy())});
 
     Res = true;
   }
@@ -441,12 +447,12 @@ static bool isAtomic(Instruction *I) {
             continue;
           if(INS::isTaskCreationFunc(calledF->getName()))
           {
-            IRBuilder<> IRB(&Inst);
-            IRB.CreateCall(AdfCreateTask,
-              {IRB.CreatePointerCast(M->getArgOperand(2), IRB.getInt8PtrTy()),
-               IRB.CreatePointerCast(M->getArgOperand(3), IRB.getInt8PtrTy())//,
-               //IRB.CreateIntCast(M->getArgOperand(2), IntptrTy, false)
-              });
+//             IRBuilder<> IRB(&Inst);
+//             IRB.CreateCall(AdfCreateTask,
+//               {IRB.CreatePointerCast(M->getArgOperand(2), IRB.getInt8PtrTy()),
+//                IRB.CreatePointerCast(M->getArgOperand(3), IRB.getInt8PtrTy())//,
+//                //IRB.CreateIntCast(M->getArgOperand(2), IntptrTy, false)
+//               });
 
               auto xx = calledF->arg_begin();
               int o=0;

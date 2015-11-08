@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////
-//  ADFinspec: a lightweight non-determinism checking 
+//  ADFinspec: a lightweight non-determinism checking
 //          tool for ADF applications
 //
 //    (c) 2015 - Hassan Salehe Matar & MSRC at Koc University
-//      Copying or using this code by any means whatsoever 
+//      Copying or using this code by any means whatsoever
 //      without consent of the owner is strictly prohibited.
-//   
+//
 //   Contact: hmatar-at-ku-dot-edu-dot-tr
 //
 /////////////////////////////////////////////////////////////////
@@ -34,7 +34,7 @@ int main(int argc, char * argv[])
     cout << "ERROR!" << endl;
     cout << "Usage: ./ADDFinspec TraceLog.txt HBlog.txt" << endl;
     cout << endl;
-    exit(-1); 
+    exit(-1);
   }
 
   Checker aChecker; // checker instance
@@ -49,12 +49,12 @@ int main(int argc, char * argv[])
 
   ifstream log(argv[1]); //  log file
   while( getline(log, logLine) ) {
-    aChecker.processLogLines(logLine); 
+    aChecker.processLogLines(logLine);
   }
   // testing writes
   // aChecker.testing();
   aChecker.reportConflicts();
-  aChecker.printHBGraph(); 
+  aChecker.printHBGraph();
 
   return 0;
 }

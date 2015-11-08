@@ -40,7 +40,8 @@ class INS {
   public:
     static VOID Init();
     static INTEGER GenTaskID();
-    static VOID TaskStartLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value, STRING taskName);
+    static VOID TaskStartLog(INTEGER taskID, STRING taskName);
+    static VOID TaskInTokenLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value);
     static VOID TransactionBegin(INTEGER taskID);
     static VOID TransactionEnd(INTEGER taskID);
     static VOID TaskEndLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value);
