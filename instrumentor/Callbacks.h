@@ -23,9 +23,12 @@ extern "C" {
   void INS_AdfMemRead8(void *addr);
   void INS_AdfMemRead4(void *addr);
   void INS_AdfMemRead1(void *addr);
-  void INS_AdfMemWrite8(void *addr, void * value);
-  void INS_AdfMemWrite4(void *addr, void * value);
-  void INS_AdfMemWrite1(void *addr, void * value);
+  void INS_AdfMemWrite8(void *addr, long int value);
+  void INS_AdfMemWrite4(void *addr, long int value);
+  void INS_AdfMemWrite1(void *addr, long int value);
+
+  void INS_AdfMemWriteFloat(void * addr, float value);
+  void INS_AdfMemWriteDouble(void * addr, double value);
 
   // task begin and end callbacks
   void INS_TaskStartFunc(void* addr);

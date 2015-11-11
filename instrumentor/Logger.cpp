@@ -15,7 +15,7 @@
 #ifndef LOGGER_CPP
 #define LOGGER_CPP
 
-#include "logger.h"
+#include "Logger.h"
 
 #include <mutex>  // std::mutex
 //#include <thread>         // std::thread

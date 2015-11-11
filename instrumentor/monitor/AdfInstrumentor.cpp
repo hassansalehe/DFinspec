@@ -74,6 +74,9 @@ namespace {
      // callback for task creation
      Function *AdfCreateTask;
 
+     // callbacks for instrumenting doubles and floats
+     Constant *INS_MemWriteFloat;
+     Constant *INS_MemWriteDouble;
 //   // Accesses sizes are powers of two: 1, 2, 4, 8, 16.
    static const size_t kNumberOfAccessSizes = 5;
   Function *TsanRead[kNumberOfAccessSizes];
@@ -136,6 +139,15 @@ static RegisterStandardPasses
   INS_TaskFinishFunc = checkSanitizerInterfaceFunction(
       M.getOrInsertFunction("INS_TaskFinishFunc", IRB.getVoidTy(), nullptr));
   OrdTy = IRB.getInt32Ty();
+
+  // functions to instrument floats and doubles
+  LLVMContext &Ctx = M.getContext();
+  INS_MemWriteFloat = M.getOrInsertFunction("INS_AdfMemWriteFloat",
+	Type::getVoidTy(Ctx), Type::getFloatPtrTy(Ctx), Type::getFloatTy(Ctx), NULL);
+
+  INS_MemWriteDouble = M.getOrInsertFunction("INS_AdfMemWriteDouble",
+	Type::getVoidTy(Ctx), Type::getDoublePtrTy(Ctx), Type::getDoubleTy(Ctx), NULL);
+
   for (size_t i = 0; i < kNumberOfAccessSizes; ++i) {
     const unsigned ByteSize = 1U << i;
     const unsigned BitSize = ByteSize * 8;
@@ -147,7 +159,7 @@ static RegisterStandardPasses
 
     SmallString<32> WriteName("INS_AdfMemWrite" + ByteSizeStr);
     INS_MemWrite[i] = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
-        WriteName, IRB.getVoidTy(), IRB.getInt8PtrTy(), IRB.getInt8PtrTy(), nullptr));
+        WriteName, IRB.getVoidTy(), IRB.getInt8PtrTy(), IRB.getInt64Ty(), nullptr));
 
     SmallString<64> UnalignedReadName("__tsan_unaligned_read" + ByteSizeStr);
     TsanUnalignedRead[i] =
@@ -353,7 +365,7 @@ static bool isAtomic(Instruction *I) {
     auto idx = name.find('(');
     if(idx != StringRef::npos)
       name = name.substr(0, idx);
-    
+
     IRBuilder<> IRB(F.getEntryBlock().getFirstNonPHI());
     Value *taskName = IRB.CreateGlobalStringPtr(name, "taskName");
     IRB.CreateCall(INS_TaskStartFunc, {IRB.CreatePointerCast(taskName, IRB.getInt8PtrTy())});
@@ -596,9 +608,22 @@ bool AdfSanitizer::instrumentLoadOrStore(Instruction *I, const DataLayout &DL) {
   {
 
     Value *Val = cast<StoreInst>(I)->getValueOperand();
-    IRB.CreateCall(OnAccessFunc,
+    if(Val->getType()->isFloatTy())
+    {
+      Value* args[] = {Addr, Val};
+      IRB.CreateCall(INS_MemWriteFloat, args);
+    }
+    if(Val->getType()->isDoubleTy())
+    {
+      Value* args[] = {Addr, Val};
+      IRB.CreateCall(INS_MemWriteDouble, args);
+    }
+    else
+      IRB.CreateCall(OnAccessFunc,
 		 {IRB.CreatePointerCast(Addr, IRB.getInt8PtrTy()),
-		   IRB.CreatePointerCast(Val, Val->getType())});
+		   //IRB.CreatePointerCast(Val, Val->getType())
+		   Val
+		});
 
   }else
     IRB.CreateCall(OnAccessFunc,
