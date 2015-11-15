@@ -44,7 +44,10 @@ class INS {
     static VOID TaskInTokenLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value);
     static VOID TransactionBegin(INTEGER taskID);
     static VOID TransactionEnd(INTEGER taskID);
-    static VOID TaskEndLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value);
+
+    static VOID TaskEndLog(INTEGER taskID);
+    static VOID TaskOutTokenLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value);
+
     static VOID Read(INTEGER taskID, ADDRESS addr, INTEGER value);
     static VOID Read2(INTEGER taskID, ADDRESS addr, int row, int column);
     static VOID Write2(INTEGER taskID, ADDRESS addr, int row, int column);

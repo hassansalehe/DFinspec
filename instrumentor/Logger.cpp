@@ -131,7 +131,7 @@ VOID INS::TaskInTokenLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value)
  if(bufLocAddr) { // dependent through a streaming buffer
     parentID = idMap[make_pair(bufLocAddr, value)];
 
-    logger << taskID << " " << funcNames[taskID] << " ST " << parentID << endl;
+    logger << taskID << " " << funcNames[taskID] << " IT " << parentID << endl;
     HBlogger << taskID << " " << parentID << endl;
 
     // there is a happens before between taskID and parentID:
@@ -148,23 +148,33 @@ VOID INS::TaskInTokenLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value)
     //  logger << *pID << " ";
     //logger << endl;
   }
-  else {
-    logger << taskID << " " << funcNames[taskID] << " ST " << endl;
-  }
+
   guardLock.unlock();
    //pthread_mutex_unlock(&g_lock);
 }
 
 
-// called before the task terminates. stores the buffer address and
-//the value stored in the buffer for the succeeding task
-VOID INS::TaskEndLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value) {
+// called before the task terminates.
+VOID INS::TaskEndLog(INTEGER taskID) {
+
+  guardLock.lock();
+    //pthread_mutex_lock(&g_lock);
+  logger << taskID << " " << funcNames[taskID] << " ED" << endl;
+
+  guardLock.unlock();
+    //pthread_mutex_unlock(&g_lock);
+}
+
+
+// stores the buffer address of the token and the value stored in
+// the buffer for the succeeding task
+VOID INS::TaskOutTokenLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value) {
 
   guardLock.lock();
     //pthread_mutex_lock(&g_lock);
 
   idMap[make_pair(bufLocAddr, value)] = taskID;
-  logger << taskID << " " << funcNames[taskID] << " ED" << endl;
+  logger << taskID << " " << funcNames[taskID] << " OT" << endl;
 
   guardLock.unlock();
     //pthread_mutex_unlock(&g_lock);

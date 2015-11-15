@@ -613,7 +613,7 @@ bool AdfSanitizer::instrumentLoadOrStore(Instruction *I, const DataLayout &DL) {
       Value* args[] = {Addr, Val};
       IRB.CreateCall(INS_MemWriteFloat, args);
     }
-    if(Val->getType()->isDoubleTy())
+    else if(Val->getType()->isDoubleTy())
     {
       Value* args[] = {Addr, Val};
       IRB.CreateCall(INS_MemWriteDouble, args);

@@ -52,7 +52,7 @@ int main(int argc, char * argv[])
     aChecker.processLogLines(logLine);
   }
   // testing writes
-  // aChecker.testing();
+  aChecker.testing();
   aChecker.reportConflicts();
   aChecker.printHBGraph();
 

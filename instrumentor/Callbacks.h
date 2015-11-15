@@ -9,7 +9,7 @@ extern "C" {
   // to initialize the logger
   void INS_Init();
 
-  // to finalize na book-keep the logger
+  // to finalize and book-keep the logger
   void INS_Fini();
 
   // callbacks at creation of task

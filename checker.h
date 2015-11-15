@@ -33,12 +33,12 @@
 using namespace std;
 
 // a bag to hold the tasks that happened-before
-typedef struct Sbag {
-  int outStr;
+typedef struct SerialBag {
+  int outBufferCount;
   INTSET HB;
 
-  Sbag(): outStr(0){}
-} Sbag;
+  SerialBag(): outBufferCount(0){}
+} SerialBag;
 
 // for constructing happans-before between tasks
 typedef struct Task {
@@ -63,7 +63,7 @@ typedef struct Report {
   set<ADDRESS> addresses;
 } Report;
 
-typedef Sbag * PSbag;
+typedef SerialBag * SerialBagPtr;
 
 class Checker {
   public:
@@ -76,7 +76,7 @@ class Checker {
   ~Checker();
 
   private:
-    unordered_map <INTEGER, PSbag> serial_bags; // hold bags of tasks
+    unordered_map <INTEGER, SerialBagPtr> serial_bags; // hold bags of tasks
     unordered_map<INTEGER, Task> graph;  // in and out edges
     unordered_map<ADDRESS, vector<Write>> writes; // for writes
     map<pair<INTEGER, INTEGER>, Report> conflictTable;

@@ -48,9 +48,11 @@ void INS_TaskStartFunc(void* taskName) {
 void INS_TaskFinishFunc(void* addr) {
 
   unsigned int threadID = (unsigned int)pthread_self();
-  if(thr2TaskMap.find(threadID) != thr2TaskMap.end())
+  auto t2t = thr2TaskMap.find(threadID);
+  if(t2t != thr2TaskMap.end())
      thr2TaskMap[threadID].active = false;
 
+  INS::TaskEndLog(t2t->second.taskID);
   cout << "Task_Ended: (threadID: " << threadID << ")"<< endl;
 }
 
@@ -76,7 +78,7 @@ void INS_RegOutToken(ADDRESS bufLocAddr, ADDRESS tokenAddr, unsigned long size)
   if( t2t != thr2TaskMap.end() && t2t->second.active)
   {
     INTEGER value = getMemoryValue(tokenAddr, size);
-    INS::TaskEndLog(t2t->second.taskID, bufLocAddr, value);
+    INS::TaskOutTokenLog(t2t->second.taskID, bufLocAddr, value);
     cout << "OutToken: " << value << " addr: " << bufLocAddr << endl;
   }
 }
