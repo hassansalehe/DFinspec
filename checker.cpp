@@ -34,29 +34,34 @@ void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value) {
   //    4.1 but same value -> append new write
   //    4.2 otherwise report a race and look for a happens-before
   //        write in the parallel writes,update and take it forward
+  //        4.2.1 check conflicts with other parallel tasks
 
   if(writes.find(addr) == writes.end()) { // 1. first write
      writes[addr] = vector<Write>();
      writes[addr].push_back(Write(taskId, value));
   }
   else {
-    auto wTable = writes[addr];
-    auto lastWrt = wTable.back();
+    auto wTable = writes.find(addr);
+    auto lastWrt = wTable->second.back();
     if(lastWrt.wrtTaskId == taskId) { // 2. same writer
       lastWrt.value = value;
+      writes[addr].pop_back();
+      writes[addr].push_back(lastWrt);
       return;
     }
     else { // check race
-      auto found = serial_bags[taskId]->HB.find(lastWrt.wrtTaskId);
+      auto HBfound = serial_bags[taskId]->HB.find(lastWrt.wrtTaskId);
       auto end = serial_bags[taskId]->HB.end();
-      if(found != end) {// 3. there's happens-before
+      if(HBfound != end) {// 3. there's happens-before
         lastWrt.wrtTaskId = taskId;
         lastWrt.value = value;
+	writes[addr].pop_back();
+	writes[addr].push_back(lastWrt);
         return;
       }
       else { // 4. parallel, possible race!
 
-         wTable.push_back(Write(taskId, value));
+         wTable->second.push_back(Write(taskId, value));
          if(lastWrt.value == value) // 4.1 same value written
            return; // no determinism error, just return
          else { // 4.2 this is definitely determinism error
@@ -71,6 +76,22 @@ void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value) {
               conflictTable[key].task2Name = graph[taskId].name;
               conflictTable[key].addresses.insert(addr);
             }
+
+            // 4.2.1 check conflicts with other parallel tasks
+            for(auto parWrite = wTable->second.begin(); parWrite != wTable->second.end(); parWrite++) {
+	      if(parWrite->wrtTaskId != taskId && parWrite->value != value) { // not write of same task and same value
+		// code for recording errors
+		auto key = make_pair(parWrite->wrtTaskId, taskId);
+		if(conflictTable.find(key) != conflictTable.end())
+		  conflictTable[key].addresses.insert(addr);
+		else {
+		  conflictTable[key] = Report();
+		  conflictTable[key].task1Name = graph[parWrite->wrtTaskId].name;
+		  conflictTable[key].task2Name = graph[taskId].name;
+		  conflictTable[key].addresses.insert(addr);
+		}
+	      }
+	    }
             return;
          }
       }
@@ -112,77 +133,8 @@ void Checker::processLogLines(string & line){
     ssin >> taskName; // get task name
     ssin >> operation; // get operation
 
-    // if new task creation
-    if(operation.find("ST") != string::npos) {
-
-      if(ssin.good()) { // get parent id
-        string t;
-        ssin >> t;
-        // remove spaces
-        t.erase(remove_if(t.begin(), t.end(), [](char x){return isspace(x);}), t.end());
-
-        if(t.length() <= 0) { // initial tasks
-          if(serial_bags.find(taskID) == serial_bags.end()) {
-            auto newTask = new Sbag();
-            if(graph.find(taskID) != graph.end()) {
-              newTask->outStr = graph[taskID].outEdges.size();
-            }
-            else //put it in the simple HB graph
-	      graph[taskID] = Task();
-
-	    graph[taskID].name = taskName; // save the name of the task
-            serial_bags[taskID] = newTask;
-          }
-        }
-        else { // other tasks, have parents
-          INTEGER parentId = stoi(t);
-
-          // check if no bag for this task
-          if(serial_bags.find(taskID) == serial_bags.end() ||
-	    serial_bags[taskID]->HB.size() == 0) { // or if the bag is empty
-            // clone the parent bag or take it all.
-            PSbag taskBag = NULL;
-
-            // 1.find the parent bag which can be inherited
-            auto inEdg = graph[taskID].inEdges.begin();
-            for(; inEdg != graph[taskID].inEdges.end(); inEdg++) {
-              // take with outstr 1 and longest
-              auto curBag = serial_bags[*inEdg];
-              if(curBag->outStr == 1) {
-                serial_bags.erase(*inEdg);
-                graph[taskID].inEdges.erase(*inEdg);
-                taskBag = curBag;
-                curBag->HB.insert(*inEdg);
-                break;  // could optimize by looking all bags
-              }
-            }
-            if(!taskBag)
-              taskBag = new Sbag(); // no bag inherited
-
-            // for inheriting bags
-            taskBag->outStr = graph[taskID].outEdges.size();
-
-            // 2. merge the HBs of the parent nodes
-            inEdg = graph[taskID].inEdges.begin();
-            for(; inEdg != graph[taskID].inEdges.end(); inEdg++) {
-              auto aBag = serial_bags[*inEdg];
-
-              taskBag->HB.insert(aBag->HB.begin(), aBag->HB.end()); // merging...
-              taskBag->HB.insert(*inEdg); // parents happen-before me
-
-              aBag->outStr--; // for inheriting bags
-              if(!aBag->outStr)
-                serial_bags.erase(*inEdg);
-            }
-            graph[taskID].name = taskName; // set the name of the task
-            serial_bags[taskID] = taskBag; // 3. add the bag to serial_bags
-          }
-        }
-        //cout << tid << endl;
-      }
-    }
     // if write
-    else if(operation.find("WR") != string::npos) {
+    if(operation.find("WR") != string::npos) {
 
       string addr; // address
       ssin >> addr;
@@ -192,6 +144,73 @@ void Checker::processLogLines(string & line){
       ssin >> value;
       VALUE val = stol(value);
       saveWrite(taskID, address, val);
+    }
+    else if (operation.find("RD") != string::npos) {
+      // it is read just return for now.
+      return;
+    }
+    // if new task creation, parents terminated
+    else if(operation.find("ST") != string::npos) {
+      // we already know its parents
+      // use this information to inherit or greate new serial bag
+      auto parentTasks = graph[taskID].inEdges.begin();
+
+      if(parentTasks == graph[taskID].inEdges.end()) { // if no HB tasks in graph
+
+	// check if has no serial bag
+	if(serial_bags.find(taskID) == serial_bags.end()) {
+	  auto newTaskbag = new SerialBag();
+	  if(graph.find(taskID) != graph.end()) {
+
+	    // specify number of tasks dependent of this task
+	    newTaskbag->outBufferCount = graph[taskID].outEdges.size();
+	  }
+	  else //put it in the simple HB graph
+	    graph[taskID] = Task();
+
+	  graph[taskID].name = taskName; // save the name of the task
+	  serial_bags[taskID] = newTaskbag;
+	}
+      }
+      else { // has parent tasks
+	// look for the parents serial bags and inherit them
+	// or construct your own by cloning the parent's
+
+	// 1.find the parent bag which can be inherited
+	SerialBagPtr taskBag = NULL;
+	auto inEdge = graph[taskID].inEdges.begin();
+	for(; inEdge != graph[taskID].inEdges.end(); inEdge++) {
+	  // take with outstr 1 and longest
+	  auto curBag = serial_bags[*inEdge];
+	  if(curBag->outBufferCount == 1) {
+	    serial_bags.erase(*inEdge);
+	    graph[taskID].inEdges.erase(*inEdge);
+	    taskBag = curBag;
+	    curBag->HB.insert(*inEdge);
+	    break;  // could optimize by looking all bags
+	  }
+	}
+	if(!taskBag)
+	  taskBag = new SerialBag(); // no bag inherited
+
+	// the number of inheriting bags
+	taskBag->outBufferCount = graph[taskID].outEdges.size();
+
+	// 2. merge the HBs of the parent nodes
+	inEdge = graph[taskID].inEdges.begin();
+	for(; inEdge != graph[taskID].inEdges.end(); inEdge++) {
+	  auto aBag = serial_bags[*inEdge];
+
+	  taskBag->HB.insert(aBag->HB.begin(), aBag->HB.end()); // merging...
+	  taskBag->HB.insert(*inEdge); // parents happen-before me
+
+	  aBag->outBufferCount--; // for inheriting bags
+	  if(!aBag->outBufferCount)
+	    serial_bags.erase(*inEdge);
+	}
+	graph[taskID].name = taskName; // set the name of the task
+	serial_bags[taskID] = taskBag; // 3. add the bag to serial_bags
+      }
     }
 }
 
@@ -250,7 +269,7 @@ VOID Checker::testing() {
   cout << "====================" << endl;
   for(auto it = serial_bags.begin(); it != serial_bags.end(); it++)
   {
-      cout << it->first << " ("<< it->second->outStr<< "): {";
+      cout << it->first << " ("<< it->second->outBufferCount<< "): {";
       for(auto x = it->second->HB.begin(); x != it->second->HB.end(); x++ )
         cout << *x << " ";
       cout << "}" << endl;
