@@ -25,6 +25,31 @@
 
 #include "checker.h"  // header
 
+void Checker::checkDetOnPreviousTasks(INTEGER taskId, ADDRESS addr, VALUE value) {
+  auto wTable = writes.find(addr);
+  auto end = serial_bags[taskId]->HB.end();
+
+  // 4.2.1 check conflicts with other parallel tasks
+  for(auto parWrite = wTable->second.begin(); parWrite != wTable->second.end(); parWrite++) {
+    if(parWrite->wrtTaskId != taskId && parWrite->value != value) { // not write of same task and same value
+      auto HBfound = serial_bags[taskId]->HB.find(parWrite->wrtTaskId);
+
+      if(HBfound == end && parWrite->value != value) {// 3. there's no happens-before
+	// code for recording errors
+	auto key = make_pair(parWrite->wrtTaskId, taskId);
+	if(conflictTable.find(key) != conflictTable.end())
+	  conflictTable[key].addresses.insert(addr);
+	else {
+	  conflictTable[key] = Report();
+	  conflictTable[key].task1Name = graph[parWrite->wrtTaskId].name;
+	  conflictTable[key].task2Name = graph[taskId].name;
+	  conflictTable[key].addresses.insert(addr);
+	}
+      }
+    }
+  }
+}
+
 void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value) {
   // CASES
   // 1. first write -> just save
@@ -57,6 +82,9 @@ void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value) {
         lastWrt.value = value;
 	writes[addr].pop_back();
 	writes[addr].push_back(lastWrt);
+
+	// check on the happens-before relations with the previous concurrent tasks
+	checkDetOnPreviousTasks(taskId, addr, value);
         return;
       }
       else { // 4. parallel, possible race!
@@ -78,20 +106,7 @@ void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value) {
             }
 
             // 4.2.1 check conflicts with other parallel tasks
-            for(auto parWrite = wTable->second.begin(); parWrite != wTable->second.end(); parWrite++) {
-	      if(parWrite->wrtTaskId != taskId && parWrite->value != value) { // not write of same task and same value
-		// code for recording errors
-		auto key = make_pair(parWrite->wrtTaskId, taskId);
-		if(conflictTable.find(key) != conflictTable.end())
-		  conflictTable[key].addresses.insert(addr);
-		else {
-		  conflictTable[key] = Report();
-		  conflictTable[key].task1Name = graph[parWrite->wrtTaskId].name;
-		  conflictTable[key].task2Name = graph[taskId].name;
-		  conflictTable[key].addresses.insert(addr);
-		}
-	      }
-	    }
+            checkDetOnPreviousTasks(taskId, addr, value);
             return;
          }
       }

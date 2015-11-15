@@ -76,6 +76,7 @@ class Checker {
   ~Checker();
 
   private:
+    VOID checkDetOnPreviousTasks(INTEGER taskId, ADDRESS addr, VALUE value);
     unordered_map <INTEGER, SerialBagPtr> serial_bags; // hold bags of tasks
     unordered_map<INTEGER, Task> graph;  // in and out edges
     unordered_map<ADDRESS, vector<Write>> writes; // for writes
