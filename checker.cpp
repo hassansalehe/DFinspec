@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////
-//  ADFinspec: a lightweight non-determinism checking 
+//  ADFinspec: a lightweight non-determinism checking
 //          tool for ADF applications
 //
 //    (c) 2015 - Hassan Salehe Matar & MSRC at Koc University
-//      Copying or using this code by any means whatsoever 
+//      Copying or using this code by any means whatsoever
 //      without consent of the owner is strictly prohibited.
-//   
+//
 //   Contact: hmatar-at-ku-dot-edu-dot-tr
 //
 /////////////////////////////////////////////////////////////////
@@ -32,7 +32,7 @@ void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value) {
   // 3. a previous write in a happens-before -> just save
   // 4. previous write is parallel:
   //    4.1 but same value -> append new write
-  //    4.2 otherwise report a race and look for a happens-before 
+  //    4.2 otherwise report a race and look for a happens-before
   //        write in the parallel writes,update and take it forward
 
   if(writes.find(addr) == writes.end()) { // 1. first write
@@ -47,8 +47,8 @@ void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value) {
       return;
     }
     else { // check race
-      auto found = p_bags[taskId]->HB.find(lastWrt.wrtTaskId);
-      auto end = p_bags[taskId]->HB.end();
+      auto found = serial_bags[taskId]->HB.find(lastWrt.wrtTaskId);
+      auto end = serial_bags[taskId]->HB.end();
       if(found != end) {// 3. there's happens-before
         lastWrt.wrtTaskId = taskId;
         lastWrt.value = value;
@@ -69,7 +69,7 @@ void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value) {
               conflictTable[key] = Report();
               conflictTable[key].task1Name = graph[lastWrt.wrtTaskId].name;
               conflictTable[key].task2Name = graph[taskId].name;
-              conflictTable[key].addresses.insert(addr);  
+              conflictTable[key].addresses.insert(addr);
             }
             return;
          }
@@ -80,8 +80,8 @@ void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value) {
 
 // Adds a new task node in the simple happens-before graph
 // @params: logLine, a log entry the contains the task ids
-void Checker:: addTaskNode(string & logLine) { 
-    stringstream ssin(logLine); 
+void Checker:: addTaskNode(string & logLine) {
+    stringstream ssin(logLine);
     int sibId;
     int parId;
 
@@ -122,7 +122,7 @@ void Checker::processLogLines(string & line){
         t.erase(remove_if(t.begin(), t.end(), [](char x){return isspace(x);}), t.end());
 
         if(t.length() <= 0) { // initial tasks
-          if(p_bags.find(taskID) == p_bags.end()) {
+          if(serial_bags.find(taskID) == serial_bags.end()) {
             auto newTask = new Sbag();
             if(graph.find(taskID) != graph.end()) {
               newTask->outStr = graph[taskID].outEdges.size();
@@ -131,24 +131,25 @@ void Checker::processLogLines(string & line){
 	      graph[taskID] = Task();
 
 	    graph[taskID].name = taskName; // save the name of the task
-            p_bags[taskID] = newTask;
+            serial_bags[taskID] = newTask;
           }
         }
         else { // other tasks, have parents
           INTEGER parentId = stoi(t);
 
           // check if no bag for this task
-          if(p_bags.find(taskID) == p_bags.end()) {           
+          if(serial_bags.find(taskID) == serial_bags.end() ||
+	    serial_bags[taskID]->HB.size() == 0) { // or if the bag is empty
             // clone the parent bag or take it all.
             PSbag taskBag = NULL;
 
-            // 1.find the parent bag which can be inherited       
-            auto inEdg = graph[taskID].inEdges.begin(); 
+            // 1.find the parent bag which can be inherited
+            auto inEdg = graph[taskID].inEdges.begin();
             for(; inEdg != graph[taskID].inEdges.end(); inEdg++) {
               // take with outstr 1 and longest
-              auto curBag = p_bags[*inEdg];
+              auto curBag = serial_bags[*inEdg];
               if(curBag->outStr == 1) {
-                p_bags.erase(*inEdg);  
+                serial_bags.erase(*inEdg);
                 graph[taskID].inEdges.erase(*inEdg);
                 taskBag = curBag;
                 curBag->HB.insert(*inEdg);
@@ -162,22 +163,22 @@ void Checker::processLogLines(string & line){
             taskBag->outStr = graph[taskID].outEdges.size();
 
             // 2. merge the HBs of the parent nodes
-            inEdg = graph[taskID].inEdges.begin(); 
-            for(; inEdg != graph[taskID].inEdges.end(); inEdg++) { 
-              auto aBag = p_bags[*inEdg];
+            inEdg = graph[taskID].inEdges.begin();
+            for(; inEdg != graph[taskID].inEdges.end(); inEdg++) {
+              auto aBag = serial_bags[*inEdg];
 
               taskBag->HB.insert(aBag->HB.begin(), aBag->HB.end()); // merging...
               taskBag->HB.insert(*inEdg); // parents happen-before me
 
               aBag->outStr--; // for inheriting bags
-              if(!aBag->outStr) 
-                p_bags.erase(*inEdg);
+              if(!aBag->outStr)
+                serial_bags.erase(*inEdg);
             }
             graph[taskID].name = taskName; // set the name of the task
-            p_bags[taskID] = taskBag; // 3. add the bag to p_bags
+            serial_bags[taskID] = taskBag; // 3. add the bag to serial_bags
           }
         }
-        //cout << tid << endl; 
+        //cout << tid << endl;
       }
     }
     // if write
@@ -221,7 +222,7 @@ VOID Checker::reportConflicts() {
 VOID Checker::printHBGraph() {
   FILEPTR flowGraph;
   flowGraph.open("flowGraph.sif",  ofstream::out | ofstream::trunc);
-  
+
   if( ! flowGraph.is_open() ) {
     cout << "Failed to write to file the graph structure" << endl;
     exit(-1);
@@ -233,7 +234,7 @@ VOID Checker::printHBGraph() {
        flowGraph << *out << "_" << graph[*out].name << endl;
     }
   if(flowGraph.is_open())
-    flowGraph.close();  
+    flowGraph.close();
 }
 
 
@@ -247,7 +248,7 @@ VOID Checker::testing() {
 
   // testing
   cout << "====================" << endl;
-  for(auto it = p_bags.begin(); it != p_bags.end(); it++)
+  for(auto it = serial_bags.begin(); it != serial_bags.end(); it++)
   {
       cout << it->first << " ("<< it->second->outStr<< "): {";
       for(auto x = it->second->HB.begin(); x != it->second->HB.end(); x++ )
@@ -260,7 +261,7 @@ VOID Checker::testing() {
 // implementation of the checker destructor
 // frees the memory dynamically generated for S-bags
 Checker::~Checker() {
- for(auto it = p_bags.begin(); it != p_bags.end(); it++)
+ for(auto it = serial_bags.begin(); it != serial_bags.end(); it++)
    delete it->second;
 }
 

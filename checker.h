@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////
-//  ADFinspec: a lightweight non-determinism checking 
+//  ADFinspec: a lightweight non-determinism checking
 //          tool for ADF applications
 //
 //    (c) 2015 - Hassan Salehe Matar & MSRC at Koc University
-//      Copying or using this code by any means whatsoever 
+//      Copying or using this code by any means whatsoever
 //      without consent of the owner is strictly prohibited.
-//   
+//
 //   Contact: hmatar-at-ku-dot-edu-dot-tr
 //
 /////////////////////////////////////////////////////////////////
@@ -47,7 +47,7 @@ typedef struct Task {
   INTSET outEdges; // outgoing data streams
 } Task;
 
-// represents last write, 
+// represents last write,
 // used for non-determinism checking
 typedef struct Write {
 
@@ -76,7 +76,7 @@ class Checker {
   ~Checker();
 
   private:
-    unordered_map <INTEGER, PSbag> p_bags; // hold bags of tasks
+    unordered_map <INTEGER, PSbag> serial_bags; // hold bags of tasks
     unordered_map<INTEGER, Task> graph;  // in and out edges
     unordered_map<ADDRESS, vector<Write>> writes; // for writes
     map<pair<INTEGER, INTEGER>, Report> conflictTable;
