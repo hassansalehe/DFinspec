@@ -38,3 +38,7 @@ clang++ -Xclang -load -Xclang $BIN_DIR/libADFTokenDetectorPass.so  -c -g -Wall -
 
 make
 cd $HOME
+
+## Build the ADFinspec tool ##
+make
+

@@ -465,7 +465,7 @@ static bool isAtomic(Instruction *I) {
 //                IRB.CreatePointerCast(M->getArgOperand(3), IRB.getInt8PtrTy())//,
 //                //IRB.CreateIntCast(M->getArgOperand(2), IntptrTy, false)
 //               });
-
+              /*
               auto xx = calledF->arg_begin();
               int o=0;
               for(;xx != calledF->arg_end(); xx++)
@@ -486,7 +486,7 @@ static bool isAtomic(Instruction *I) {
 
                    //if(isa<IntegerType>(&*xx))
                    //errs() << x->getType()->getName() << "\n";
-              }
+              }*/
           }
         }
 
