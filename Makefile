@@ -1,11 +1,11 @@
 #/////////////////////////////////////////////////////////////////
-#//  ADFinspec: a lightweight non-determinism checking 
+#//  ADFinspec: a lightweight non-determinism checking
 #//          tool for ADF applications
 #//
 #//    (c) 2015 - Hassan Salehe Matar & MSRC at Koc University
-#//      Copying or using this code by any means whatsoever 
+#//      Copying or using this code by any means whatsoever
 #//      without consent of the owner is strictly prohibited.
-#//   
+#//
 #//   Contact: hmatar-at-ku-dot-edu-dot-tr
 #//
 #/////////////////////////////////////////////////////////////////
@@ -20,7 +20,7 @@ else
     CXX = g++
   endif
 endif
-CXX = g++
+#CXX = g++
 CXXFLGS = -g -O3 -std=c++11
 DEPS = checker.h defs.h
 OBJ = checker.o main.o
