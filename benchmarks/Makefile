@@ -1,4 +1,5 @@
 MAINDIR = $(PWD)
+BINDIR=$(MAINDIR)/../bin
 INCDIR = $(MAINDIR)/include
 INCSTL = $(MAINDIR)/include/stm_stl
 INCATOMIC = $(MAINDIR)/include/atomic_ops
@@ -71,7 +72,7 @@ $(OBJDIR)/adf/%.o: $(SRCDIR)/%.cpp
 
 .cpp.o:
 	$(APPNAME)
-	$(CXX) $(CXXFLAGS) $< -o $@
+	$(CXX) -Xclang -load -Xclang $(BINDIR)/libADFInstrumentationPass.so $(CXXFLAGS) $< -o $@
 
 # --------------------------------------------------------------------------------
 # Rules to compile library
@@ -123,7 +124,7 @@ APPS= $(ADFDWARFS)
 
 $(APPS): APPNAME=@ printf "\n$(subst .o,,$(lastword $(subst /, ,$@)))\n-------------------\n\n"
 $(APPS): %:%.o
-	$(CXX) -o $@ $< $(LDFLAGS)
+	$(CXX) -o $@ $< $(BINDIR)/Callbacks.o $(BINDIR)/Logger.o $(LDFLAGS)
 
 .PHONY: adf_apps_intro adf_apps
 adf_apps_intro:

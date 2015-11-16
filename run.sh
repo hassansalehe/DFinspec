@@ -2,47 +2,39 @@
 export LLVM_DIR=/usr/bin/llvm-3.8/share/llvm/cmake
 
 HOME=`pwd`
-BENCHS=$HOME/../benchmarks
-SRC=$BENCHS/src
-INC=$BENCHS/include
-STMSTL=$BENCHS/include/stm_stl
-ATOMICOPS=$BENCHS/include/atomic_ops
-TMMISC=$BENCHS/tmmisc
+
+## Benchmarks-related directories ##
+BENCHS_DIR=$HOME/benchmarks
+SRC=$BENCHS_DIR/src
+INC=$BENCHS_DIR/include
+STMSTL=$BENCHS_DIR/include/stm_stl
+ATOMICOPS=$BENCHS_DIR/include/atomic_ops
+TMMISC=$BENCHS_DIR/tmmisc
+
+#instrumentation directory
+INSTR_DIR=$HOME/instrumentor
+BIN_DIR=$HOME/bin
 
 mkdir -p build
+mkdir -p bin
+
 cd build/
 
-#rm -rf *
-rm monitor/libADFInstrumentationPass.so
+rm -rf *  > /dev/null 2>&1
 
-cmake ..
+## Build the LLVM passes for runtime and application instrumentations ##
+cmake $INSTR_DIR
 make
-#make VERBOSE=1
-cd ..
-rm *.o
-rm ${BENCHS}/obj/adf/adf.o
+cp *.so $BIN_DIR/
+g++ -c -std=c++11 $INSTR_DIR/Logger.cpp -o $BIN_DIR/Logger.o
+g++ -c -std=c++11 $INSTR_DIR/Callbacks.cpp -o $BIN_DIR/Callbacks.o
 
-#clang++ -Xclang -load -Xclang build/monitor/libADFInstrumentationPass.so -c example.cpp -o sparse_algebra_adf.o
+## Build the ADF runtime and the dwarf benchmarks  ##
+cd $BENCHS_DIR
+make clean
+rm ${BENCHS_DIR}/obj/adf/adf.o > /dev/null 2>&1
 
+clang++ -Xclang -load -Xclang $BIN_DIR/libADFTokenDetectorPass.so  -c -g -Wall -O0 -Wno-unused-but-set-variable -I${SRC} -I${INC} -I${STMSTL}  -DADF_STM -DADF -std=c++11 -pthread -I${ATOMICOPS} -I${TMMISC} ${BENCHS_DIR}/src/adf.cpp -o ${BENCHS_DIR}/obj/adf/adf.o
 
-clang++ -Xclang -load -Xclang build/monitor/libADFTokenDetectorPass.so  -c -g -Wall -O0 -Wno-unused-but-set-variable -I${SRC} -I${INC} -I${STMSTL}  -DADF_STM -DADF -std=c++11 -pthread -I${ATOMICOPS} -I${TMMISC} ${BENCHS}/src/adf.cpp -o ${BENCHS}/obj/adf/adf.o
-
-cd $BENCHS
 make
 cd $HOME
-
-clang++ -Xclang -load -Xclang build/monitor/libADFInstrumentationPass.so -c -g -Wall -O0 -Wno-unused-but-set-variable -I${BENCHS}/src -I${BENCHS}/include -I${BENCHS}/include/stm_stl  -DADF_STM -DADF -std=c++11 -pthread  -I${BENCHS}/include/atomic_ops -I${BENCHS}/tmmisc ${BENCHS}/dwarfs/sparse_algebra/sparse_algebra_adf.cpp
-#exit
-echo "COMPLETE 1st compile step"
-
-g++ -c -std=c++11 Logger.cpp
-g++ -c -std=c++11 Callbacks.cpp
-echo "COMPLETE 2nd compile step"
-
-g++ -o sparse_algebra_adf sparse_algebra_adf.o Callbacks.o Logger.o -L${BENCHS}/lib -litm -ladf -lpthread -lsfftw
-#g++ -o sparse_algebra_adf sparse_algebra_adf.o Callbacks.o Logger.o -L${BENCHS}/lib -litm -ladf -lpthread -lsfftw
-echo "COMPLETE 3rd compile step"
-#g++ -o  sparse_algebra_adf rtlib.o sparse_algebra_adf.o
-echo "RUNNING"
-
-./sparse_algebra_adf
