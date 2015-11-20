@@ -34,11 +34,19 @@ using namespace llvm;
 namespace {
   /// TokenDetectorr: instrument the code in module to find in/out tokens
   struct TokenDetector : public FunctionPass {
+
+    static char ID;  // Instrumentation Pass identification, replacement for typeid.
+
     TokenDetector() : FunctionPass(ID) {}
     const char *getPassName() const override{ return "TokenDetector";}
+
+    bool doInitialization(Module &M) override {
+      INS::InitializeSignatures();
+    }
+
     bool runOnFunction(Function &F) override {
 
-      if(F.getName().find("PassToken") != StringRef::npos) {
+      if(INS::isPassTokenFunc(F.getName())) {
 	return instrumentTokens(F); // the function with tokens
       }
 
@@ -113,8 +121,9 @@ namespace {
     }
 
 
-    bool doInitialization(Module &M) override{;}
-    static char ID;  // Instrumentation Pass identification, replacement for typeid.
+    bool doFinalization(Module &M) override {
+      INS::ClearSignatures();
+    }
 
   };
 }  // namespace

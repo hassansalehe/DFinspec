@@ -28,6 +28,7 @@
 #include "llvm/IR/Function.h"
 #include "llvm/Support/raw_ostream.h"
 #include <iostream>
+#include <fstream>
 #include <memory>
 #include <string>
 #include <cxxabi.h>
@@ -36,25 +37,76 @@ using namespace llvm;
 using namespace std;
 
 namespace INS {
-   StringRef blackList[] =
-   {
-     "Settings::Settings(char*)",
-     "Settings::~Settings()",
-     "Settings::PrintStringSettings()",
-     "genmat(float**)",
-     "Configurator::GetContent(float***)",
-     "Configurator::Close()",
-     "Solver::Solver(Configurator*)",
-     "Configurator::WriteSettings()",
-     "Solver::InitSolver()",
-     "Solver::~Solver()",
-     "Solver::allocate_clean_block()"
-   };
 
-   StringRef whiteList[] =
-   {
-     "adf_create_task"
-   };
+   // function signature for terminating the scheduler
+   StringRef schedTerminFunc;
+
+   // function signature for initializing the scheduler
+   StringRef schedInitiFunc;
+
+   // function singature for passing tokens to the succeeding tasks
+   StringRef tokenPassingFunc;
+
+   // function signature for receiving tokens in a task
+   StringRef tokenReceivingFunc;
+
+   // function signature of a task body
+   StringRef taskSignature;
+
+   // This method parses the signature file and initializes
+   // the signatures accordingly.
+   void InitializeSignatures() {
+     std::ifstream signatureFile;
+     signatureFile.open("/home/hmatar/ADFinspec/instrumentor/SchedulerSignatures.txt"/*, std::ifstream::in*/);
+     if(signatureFile.is_open()) {
+
+       for (std::string line; std::getline(signatureFile, line); ) {
+         StringRef key(line);
+
+         if(key.startswith("TASK:")){ // task body name
+
+           std::string ts = std::get<1>(key.split(':')).str();
+           char * holder = new char[ts.length()];
+           ts.copy(holder, ts.length());
+           taskSignature = StringRef(holder, ts.length());
+         }
+         else if(key.startswith("PASS:")) { // for passing token
+
+           std::string ts = std::get<1>(key.split(':')).str();
+           char * holder = new char[ts.length()];
+           ts.copy(holder, ts.length());
+           tokenPassingFunc = StringRef(holder, ts.length());
+         }
+         else if(key.startswith("RECV:")) { // for receiving token
+
+           std::string ts = std::get<1>(key.split(':')).str();
+           char * holder = new char[ts.length()];
+           ts.copy(holder, ts.length());
+           tokenReceivingFunc = StringRef(holder, ts.length());
+         }
+         else if(key.startswith("CREA:")) { // for creating task
+           //adf_create_task
+           continue;
+         }
+         else if(key.startswith("INIT:")) { // for scheduler initialization
+
+           std::string ts = std::get<1>(key.split(':')).str();
+           char * holder = new char[ts.length()];
+           ts.copy(holder, ts.length());
+           schedInitiFunc = StringRef(holder, ts.length());
+         }
+         else if(key.startswith("TERM")) { // for scheduler rermination
+
+           std::string ts = std::get<1>(key.split(':')).str();
+           char * holder = new char[ts.length()];
+           ts.copy(holder, ts.length());
+           schedTerminFunc = StringRef(holder, ts.length());
+         }
+         line.clear();
+       } // end loop
+       signatureFile.close(); // close file
+     }
+   }
 
    bool DontInstrument(StringRef name) {
      int status = -1;
@@ -92,7 +144,7 @@ namespace INS {
         string dname(d);
         return dname;
       }
-      return string("");
+      return name;
    }
 
    bool isTaskBodyFunction(StringRef name) {
@@ -103,7 +155,7 @@ namespace INS {
        string dname(d);
        //if(dname.find("std::function<void (token_s*)>::function") != string::npos
        //            || dname.find("create_task") != string::npos || dname.find("luTask") != string::npos)
-       if(dname.find("::operator()(token_s*) const") != string::npos)
+       if(dname.find(taskSignature) != string::npos)
          return true;
      }
      return false;
@@ -113,25 +165,11 @@ namespace INS {
       if(name.find("llvm") != StringRef::npos)
         return true;
       return false;
-     /*int status = -1;
-     char* d =abi::__cxa_demangle(name.str().c_str(), nullptr, nullptr, &status);
-     if(! status) {
-       string dname(d);
-       errs() << "What: " << name << "\n";
-       errs() << "But how: " << dname << "\n";
-       if(dname.find("llvm") != string::npos) {
-         errs() << "Da eeeH: " <<  name << "\n";
-         return true;
-       }
-     }
-     else
-       errs() << "Failed: " << name << "\n";
-     return false;*/
    }
 
    bool isPassTokenFunc(StringRef name) {
 
-     return name.find("adf_pass_token") !=StringRef::npos;
+     return name.find(tokenPassingFunc) !=StringRef::npos;
    }
 
    bool isTaskCreationFunc(StringRef name) {
@@ -140,11 +178,19 @@ namespace INS {
    }
 
    bool isRuntimeInitializer(StringRef name){
-     return name.find("InitRuntime")!= StringRef::npos;
+     return name.find(schedInitiFunc)!= StringRef::npos;
    }
 
   bool isRuntimeTerminator(StringRef name) {
-     return name.find("TerminateRuntime") != StringRef::npos;
+     return name.find(schedTerminFunc) != StringRef::npos;
+  }
+
+  void ClearSignatures() {
+    delete [] schedTerminFunc.data();
+    delete [] schedInitiFunc.data();
+    delete [] tokenPassingFunc.data();
+    delete [] tokenReceivingFunc.data();
+    delete [] taskSignature.data();
   }
 }
 

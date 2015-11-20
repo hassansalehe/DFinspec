@@ -48,6 +48,9 @@ namespace {
    const char *getPassName() const override;
    bool runOnFunction(Function &F) override;
    bool doInitialization(Module &M) override;
+   bool doFinalization(Module &M) override {
+     INS::ClearSignatures();
+   }
    static char ID;  // Instrumentation Pass identification, replacement for typeid.
 
  private:
@@ -244,7 +247,7 @@ static RegisterStandardPasses
    //  errs() << INS::demangleName(F.getName()) << "\n";
    CallGraph myGraph(M);
    //myGraph.dump();
-   errs() << "Hi my student\n";
+   INS::InitializeSignatures();
 
    const DataLayout &DL = M.getDataLayout();
    IntptrTy = DL.getIntPtrType(M.getContext());
