@@ -21,7 +21,7 @@ AR = ar
 # flags
 # -------------------------------------------
 
-CXXFLAGS = -c -Wall -O3 -Wno-unused-but-set-variable -I$(SRCDIR) -I$(INCDIR) -I$(INCSTL)
+CXXFLAGS = -g -c -Wall -O0 -Wno-unused-but-set-variable -I$(SRCDIR) -I$(INCDIR) -I$(INCSTL)
 LDFLAGS =
 
 CXXFLAGS_ADF = -std=c++11 -pthread -I$(INCATOMIC) -I$(TMMISC)

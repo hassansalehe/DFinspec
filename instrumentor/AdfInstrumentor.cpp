@@ -19,6 +19,8 @@
 #include "llvm/IR/Metadata.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Type.h"
+#include "llvm/IR/DiagnosticInfo.h"
+#include "llvm/IR/DebugInfo.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/InstrTypes.h"
 #include "llvm/Support/CommandLine.h"
@@ -54,6 +56,25 @@ namespace {
    static char ID;  // Instrumentation Pass identification, replacement for typeid.
 
  private:
+
+   Constant* getLineNumber(Instruction* I) {
+
+     if (auto Loc = I->getDebugLoc()) { // Here I is an LLVM instruction
+       IRBuilder<> IRB(I);
+       unsigned Line = Loc->getLine();
+       //StringRef File = Loc->getFilename();
+       // StringRef Dir = Loc->getDirectory();
+     //if (MDNode *N = I->getMetadata("dbg")) {
+     //  DILocation Loc(N);
+     //  unsigned Line = Loc.getLineNumber();
+       return ConstantInt::get(Type::getInt32Ty(I->getContext()), Line);
+     }
+     else {
+       Constant* zero = ConstantInt::get(Type::getInt32Ty(I->getContext()), 0);
+       return zero;
+     }
+   }
+
    void initializeCallbacks(Module &M);
    bool instrumentLoadOrStore(Instruction *I, const DataLayout &DL);
    bool instrumentAtomic(Instruction *I, const DataLayout &DL);
@@ -146,10 +167,10 @@ static RegisterStandardPasses
   // functions to instrument floats and doubles
   LLVMContext &Ctx = M.getContext();
   INS_MemWriteFloat = M.getOrInsertFunction("INS_AdfMemWriteFloat",
-	Type::getVoidTy(Ctx), Type::getFloatPtrTy(Ctx), Type::getFloatTy(Ctx), NULL);
+	Type::getVoidTy(Ctx), Type::getFloatPtrTy(Ctx), Type::getFloatTy(Ctx), Type::getInt8Ty(Ctx), NULL);
 
   INS_MemWriteDouble = M.getOrInsertFunction("INS_AdfMemWriteDouble",
-	Type::getVoidTy(Ctx), Type::getDoublePtrTy(Ctx), Type::getDoubleTy(Ctx), NULL);
+	Type::getVoidTy(Ctx), Type::getDoublePtrTy(Ctx), Type::getDoubleTy(Ctx), Type::getInt8Ty(Ctx), NULL);
 
   for (size_t i = 0; i < kNumberOfAccessSizes; ++i) {
     const unsigned ByteSize = 1U << i;
@@ -162,7 +183,7 @@ static RegisterStandardPasses
 
     SmallString<32> WriteName("INS_AdfMemWrite" + ByteSizeStr);
     INS_MemWrite[i] = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
-        WriteName, IRB.getVoidTy(), IRB.getInt8PtrTy(), IRB.getInt64Ty(), nullptr));
+        WriteName, IRB.getVoidTy(), IRB.getInt8PtrTy(), IRB.getInt64Ty(), IRB.getInt8Ty(), nullptr));
 
     SmallString<64> UnalignedReadName("__tsan_unaligned_read" + ByteSizeStr);
     TsanUnalignedRead[i] =
@@ -611,21 +632,22 @@ bool AdfSanitizer::instrumentLoadOrStore(Instruction *I, const DataLayout &DL) {
   {
 
     Value *Val = cast<StoreInst>(I)->getValueOperand();
+    Constant* LineNo = getLineNumber(I);
     if(Val->getType()->isFloatTy())
     {
-      Value* args[] = {Addr, Val};
+      Value* args[] = {Addr, Val, LineNo};
       IRB.CreateCall(INS_MemWriteFloat, args);
     }
     else if(Val->getType()->isDoubleTy())
     {
-      Value* args[] = {Addr, Val};
+      Value* args[] = {Addr, Val, LineNo};
       IRB.CreateCall(INS_MemWriteDouble, args);
     }
     else
       IRB.CreateCall(OnAccessFunc,
 		 {IRB.CreatePointerCast(Addr, IRB.getInt8PtrTy()),
 		   //IRB.CreatePointerCast(Val, Val->getType())
-		   Val
+		   Val, LineNo
 		});
 
   }else

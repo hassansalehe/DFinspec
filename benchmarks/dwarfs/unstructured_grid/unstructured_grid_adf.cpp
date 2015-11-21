@@ -196,7 +196,7 @@ void Configurator :: GetContent(unsigned int *numVertex, unsigned int *numTriang
         }
     }
 
-    delete str;
+    delete[] str;
 
 
 	fclose(file);

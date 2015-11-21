@@ -57,7 +57,7 @@ namespace INS {
    // the signatures accordingly.
    void InitializeSignatures() {
      std::ifstream signatureFile;
-     signatureFile.open("/home/hmatar/ADFinspec/instrumentor/SchedulerSignatures.txt"/*, std::ifstream::in*/);
+     signatureFile.open("/home/hmatar/Desktop/VirtualBoxShare/ADFinspec/instrumentor/SchedulerSignatures.txt"/*, std::ifstream::in*/);
      if(signatureFile.is_open()) {
 
        for (std::string line; std::getline(signatureFile, line); ) {

@@ -119,31 +119,31 @@ void INS_AdfMemRead8(void *addr) {
 }
 
 /** Callbacks for store operations  */
-void INS_AdfMemWrite(void *addr, long int value) {
+void INS_AdfMemWrite(void *addr, long int value, int lineNo) {
 
   unsigned int threadID = (unsigned int)pthread_self();
   auto t2t = thr2TaskMap.find(threadID);
 
   if( t2t != thr2TaskMap.end() && t2t->second.active)
   {
-    cout << "=WRITE: addr:" << addr << " value " << (long int)value << " taskID: " << t2t->second.taskID << endl;
-    INS::Write(t2t->second.taskID, addr, (long int)value);
+    cout << "=WRITE: addr:" << addr << " value " << (long int)value << " taskID: " << t2t->second.taskID << " line number: " << lineNo << endl;
+    INS::Write(t2t->second.taskID, addr, (long int)value, lineNo);
   }
 }
 
-void INS_AdfMemWrite1(void *addr, long int value) {
-  INS_AdfMemWrite(addr, value);
+void INS_AdfMemWrite1(void *addr, long int value, int lineNo) {
+  INS_AdfMemWrite(addr, value, lineNo);
 }
 
-void INS_AdfMemWrite4(void *addr, long int value) {
-  INS_AdfMemWrite(addr, value);
+void INS_AdfMemWrite4(void *addr, long int value, int lineNo) {
+  INS_AdfMemWrite(addr, value, lineNo);
 }
 
-void INS_AdfMemWrite8(void *addr, long int value) {
-  INS_AdfMemWrite(addr, value);
+void INS_AdfMemWrite8(void *addr, long int value, int lineNo) {
+  INS_AdfMemWrite(addr, value, lineNo);
 }
 
-void INS_AdfMemWriteFloat(void * addr, float value) {
+void INS_AdfMemWriteFloat(void * addr, float value, int lineNo) {
 
   printf("store addr %p value %f float\n", addr, value);
   unsigned int threadID = (unsigned int)pthread_self();
@@ -152,11 +152,11 @@ void INS_AdfMemWriteFloat(void * addr, float value) {
   if( t2t != thr2TaskMap.end() && t2t->second.active)
   {
     cout << "WRITE: addr:" << addr << " value " << (long int)value << " float, taskID: " << t2t->second.taskID << endl;
-    INS::Write(t2t->second.taskID, addr, (long int)value);
+    INS::Write(t2t->second.taskID, addr, (long int)value, lineNo);
   }
 }
 
-void INS_AdfMemWriteDouble(void * addr, double value) {
+void INS_AdfMemWriteDouble(void * addr, double value, int lineNo) {
   printf("store addr %p value %f\n", addr, value);
   unsigned int threadID = (unsigned int)pthread_self();
   auto t2t = thr2TaskMap.find(threadID);
@@ -164,6 +164,6 @@ void INS_AdfMemWriteDouble(void * addr, double value) {
   if( t2t != thr2TaskMap.end() && t2t->second.active)
   {
     cout << "WRITE: addr:" << addr << " value " << (long int)value << " double taskID: " << t2t->second.taskID << endl;
-    INS::Write(t2t->second.taskID, addr, (long int)value);
+    INS::Write(t2t->second.taskID, addr, (long int)value, lineNo);
   }
-  }
+}

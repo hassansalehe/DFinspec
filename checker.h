@@ -53,14 +53,32 @@ typedef struct Write {
 
   INTEGER wrtTaskId;
   VALUE value;
-  Write(INTEGER tskId, VALUE val):wrtTaskId(tskId), value(val) {}
+  VALUE lineNo;
+  Write(INTEGER tskId, VALUE val, VALUE ln):wrtTaskId(tskId), value(val), lineNo(ln) {}
 } Write;
+
+
+// This struct keeps the line information of the
+// address with determinism conflict
+typedef struct Conflict {
+  ADDRESS addr;
+  VALUE lineNo1;
+  VALUE lineNo2;
+  Conflict(ADDRESS _addr, VALUE _ln1, VALUE _ln2) {
+    addr = _addr;
+    lineNo1 = _ln1;
+    lineNo2 = _ln2;
+  }
+  bool operator<(const Conflict &RHS) const {
+    return addr < RHS.addr;
+  }
+} Conflict;
 
 typedef struct Report {
   string task1Name;
 
   string  task2Name;
-  set<ADDRESS> addresses;
+  set<Conflict> addresses;
 } Report;
 
 typedef SerialBag * SerialBagPtr;
@@ -68,7 +86,7 @@ typedef SerialBag * SerialBagPtr;
 class Checker {
   public:
   VOID addTaskNode(string & logLine);
-  VOID saveWrite(INTEGER taskId, ADDRESS addr, VALUE value);
+  VOID saveWrite(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo);
   VOID processLogLines(string & line);
   VOID reportConflicts();
   VOID printHBGraph();
@@ -76,7 +94,7 @@ class Checker {
   ~Checker();
 
   private:
-    VOID checkDetOnPreviousTasks(INTEGER taskId, ADDRESS addr, VALUE value);
+    VOID checkDetOnPreviousTasks(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo);
     unordered_map <INTEGER, SerialBagPtr> serial_bags; // hold bags of tasks
     unordered_map<INTEGER, Task> graph;  // in and out edges
     unordered_map<ADDRESS, vector<Write>> writes; // for writes
