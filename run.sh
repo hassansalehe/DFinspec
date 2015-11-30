@@ -26,19 +26,19 @@ rm -rf *  > /dev/null 2>&1
 cmake $INSTR_DIR
 make
 cp *.so $BIN_DIR/
-g++ -c -std=c++11 $INSTR_DIR/Logger.cpp -o $BIN_DIR/Logger.o
-g++ -c -std=c++11 $INSTR_DIR/Callbacks.cpp -o $BIN_DIR/Callbacks.o
+g++ -c -std=c++11 $INSTR_DIR/Logger.cpp -o $BIN_DIR/Logger.o  || { echo 'Compiling Logger.cpp failed' ; exit 1; }
+g++ -c -std=c++11 $INSTR_DIR/Callbacks.cpp -o $BIN_DIR/Callbacks.o  || { echo 'Compiling Callbacks.cpp failed' ; exit 1; }
 
 ## Build the ADF runtime and the dwarf benchmarks  ##
 cd $BENCHS_DIR
 make clean
 rm ${BENCHS_DIR}/obj/adf/adf.o > /dev/null 2>&1
 
-clang++ -Xclang -load -Xclang $BIN_DIR/libADFTokenDetectorPass.so  -c -g -Wall -O0 -Wno-unused-but-set-variable -I${SRC} -I${INC} -I${STMSTL}  -DADF_STM -DADF -std=c++11 -pthread -I${ATOMICOPS} -I${TMMISC} ${BENCHS_DIR}/src/adf.cpp -o ${BENCHS_DIR}/obj/adf/adf.o
+clang++ -Xclang -load -Xclang $BIN_DIR/libADFTokenDetectorPass.so  -c -g -Wall -O0 -Wno-unused-but-set-variable -I${SRC} -I${INC} -I${STMSTL}  -DADF_STM -DADF -std=c++11 -pthread -I${ATOMICOPS} -I${TMMISC} ${BENCHS_DIR}/src/adf.cpp -o ${BENCHS_DIR}/obj/adf/adf.o  || { echo 'Compiling adf.cpp failed' ; exit 1; }
 
-make
+make  || { echo 'make failed' ; exit 1; }
 cd $HOME
 
 ## Build the ADFinspec tool ##
-make
+make  || { echo 'Building ADFincpec failed' ; exit 1; }
 

@@ -38,7 +38,7 @@ namespace {
     static char ID;  // Instrumentation Pass identification, replacement for typeid.
 
     TokenDetector() : FunctionPass(ID) {}
-    const char *getPassName() const override{ return "TokenDetector";}
+    const char *getPassName() const override{ return "TokenDetector"; }
 
     bool doInitialization(Module &M) override {
       INS::InitializeSignatures();
@@ -61,8 +61,15 @@ namespace {
       return false;
     }
 
+    /**
+     * This method given a function name, constructs an insertable callback function
+     * and inserts at the beginning of the application function F.
+     * @param F the function object from the application
+     * @param functionName the name of the function to be inserted
+     * @return boolean, true if the function was inserted
+     */
     bool insertVoidFunction(Function &F, StringRef functionName) {
-      errs() << "Function name" << functionName << "\n";
+
       // create finction
       Module &M = *F.getParent();
       IRBuilder<> IRB(M.getContext());

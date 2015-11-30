@@ -47,10 +47,15 @@ VOID INS::Init() {
 
   taskIDSeed = 0;
 
+  // get current time to suffix log files
+  time_t currentTime;
+  time(&currentTime);
+  cout << "TIME " << currentTime << endl;
+
   if(! logger.is_open())
-    logger.open("Tracelog.txt",  ofstream::out | ofstream::trunc);
+    logger.open("Tracelog-" + to_string(currentTime) + ".txt",  ofstream::out | ofstream::trunc);
   if(! HBlogger.is_open())
-    HBlogger.open("HBlog.txt",  ofstream::out | ofstream::trunc);
+    HBlogger.open("HBlog-" + to_string(currentTime) + ".txt",  ofstream::out | ofstream::trunc);
   if(! logger.is_open() || ! HBlogger.is_open())
   {
     cerr << "Could not open log file" << endl;
