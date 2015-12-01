@@ -104,14 +104,14 @@ VOID INS::Finalize() {
 VOID INS::TransactionBegin(INTEGER taskID)
 {
   guardLock.lock();
-  logger << taskID << " " << funcNames[taskID] << " TM ST " << endl;
+  logger << taskID << " STTM " << funcNames[taskID] << endl;
   guardLock.unlock();
 }
 
 VOID INS::TransactionEnd(INTEGER taskID)
 {
   guardLock.lock();
-  logger << taskID << " "<< funcNames[taskID] << " TM ED" << endl;
+  logger << taskID << " EDTM "<< funcNames[taskID] << endl;
   guardLock.unlock();
 }
 
@@ -121,7 +121,7 @@ VOID INS::TaskStartLog(INTEGER taskID, STRING taskName)
   guardLock.lock();
     //pthread_mutex_lock(&g_lock);
   funcNames[taskID] = taskName;
-  logger << taskID << " " << funcNames[taskID] << " ST " << endl;
+  logger << taskID << " ST " << funcNames[taskID] << endl;
 
   guardLock.unlock();
 }
@@ -136,7 +136,7 @@ VOID INS::TaskInTokenLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value)
  if(bufLocAddr) { // dependent through a streaming buffer
     parentID = idMap[make_pair(bufLocAddr, value)];
 
-    logger << taskID << " " << funcNames[taskID] << " IT " << parentID << endl;
+    logger << taskID << " IT " << funcNames[taskID] << " " << parentID << endl;
     HBlogger << taskID << " " << parentID << endl;
 
     // there is a happens before between taskID and parentID:
@@ -164,7 +164,7 @@ VOID INS::TaskEndLog(INTEGER taskID) {
 
   guardLock.lock();
     //pthread_mutex_lock(&g_lock);
-  logger << taskID << " " << funcNames[taskID] << " ED" << endl;
+  logger << taskID << " ED " << funcNames[taskID] << endl;
 
   guardLock.unlock();
     //pthread_mutex_unlock(&g_lock);
@@ -179,7 +179,7 @@ VOID INS::TaskOutTokenLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value) {
     //pthread_mutex_lock(&g_lock);
 
   idMap[make_pair(bufLocAddr, value)] = taskID;
-  logger << taskID << " " << funcNames[taskID] << " OT" << endl;
+  logger << taskID << " OT " << funcNames[taskID] << endl;
 
   guardLock.unlock();
     //pthread_mutex_unlock(&g_lock);
@@ -191,7 +191,7 @@ VOID INS::Read(INTEGER taskID, ADDRESS addr, INTEGER value)
 {
   guardLock.lock();
 
-  logger << taskID << " " << funcNames[taskID] << " RD "<< addr << " " << value << endl;
+  logger << taskID << " RD " << addr << " " << value << endl;
   guardLock.unlock();
     //pthread_mutex_unlock(&g_lock);
 }
@@ -201,7 +201,7 @@ VOID INS::Read(INTEGER taskID, ADDRESS addr, INTEGER value)
 VOID INS::Write(INTEGER taskID, ADDRESS addr, INTEGER value, INTEGER lineNo)
 {
   guardLock.lock();
-  logger << taskID << " " << funcNames[taskID] << " WR "<< addr << " " << value << " " << lineNo << endl;
+  logger << taskID << " WR " <<  addr << " " << value << " " << lineNo << endl;
   guardLock.unlock();
 }
 

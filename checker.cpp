@@ -147,7 +147,6 @@ void Checker::processLogLines(string & line){
     string operation;
 
     ssin >> taskID; // get task id
-    ssin >> taskName; // get task name
     ssin >> operation; // get operation
 
     // if write
@@ -173,6 +172,9 @@ void Checker::processLogLines(string & line){
     }
     // if new task creation, parents terminated
     else if(operation.find("ST") != string::npos) {
+
+      ssin >> taskName; // get task name
+
       // we already know its parents
       // use this information to inherit or greate new serial bag
       auto parentTasks = graph[taskID].inEdges.begin();
