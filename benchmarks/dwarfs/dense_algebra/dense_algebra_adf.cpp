@@ -190,9 +190,9 @@ void FreeMatrix() {
 	delete [] spotrfToken;
 	delete [] ssyrkToken;
 	delete [] strsmToken;
-	delete [] sgemmToken;
 	for (long i = 0; i < NumBlocks; i++)
 		delete [] sgemmToken[i];
+	delete [] sgemmToken;
 }
 
 
@@ -579,8 +579,8 @@ void ParseCommandLine(int argc, char **argv)
 				exit(1);
 		}
 
-	if (BlockSize < 10) BlockSize = 10;
-	if (NumBlocks < 1) NumBlocks = 1;
+	if (BlockSize < 10) BlockSize = 20;
+	if (NumBlocks < 3) NumBlocks = 3;
 	if (num_threads < 1) num_threads = 1;
 
 	printf ("\nCholesky Decomposition\nMatrix size is %ldx%ld, devided into %ldx%ld blocks of size %ld.\n",
