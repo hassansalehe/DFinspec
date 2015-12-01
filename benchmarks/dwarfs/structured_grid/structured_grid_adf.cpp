@@ -14,7 +14,8 @@ bool     print_results;
 char    *input_file_name;
 int      num_threads;
 int      num_tasks;
-int      matrix_size = 512;
+//HASSAN int      matrix_size = 512;
+int      matrix_size = 64;
 double   epsilon = 1.0;
 
 

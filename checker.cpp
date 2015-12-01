@@ -254,8 +254,15 @@ VOID Checker::reportConflicts() {
     cout << it->first.second << " (" << it->second.task2Name << ")";
     cout << " on "<< it->second.addresses.size() << " memory addresses" << endl;
 
+    if(it->second.addresses.size() > 10)
+      cout << "    showing at most 10 addresses                        " << endl;
+    int addressCount = 0;
+
     for(auto conf = it->second.addresses.begin(); conf != it->second.addresses.end(); conf++) {
       cout << "      " <<  conf->addr << " lines: " << conf->lineNo1 << " " << conf->lineNo2 << endl;
+      addressCount++;
+      if(addressCount == 10) // we want to print at most 10 addresses if they are too many.
+        break;
     }
   }
 

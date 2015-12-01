@@ -39,7 +39,9 @@ void INS_TaskStartFunc(void* taskName) {
   t2t.taskID = INS::GenTaskID();
   t2t.active = true;
   thr2TaskMap[t2t.threadID] = t2t;
+#ifdef DEBUG
   cout << "Task_Started, (threadID: "<< t2t.threadID << ", taskID : " << thr2TaskMap[t2t.threadID].taskID <<") name: "<< (char *)taskName<< endl;
+#endif
   INS::TaskStartLog(t2t.taskID, (char*)taskName);
 
 }
@@ -53,7 +55,9 @@ void INS_TaskFinishFunc(void* addr) {
      thr2TaskMap[threadID].active = false;
 
   INS::TaskEndLog(t2t->second.taskID);
+#ifdef DEBUG
   cout << "Task_Ended: (threadID: " << threadID << ")"<< endl;
+#endif
 }
 
 /** Callbacks for tokens */
@@ -66,7 +70,9 @@ void INS_RegInToken(void * tokenAddr, unsigned long size)
   {
     INTEGER value = getMemoryValue(tokenAddr, size);
     INS::TaskInTokenLog(t2t->second.taskID, tokenAddr, value);
+#ifdef DEBUG
     cout << "InToken: " << value << " addr: " << tokenAddr << endl;
+#endif
   }
 }
 
@@ -79,17 +85,23 @@ void INS_RegOutToken(ADDRESS bufLocAddr, ADDRESS tokenAddr, unsigned long size)
   {
     INTEGER value = getMemoryValue(tokenAddr, size);
     INS::TaskOutTokenLog(t2t->second.taskID, bufLocAddr, value);
+#ifdef DEBUG
     cout << "OutToken: " << value << " addr: " << bufLocAddr << endl;
+#endif
   }
 }
 
 
 void toolVptrUpdate(void *addr, void * value) {
+#ifdef DEBUG
   cout << " VPTR write: addr:" << addr << " value " << (long int)value << endl;
+#endif
 }
 
 void toolVptrLoad(void *addr, void * value) {
+#ifdef DEBUG
   cout << " VPTR read: addr:" << addr << " value " << (long int)value << endl;
+#endif
 }
 
 /** Callbacks for store operations  */
@@ -101,8 +113,10 @@ void INS_AdfMemRead(void *addr, unsigned long size) {
   if( t2t != thr2TaskMap.end() && t2t->second.active)
   {
     INTEGER value = getMemoryValue(addr, size);
-    cout << "READ: addr: " << addr << " value: "<< value << " taskID: " << t2t->second.taskID << endl;
     INS::Read(t2t->second.taskID, addr, value);
+#ifdef DEBUG
+    cout << "READ: addr: " << addr << " value: "<< value << " taskID: " << t2t->second.taskID << endl;
+#endif
   }
 }
 
@@ -126,8 +140,10 @@ void INS_AdfMemWrite(void *addr, long int value, int lineNo) {
 
   if( t2t != thr2TaskMap.end() && t2t->second.active)
   {
-    cout << "=WRITE: addr:" << addr << " value " << (long int)value << " taskID: " << t2t->second.taskID << " line number: " << lineNo << endl;
     INS::Write(t2t->second.taskID, addr, (long int)value, lineNo);
+#ifdef DEBUG
+    cout << "=WRITE: addr:" << addr << " value " << (long int)value << " taskID: " << t2t->second.taskID << " line number: " << lineNo << endl;
+#endif
   }
 }
 
@@ -144,26 +160,33 @@ void INS_AdfMemWrite8(void *addr, long int value, int lineNo) {
 }
 
 void INS_AdfMemWriteFloat(void * addr, float value, int lineNo) {
-
+#ifdef DEBUG
   printf("store addr %p value %f float\n", addr, value);
+#endif
   unsigned int threadID = (unsigned int)pthread_self();
   auto t2t = thr2TaskMap.find(threadID);
 
   if( t2t != thr2TaskMap.end() && t2t->second.active)
   {
+#ifdef DEBUG
     cout << "WRITE: addr:" << addr << " value " << (long int)value << " float, taskID: " << t2t->second.taskID << endl;
+#endif
     INS::Write(t2t->second.taskID, addr, (long int)value, lineNo);
   }
 }
 
 void INS_AdfMemWriteDouble(void * addr, double value, int lineNo) {
+#ifdef DEBUG
   printf("store addr %p value %f\n", addr, value);
+#endif
   unsigned int threadID = (unsigned int)pthread_self();
   auto t2t = thr2TaskMap.find(threadID);
 
   if( t2t != thr2TaskMap.end() && t2t->second.active)
   {
+#ifdef DEBUG
     cout << "WRITE: addr:" << addr << " value " << (long int)value << " double taskID: " << t2t->second.taskID << endl;
+#endif
     INS::Write(t2t->second.taskID, addr, (long int)value, lineNo);
   }
 }

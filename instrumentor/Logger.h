@@ -24,6 +24,7 @@ This is a logger for all events in an ADF application
 #include <unordered_map>
 #include <vector>
 #include <set>
+#include <ctime>
 
 using namespace std;
 
