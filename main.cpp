@@ -60,12 +60,13 @@ int main(int argc, char * argv[])
   // take time at end of analyis
   high_resolution_clock::time_point t2 = high_resolution_clock::now();
   auto duration = duration_cast<microseconds>( t2 - t1 ).count();
-  cout << "Checker execution time: "<< duration << " microseconds" << endl;
 
   // testing writes
   //aChecker.testing();
   aChecker.reportConflicts();
   aChecker.printHBGraph();
+
+  cout << "Checker execution time: "<< duration << " microseconds" << endl;
 
   return 0;
 }
