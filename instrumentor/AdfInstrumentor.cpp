@@ -1,3 +1,17 @@
+/////////////////////////////////////////////////////////////////
+//  ADFinspec: a lightweight non-determinism checking
+//          tool for ADF applications
+//
+//    (c) 2015 - Hassan Salehe Matar & MSRC at Koc University
+//      Copying or using this code by any means whatsoever
+//      without consent of the owner is strictly prohibited.
+//
+//   Contact: hmatar-at-ku-dot-edu-dot-tr
+//
+/////////////////////////////////////////////////////////////////
+
+// Instrumentation pass for memory accesses and other actions.
+
 #include "llvm/Transforms/Instrumentation.h"
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"

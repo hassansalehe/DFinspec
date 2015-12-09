@@ -1,3 +1,17 @@
+/////////////////////////////////////////////////////////////////
+//  ADFinspec: a lightweight non-determinism checking
+//          tool for ADF applications
+//
+//    (c) 2015 - Hassan Salehe Matar & MSRC at Koc University
+//      Copying or using this code by any means whatsoever
+//      without consent of the owner is strictly prohibited.
+//
+//   Contact: hmatar-at-ku-dot-edu-dot-tr
+//
+/////////////////////////////////////////////////////////////////
+
+// Include for the instrumentation passes.
+
 #ifndef EXCLUDES_H_P_P
 #define EXCLUDES_H_P_P
 
