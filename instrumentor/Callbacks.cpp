@@ -39,9 +39,9 @@ void INS_TaskStartFunc(void* taskName) {
   t2t.taskID = INS::GenTaskID();
   t2t.active = true;
   thr2TaskMap[t2t.threadID] = t2t;
-#ifdef DEBUG
+//#ifdef DEBUG
   cout << "Task_Started, (threadID: "<< t2t.threadID << ", taskID : " << thr2TaskMap[t2t.threadID].taskID <<") name: "<< (char *)taskName<< endl;
-#endif
+//#endif
   INS::TaskStartLog(t2t.taskID, (char*)taskName);
 
 }
@@ -55,9 +55,9 @@ void INS_TaskFinishFunc(void* addr) {
      thr2TaskMap[threadID].active = false;
 
   INS::TaskEndLog(t2t->second.taskID);
-#ifdef DEBUG
-  cout << "Task_Ended: (threadID: " << threadID << ")"<< endl;
-#endif
+//#ifdef DEBUG
+  cout << "Task_Ended: (threadID: " << threadID << ") taskID: " << thr2TaskMap[threadID].taskID << endl;
+//#endif
 }
 
 /** Callbacks for tokens */

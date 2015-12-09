@@ -50,12 +50,17 @@ VOID INS::Init() {
   // get current time to suffix log files
   time_t currentTime;
   time(&currentTime);
-  cout << "TIME " << currentTime << endl;
+  struct tm * timeinfo = localtime(&currentTime);
+
+  char buff[40];
+  strftime(buff,40,"%d-%m-%Y_%H.%M.%S",timeinfo);
+  string timeStr(buff);
+  cout << "\nTIME " << buff << endl;
 
   if(! logger.is_open())
-    logger.open("Tracelog-" + to_string(currentTime) + ".txt",  ofstream::out | ofstream::trunc);
+    logger.open("Tracelog_" + timeStr + ".txt",  ofstream::out | ofstream::trunc);
   if(! HBlogger.is_open())
-    HBlogger.open("HBlog-" + to_string(currentTime) + ".txt",  ofstream::out | ofstream::trunc);
+    HBlogger.open("HBlog_" + timeStr + ".txt",  ofstream::out | ofstream::trunc);
   if(! logger.is_open() || ! HBlogger.is_open())
   {
     cerr << "Could not open log file" << endl;
@@ -136,6 +141,12 @@ VOID INS::TaskInTokenLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value)
  if(bufLocAddr) { // dependent through a streaming buffer
     parentID = idMap[make_pair(bufLocAddr, value)];
 
+    if(parentID == taskID) // there was a bug where a task could send token to itself
+    {
+       guardLock.unlock();
+       return; // do nothing, just return
+    }
+
     logger << taskID << " IT " << funcNames[taskID] << " " << parentID << endl;
     HBlogger << taskID << " " << parentID << endl;
 
@@ -189,6 +200,7 @@ VOID INS::TaskOutTokenLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value) {
 // provides the address of memory a task reads from
 VOID INS::Read(INTEGER taskID, ADDRESS addr, INTEGER value)
 {
+  return; // logging reads currently disabled because we don't use reads to check non-determinism
   guardLock.lock();
 
   logger << taskID << " RD " << addr << " " << value << endl;
