@@ -90,6 +90,7 @@ class Checker {
   VOID processLogLines(string & line);
   VOID reportConflicts();
   VOID printHBGraph();
+  VOID printHBGraphJS();  // for printing dependency graph in JS format
   VOID testing();
   ~Checker();
 

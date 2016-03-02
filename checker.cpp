@@ -316,6 +316,45 @@ VOID Checker::printHBGraph() {
     flowGraph.close();
 }
 
+VOID Checker::printHBGraphJS() {
+  FILEPTR graphJS;
+  graphJS.open("flowGraph.js",  ofstream::out | ofstream::trunc);
+
+  if( ! graphJS.is_open() ) {
+    cout << "Failed to write to file the graph structure" << endl;
+    exit(-1);
+  }
+
+  // generate list of nodes
+  graphJS << "nodes: [ \n";
+  for(auto it = graph.begin(); it != graph.end(); it++) {
+    if(it == graph.begin())
+      graphJS << "      { data: { id: '" << it->second.name << it->first << "', name: '" << it->second.name << it->first << "' }}";
+    else
+      graphJS << ",\n      { data: { id: '" << it->second.name << it->first << "', name: '" << it->second.name << it->first << "' }}";
+  }
+  graphJS << "\n     ],\n";
+
+  // generate list of edges
+  graphJS << "edges: [ \n";
+  int start = 1;
+  for(auto it = graph.begin(); it != graph.end(); it++)
+    for(auto out = it->second.outEdges.begin(); out != it->second.outEdges.end(); out++) {
+      if(start) {
+        graphJS << "      { data: { source: '" << it->second.name << it->first << "', target: '" << graph[*out].name << *out << "' }}";
+        start = 0;
+      }
+      else
+        graphJS << ",\n      { data: { source: '" << it->second.name << it->first << "', target: '" << graph[*out].name << *out << "' }}";
+    }
+  graphJS << "\n     ]\n";
+
+   //    graphJS << it->first << "_" << it->second.name << " pp ";
+   //    graphJS << *out << "_" << graph[*out].name << endl;
+  if(graphJS.is_open())
+    graphJS.close();
+}
+
 
 VOID Checker::testing() {
   for(auto it = writes.begin(); it != writes.end(); it++)
