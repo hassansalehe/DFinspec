@@ -138,7 +138,8 @@ VOID INS::TaskInTokenLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value)
 
   INTEGER parentID = -1;
 
- if(bufLocAddr) { // dependent through a streaming buffer
+  // if streaming location address not null and there is a sender of the token
+ if(bufLocAddr && idMap.count(make_pair(bufLocAddr, value))) { // dependent through a streaming buffer
     parentID = idMap[make_pair(bufLocAddr, value)];
 
     if(parentID == taskID) // there was a bug where a task could send token to itself

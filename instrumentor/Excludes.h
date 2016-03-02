@@ -71,7 +71,14 @@ namespace INS {
    // the signatures accordingly.
    void InitializeSignatures() {
      std::ifstream signatureFile;
-     signatureFile.open("/home/hmatar/ADFinspec/instrumentor/ADFSchedulerSignatures.txt"/*, std::ifstream::in*/);
+     signatureFile.open("/home/hmatar/SC16DFinspec/instrumentor/ADFSchedulerSignatures.txt"/*, std::ifstream::in*/);
+
+     // check if file does not exist
+     if(!signatureFile.good()) {
+       printf ("Error opening signature file in Excludes.h\n");
+       exit (EXIT_FAILURE);
+     }
+
      if(signatureFile.is_open()) {
 
        for (std::string line; std::getline(signatureFile, line); ) {
