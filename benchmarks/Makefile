@@ -54,6 +54,7 @@ DWARFS_COMMON = $(DWARFDIR)/sparse_algebra/sparse_algebra                       
 		$(DWARFDIR)/spectral_methods/spectral_methods                      \
 		$(DWARFDIR)/structured_grid/structured_grid                        \
 		$(DWARFDIR)/combinatorial_logic/combinatorial_logic                \
+		$(DWARFDIR)/../../motivating_bank_example				\
 		$(DWARFDIR)/unstructured_grid/unstructured_grid
 
 ADFDWARFS = $(addsuffix _adf, $(DWARFS_COMMON))
