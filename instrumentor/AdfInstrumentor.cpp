@@ -45,6 +45,9 @@
 
 #include "Excludes.h"
 
+//include for logging IR codes for verification of nondeterministic bugs
+#include "IIRlogger.h"
+
 using namespace llvm;
 
 /*
@@ -278,6 +281,10 @@ static RegisterStandardPasses
 
  bool AdfSanitizer::doInitialization(Module &M) {
    errs() << "Hi my student "<< M.getName()<< "\n";
+
+   // initialization of task IIR logger.
+   IIRlog::Init( M.getName() );
+
    //for (Function &F : M)
    //  errs() << INS::demangleName(F.getName()) << "\n";
    CallGraph myGraph(M);
@@ -409,6 +416,19 @@ static bool isAtomic(Instruction *I) {
     IRB.CreateCall(INS_TaskStartFunc, {IRB.CreatePointerCast(taskName, IRB.getInt8PtrTy())});
 
     Res = true;
+
+    /* Log all its body statements for verification of nondererminism bugs */
+    IIRlog::LogNewTask( name );
+    for (auto &BB : F) {
+      for (auto &Inst : BB) {
+        unsigned lineNo = 0;
+         if(auto Loc = Inst.getDebugLoc())
+           lineNo = Loc->getLine();
+
+        IIRlog::LogNewIIRcode( lineNo, Inst);
+      }
+    }
+
   }
 
 //else return false;

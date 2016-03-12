@@ -23,6 +23,7 @@ cd build/
 rm -rf *  > /dev/null 2>&1
 
 ## Build the LLVM passes for runtime and application instrumentations ##
+rm -rf $INSTR_DIR/Makefile $INSTR_DIR/*.so $INSTR_DIR/CMakeFile $INSTR_DIR/*.cmake > /dev/null 2>&1
 cmake $INSTR_DIR
 make
 cp *.so $BIN_DIR/
