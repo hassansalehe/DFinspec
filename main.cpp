@@ -12,18 +12,6 @@
 
 // implements the main function.
 
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
-#include <unordered_set>
-#include <unordered_map>
-#include <algorithm>
-#include <cctype>
-#include <vector>
-#include <set>
-#include <chrono>
-
 #include "checker.h"  // header
 
 using namespace std::chrono;

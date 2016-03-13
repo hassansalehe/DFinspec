@@ -12,7 +12,6 @@
 
 // callbacks for instrumentation
 
-#include <iostream>
 #include "Callbacks.h"
 #include "Logger.h"
 

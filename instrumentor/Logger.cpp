@@ -17,10 +17,6 @@
 
 #include "Logger.h"
 
-#include <mutex>  // std::mutex
-//#include <thread>         // std::thread
-//#include<//pthread.h>
-
 std::mutex guardLock;
 
 ////pthread_mutex_t g_lock;

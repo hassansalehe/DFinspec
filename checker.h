@@ -16,18 +16,7 @@
 #ifndef _CHECKER_HPP_
 #define _CHECKER_HPP_
 
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
-#include <unordered_set>
-#include <unordered_map>
-#include <algorithm>
-#include <cctype>
-#include <vector>
-#include <set>
-#include <map>
-
+// includes and definitions
 #include "defs.h"
 
 using namespace std;
@@ -35,7 +24,7 @@ using namespace std;
 // a bag to hold the tasks that happened-before
 typedef struct SerialBag {
   int outBufferCount;
-  INTSET HB;
+  UNORD_INTSET HB;  // unordered int set
 
   SerialBag(): outBufferCount(0){}
 } SerialBag;
@@ -43,8 +32,8 @@ typedef struct SerialBag {
 // for constructing happans-before between tasks
 typedef struct Task {
   string name;     // name of the task
-  INTSET inEdges;  // incoming data streams
-  INTSET outEdges; // outgoing data streams
+  UNORD_INTSET inEdges;  // incoming data streams
+  UNORD_INTSET outEdges; // outgoing data streams
 } Task;
 
 // represents last write,

@@ -12,17 +12,6 @@
 
 // this file implements the checking tool functionalities.
 
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
-#include <unordered_set>
-#include <unordered_map>
-#include <algorithm>
-#include <cctype>
-#include <vector>
-#include <set>
-
 #include "checker.h"  // header
 
 void Checker::checkDetOnPreviousTasks(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo) {

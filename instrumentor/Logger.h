@@ -18,23 +18,7 @@ This is a logger for all events in an ADF application
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include <iostream>
-#include <fstream>
-#include <map>
-#include <unordered_map>
-#include <vector>
-#include <set>
-#include <ctime>
-
-using namespace std;
-
-typedef        void  VOID;
-typedef      void *  ADDRESS;
-typedef    ofstream  FILEPTR;
-typedef    long int  INTEGER;
-typedef const char*  STRING;
-typedef    set<int>  INTSET;
-typedef vector<int>  INTVECTOR;
+#include "defs.h"
 
 class INS {
 

@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////
-//  ADFinspec: a lightweight non-determinism checking 
+//  ADFinspec: a lightweight non-determinism checking
 //          tool for ADF applications
 //
-//    (c) 2015 - Hassan Salehe Matar & MSRC at Koc University
-//      Copying or using this code by any means whatsoever 
+//    (c) 2015, 2016 - Hassan Salehe Matar & MSRC at Koc University
+//      Copying or using this code by any means whatsoever
 //      without consent of the owner is strictly prohibited.
-//   
+//
 //   Contact: hmatar-at-ku-dot-edu-dot-tr
 //
 /////////////////////////////////////////////////////////////////
@@ -27,6 +27,11 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <ctime>
+#include <chrono>
+#include <mutex>          // std::mutex
+//#include<//pthread.h>
+//#include <thread>       // std::thread
 
 using namespace std;
 
@@ -37,7 +42,8 @@ typedef    long int        INTEGER;
 typedef    long int        VALUE;
 typedef const char*        STRING;
 typedef vector<int>        INTVECTOR;
-typedef unordered_set<int> INTSET;
+typedef    set<int>        INTSET;
+typedef unordered_set<int> UNORD_INTSET;
 
 
 #endif
