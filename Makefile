@@ -22,8 +22,8 @@ else
 endif
 #CXX = g++
 CXXFLGS = -g -O3 -std=c++11
-DEPS = checker.h defs.h
-OBJ = checker.o main.o
+DEPS = validator.h checker.h defs.h
+OBJ = validator.o checker.o main.o
 TOOL = ADFinspec
 
 all: $(TOOL)

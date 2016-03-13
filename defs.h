@@ -29,6 +29,8 @@
 #include <map>
 #include <ctime>
 #include <chrono>
+#include <regex>
+
 #include <mutex>          // std::mutex
 //#include<//pthread.h>
 //#include <thread>       // std::thread
@@ -44,6 +46,12 @@ typedef const char*        STRING;
 typedef vector<int>        INTVECTOR;
 typedef    set<int>        INTSET;
 typedef unordered_set<int> UNORD_INTSET;
+typedef        bool        BOOL;
+typedef vector<string>     STRVECTOR;
 
+// for conflict task pairs
+typedef pair<string,string>     STRPAIR;
+typedef set<pair<int,int>>      INT_PAIRS;
+typedef map<STRPAIR, INT_PAIRS> CONFLICT_PAIRS;
 
 #endif

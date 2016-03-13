@@ -227,6 +227,27 @@ void Checker::processLogLines(string & line){
     }
 }
 
+CONFLICT_PAIRS & Checker::getConflictingPairs() {
+
+  // generate simplified version of conflicts from scratch
+  conflictTasksAndLines.clear();
+
+  // a pair of conflicting task body with a set of line numbers
+  for(auto it = conflictTable.begin(); it != conflictTable.end(); ++it) {
+    pair<string, string> namesPair = make_pair(it->second.task1Name, it->second.task2Name);
+    if(conflictTasksAndLines.find(namesPair) == conflictTasksAndLines.end())
+      conflictTasksAndLines[namesPair] = set<pair<int,int>>();
+
+    // get line numbers
+    for(auto conf = it->second.addresses.begin(); conf != it->second.addresses.end(); conf++) {
+      pair<int,int> lines = make_pair(conf->lineNo1, conf->lineNo2);
+      conflictTasksAndLines[namesPair].insert(lines);
+    }
+  }
+  return conflictTasksAndLines;
+}
+
+
 VOID Checker::reportConflicts() {
   cout << "============================================================" << endl;
   cout << "                                                            " << endl;
@@ -262,19 +283,10 @@ VOID Checker::reportConflicts() {
 #else
 
   // a pair of conflicting task body with a set of line numbers
-  map< pair<string,string>,  set<pair<int,int>>> tasksAndLines;
-  for(auto it = conflictTable.begin(); it != conflictTable.end(); ++it) {
-    pair<string, string> namesPair = make_pair(it->second.task1Name, it->second.task2Name);
-    if(tasksAndLines.find(namesPair) == tasksAndLines.end())
-      tasksAndLines[namesPair] = set<pair<int,int>>();
+  if(conflictTasksAndLines.empty())
+    getConflictingPairs();
 
-    // get line numbers
-    for(auto conf = it->second.addresses.begin(); conf != it->second.addresses.end(); conf++) {
-      pair<int,int> lines = make_pair(conf->lineNo1, conf->lineNo2);
-      tasksAndLines[namesPair].insert(lines);
-    }
-  }
-  for(auto it = tasksAndLines.begin(); it!= tasksAndLines.end(); it++)
+  for(auto it = conflictTasksAndLines.begin(); it!= conflictTasksAndLines.end(); it++)
   {
     cout << it->first.first << " <--> " << it->first.second << ": line numbers  {";
     for(auto ot = it->second.begin(); ot != it->second.end(); ot++)

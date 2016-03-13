@@ -77,6 +77,10 @@ class Checker {
   VOID addTaskNode(string & logLine);
   VOID saveWrite(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo);
   VOID processLogLines(string & line);
+
+  // a pair of conflicting task body with a set of line numbers
+  CONFLICT_PAIRS & getConflictingPairs();
+
   VOID reportConflicts();
   VOID printHBGraph();
   VOID printHBGraphJS();  // for printing dependency graph in JS format
@@ -89,6 +93,7 @@ class Checker {
     unordered_map<INTEGER, Task> graph;  // in and out edges
     unordered_map<ADDRESS, vector<Write>> writes; // for writes
     map<pair<INTEGER, INTEGER>, Report> conflictTable;
+    CONFLICT_PAIRS conflictTasksAndLines;
 };
 
 

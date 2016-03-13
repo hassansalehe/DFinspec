@@ -2,7 +2,7 @@
 //  ADFinspec: a lightweight non-determinism checking
 //          tool for ADF applications
 //
-//    (c) 2015 - Hassan Salehe Matar & MSRC at Koc University
+//    (c) 2015, 2016 - Hassan Salehe Matar & MSRC at Koc University
 //      Copying or using this code by any means whatsoever
 //      without consent of the owner is strictly prohibited.
 //
@@ -13,16 +13,17 @@
 // implements the main function.
 
 #include "checker.h"  // header
+#include "validator.h"
 
 using namespace std::chrono;
 
 int main(int argc, char * argv[])
 {
 
-  if(argc != 3) {
+  if(argc != 4) {
     cout << endl;
     cout << "ERROR!" << endl;
-    cout << "Usage: ./ADDFinspec TraceLog.txt HBlog.txt" << endl;
+    cout << "Usage: ./ADDFinspec TraceLog.txt HBlog.txt IRlog.txt" << endl;
     cout << endl;
     exit(-1);
   }
@@ -44,6 +45,13 @@ int main(int argc, char * argv[])
   while( getline(log, logLine) ) {
     aChecker.processLogLines(logLine);
   }
+  log.close();
+
+  // validate the detected nondeterminism bugs
+  BugValidator validator(argv[3]); // read IR file
+
+  // do the validation
+  validator.validate( aChecker.getConflictingPairs( ) );
 
   // take time at end of analyis
   high_resolution_clock::time_point t2 = high_resolution_clock::now();
