@@ -212,7 +212,7 @@ bool BugValidator::isSafe(vector<Instruction> & trace, INTEGER loc, string opera
     }
 
     // ADD
-    if(instr.oper == ADD) {
+    if(instr.oper == ADD || instr.oper == SUB) {
        if(instr.destination == operand) {
           bool t1 = isSafe(trace, loc-1, instr.operand1);
           bool t2 = isSafe(trace, loc-1, instr.operand2);
@@ -275,6 +275,34 @@ Instruction BugValidator::makeInstruction(string stmt) {
         instr.oper = MUL;
     // ...
 
+  }
+  else if(contents[2] == "add" ||
+          contents[2] == "sub" ||
+          contents[2] == "mul" ||
+          contents[2] == "shl") {
+     instr.destination = contents[0];
+     instr.oper = contents[2] == "add" ? ADD :
+     (instr.oper = contents[2] == "sub"? SUB :
+     (instr.oper = contents[2] == "mul"? MUL : SHL));
+     // <result> = add nuw nsw <ty> <op1>, <op2>  ; yields {ty}:result
+     if(contents[3] == "nuw" && contents[4] == "nsw") {
+        instr.type = contents[5];
+        instr.operand1 = contents[6];
+        instr.operand2 = contents[7];
+     }
+     else if(contents[3] == "nuw" || contents[3] == "nsw") {
+        // <result> = add nuw <ty> <op1>, <op2>      ; yields {ty}:result
+        // <result> = add nsw <ty> <op1>, <op2>      ; yields {ty}:result
+        instr.type = contents[4];
+        instr.operand1 = contents[5];
+        instr.operand2 = contents[6];
+     }
+     else {
+        // <result> = add <ty> <op1>, <op2>          ; yields {ty}:result
+        instr.type = contents[3];
+        instr.operand1 = contents[4];
+        instr.operand2 = contents[5];
+     }
   }
   else if(contents[2] == "alloca") {
     instr.destination = contents[0];

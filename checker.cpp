@@ -283,9 +283,6 @@ VOID Checker::reportConflicts() {
 #else
 
   // a pair of conflicting task body with a set of line numbers
-  if(conflictTasksAndLines.empty())
-    getConflictingPairs();
-
   for(auto it = conflictTasksAndLines.begin(); it!= conflictTasksAndLines.end(); it++)
   {
     cout << it->first.first << " <--> " << it->first.second << ": line numbers  {";

@@ -28,6 +28,8 @@ enum OPERATION {
   RET,
   MUL,
   ADD,
+  SUB,
+  SHL,
 };
 
 typedef struct Instruction {
@@ -37,7 +39,7 @@ typedef struct Instruction {
   OPERATION oper;
   string operand1;
   string operand2;
-  
+
   // raw
   string raw;
 } Instruction;
