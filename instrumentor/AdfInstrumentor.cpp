@@ -677,12 +677,36 @@ bool AdfSanitizer::instrumentLoadOrStore(Instruction *I, const DataLayout &DL) {
       Value* args[] = {Addr, Val, LineNo};
       IRB.CreateCall(INS_MemWriteDouble, args);
     }
+    else if(Val->getType()->isIntegerTy())
+    {
+#ifdef DEBUG
+       unsigned lineNo = 0;
+       if(auto Loc = I->getDebugLoc())
+          lineNo = Loc->getLine();
+       if(lineNo == 1172)
+       {
+         errs() << "Unknown ";
+         Val->getType()->dump();
+         I->dump();
+         errs() << "Idx " << Idx << " Alignment " << Alignment << "\n";
+         LineNo->dump();
+         errs() << "Computed:  " << lineNo << "\n";
+         errs() << INS::demangleName(F.getName()) << "\n";
+         errs() << "========\n";
+       }
+#endif
+       IRB.CreateCall(OnAccessFunc,
+		{IRB.CreatePointerCast(Addr, IRB.getInt8PtrTy()),
+		 //IRB.CreatePointerCast(Val, Val->getType())
+		 Val, LineNo
+		});
+    }
     else
       IRB.CreateCall(OnAccessFunc,
-		 {IRB.CreatePointerCast(Addr, IRB.getInt8PtrTy()),
-		   //IRB.CreatePointerCast(Val, Val->getType())
-		   Val, LineNo
-		});
+                 {IRB.CreatePointerCast(Addr, IRB.getInt8PtrTy()),
+                   //IRB.CreatePointerCast(Val, Val->getType())
+                   Val, LineNo
+                });
 
   }else
     IRB.CreateCall(OnAccessFunc,

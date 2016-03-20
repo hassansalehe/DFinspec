@@ -75,10 +75,13 @@ namespace INS {
 
      // check if file does not exist
      if(!signatureFile.good()) {
-       printf("===========================================\n");
-       printf ("Error opening signature file in Excludes.h\n");
-       printf("===========================================\n");
-       exit (EXIT_FAILURE);
+       printf( "                                           \n");
+       printf( "===========================================\n");
+       printf( " ERROR!                                    \n");
+       printf( "Error opening signature file in Excludes.h \n");
+       printf( "                                           \n");
+       printf( "===========================================\n");
+       exit ( EXIT_FAILURE );
      }
 
      if(signatureFile.is_open()) {
