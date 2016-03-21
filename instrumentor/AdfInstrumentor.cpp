@@ -691,7 +691,7 @@ bool AdfSanitizer::instrumentLoadOrStore(Instruction *I, const DataLayout &DL) {
          errs() << "Idx " << Idx << " Alignment " << Alignment << "\n";
          LineNo->dump();
          errs() << "Computed:  " << lineNo << "\n";
-         errs() << INS::demangleName(F.getName()) << "\n";
+         //errs() << INS::demangleName(F.getName()) << "\n";
          errs() << "========\n";
        }
 #endif
