@@ -36,7 +36,7 @@ class INS {
     static VOID Read(INTEGER taskID, ADDRESS addr, INTEGER value);
     static VOID Read2(INTEGER taskID, ADDRESS addr, int row, int column);
     static VOID Write2(INTEGER taskID, ADDRESS addr, int row, int column);
-    static VOID Write(INTEGER taskID, ADDRESS addr, INTEGER value, INTEGER lineNo);
+    static VOID Write(INTEGER taskID, ADDRESS addr, INTEGER value, INTEGER lineNo, STRING funcName);
     static VOID Finalize();
 
   private:

@@ -108,6 +108,10 @@ namespace {
      Function *INS_TaskStartFunc;
      Function *INS_TaskFinishFunc;
 
+     // register every new instrumented function
+     Value *funcNamePtr = NULL;
+     Function *INS_TaskStartFunc2;
+
      // callbacks for registering tokens
      Function *INS_RegInToken;
      //Function *INS_RegOutToken;
@@ -177,6 +181,11 @@ static RegisterStandardPasses
 
   INS_TaskStartFunc = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
       "INS_TaskStartFunc", IRB.getVoidTy(), IRB.getInt8PtrTy(), nullptr));
+
+  // register every executed function.
+  INS_TaskStartFunc2 = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
+      "INS_TaskStartFunc2", IRB.getVoidTy(), IRB.getInt8PtrTy(), nullptr));
+
   INS_TaskFinishFunc = checkSanitizerInterfaceFunction(
       M.getOrInsertFunction("INS_TaskFinishFunc", IRB.getVoidTy(), nullptr));
   OrdTy = IRB.getInt32Ty();
@@ -431,6 +440,12 @@ static bool isAtomic(Instruction *I) {
 
   }
 
+  // Register task name
+  StringRef funcName = INS::demangleName(F.getName());
+  IRBuilder<> IRB(F.getEntryBlock().getFirstNonPHI());
+  funcNamePtr = IRB.CreateGlobalStringPtr(funcName, "functionName");
+  //IRB.CreateCall(INS_TaskStartFunc2, {IRB.CreatePointerCast(funcNamePtr, IRB.getInt8PtrTy())});
+
 //else return false;
    /*
    if ( isTaskBodyFunction(F) ) {
@@ -669,12 +684,12 @@ bool AdfSanitizer::instrumentLoadOrStore(Instruction *I, const DataLayout &DL) {
     Constant* LineNo = getLineNumber(I);
     if(Val->getType()->isFloatTy())
     {
-      Value* args[] = {Addr, Val, LineNo};
+      Value* args[] = {Addr, Val, LineNo, funcNamePtr};
       IRB.CreateCall(INS_MemWriteFloat, args);
     }
     else if(Val->getType()->isDoubleTy())
     {
-      Value* args[] = {Addr, Val, LineNo};
+      Value* args[] = {Addr, Val, LineNo, funcNamePtr};
       IRB.CreateCall(INS_MemWriteDouble, args);
     }
     else if(Val->getType()->isIntegerTy())
@@ -698,14 +713,14 @@ bool AdfSanitizer::instrumentLoadOrStore(Instruction *I, const DataLayout &DL) {
        IRB.CreateCall(OnAccessFunc,
 		{IRB.CreatePointerCast(Addr, IRB.getInt8PtrTy()),
 		 //IRB.CreatePointerCast(Val, Val->getType())
-		 Val, LineNo
+		 Val, LineNo, funcNamePtr
 		});
     }
     else
       IRB.CreateCall(OnAccessFunc,
                  {IRB.CreatePointerCast(Addr, IRB.getInt8PtrTy()),
                    //IRB.CreatePointerCast(Val, Val->getType())
-                   Val, LineNo
+                   Val, LineNo, funcNamePtr
                 });
 
   }else

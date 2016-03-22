@@ -43,7 +43,12 @@ typedef struct Write {
   INTEGER wrtTaskId;
   VALUE value;
   VALUE lineNo;
-  Write(INTEGER tskId, VALUE val, VALUE ln):wrtTaskId(tskId), value(val), lineNo(ln) {}
+  string funcName;
+  Write(INTEGER tskId, VALUE val, VALUE ln, string fname):
+    wrtTaskId(tskId),
+    value(val),
+    lineNo(ln),
+    funcName(fname) {}
 } Write;
 
 
@@ -53,10 +58,16 @@ typedef struct Conflict {
   ADDRESS addr;
   VALUE lineNo1;
   VALUE lineNo2;
-  Conflict(ADDRESS _addr, VALUE _ln1, VALUE _ln2) {
+
+  string funcName1;
+  string funcName2;
+  Conflict(ADDRESS _addr, VALUE _ln1, string fname1, VALUE _ln2, string fname2) {
     addr = _addr;
     lineNo1 = _ln1;
     lineNo2 = _ln2;
+
+    funcName1 = fname1;
+    funcName2 = fname2;
   }
   bool operator<(const Conflict &RHS) const {
     return addr < RHS.addr;
@@ -75,7 +86,7 @@ typedef SerialBag * SerialBagPtr;
 class Checker {
   public:
   VOID addTaskNode(string & logLine);
-  VOID saveWrite(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo);
+  VOID saveWrite(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo, string& funcName);
   VOID processLogLines(string & line);
 
   // a pair of conflicting task body with a set of line numbers
@@ -88,7 +99,7 @@ class Checker {
   ~Checker();
 
   private:
-    VOID checkDetOnPreviousTasks(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo);
+    VOID checkDetOnPreviousTasks(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo, string & funcName);
     unordered_map <INTEGER, SerialBagPtr> serial_bags; // hold bags of tasks
     unordered_map<INTEGER, Task> graph;  // in and out edges
     unordered_map<ADDRESS, vector<Write>> writes; // for writes

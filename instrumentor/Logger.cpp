@@ -207,10 +207,10 @@ VOID INS::Read(INTEGER taskID, ADDRESS addr, INTEGER value)
 
 
 // checks a race at write operation
-VOID INS::Write(INTEGER taskID, ADDRESS addr, INTEGER value, INTEGER lineNo)
+VOID INS::Write(INTEGER taskID, ADDRESS addr, INTEGER value, INTEGER lineNo, STRING funcName)
 {
   guardLock.lock();
-  logger << taskID << " WR " <<  addr << " " << value << " " << lineNo << endl;
+  logger << taskID << " WR " <<  addr << " " << value << " " << lineNo << " " << funcName << endl;
   guardLock.unlock();
 }
 

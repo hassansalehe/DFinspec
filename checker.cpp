@@ -14,7 +14,9 @@
 
 #include "checker.h"  // header
 
-void Checker::checkDetOnPreviousTasks(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo) {
+#define VERBOSE
+
+void Checker::checkDetOnPreviousTasks(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo, string & funcName) {
   auto wTable = writes.find(addr);
   auto end = serial_bags[taskId]->HB.end();
 
@@ -27,19 +29,19 @@ void Checker::checkDetOnPreviousTasks(INTEGER taskId, ADDRESS addr, VALUE value,
 	// code for recording errors
 	auto key = make_pair(parWrite->wrtTaskId, taskId);
 	if(conflictTable.find(key) != conflictTable.end())
-	  conflictTable[key].addresses.insert(Conflict(addr, parWrite->lineNo, lineNo));
+	  conflictTable[key].addresses.insert(Conflict(addr, parWrite->lineNo, parWrite->funcName, lineNo, funcName));
 	else {
 	  conflictTable[key] = Report();
 	  conflictTable[key].task1Name = graph[parWrite->wrtTaskId].name;
 	  conflictTable[key].task2Name = graph[taskId].name;
-	  conflictTable[key].addresses.insert(Conflict(addr, parWrite->lineNo, lineNo));
+	  conflictTable[key].addresses.insert(Conflict(addr, parWrite->lineNo, parWrite->funcName, lineNo, funcName));
 	}
       }
     }
   }
 }
 
-void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo) {
+void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo, string& funcName) {
   // CASES
   // 1. first write -> just save
   // 2. nth write of the same task -> just save
@@ -52,7 +54,7 @@ void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo)
 
   if(writes.find(addr) == writes.end()) { // 1. first write
      writes[addr] = vector<Write>();
-     writes[addr].push_back(Write(taskId, value, lineNo));
+     writes[addr].push_back(Write(taskId, value, lineNo, funcName));
   }
   else {
     auto wTable = writes.find(addr);
@@ -75,12 +77,12 @@ void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo)
 	writes[addr].push_back(lastWrt);
 
 	// check on the happens-before relations with the previous concurrent tasks
-	checkDetOnPreviousTasks(taskId, addr, value, lineNo);
+	checkDetOnPreviousTasks(taskId, addr, value, lineNo, funcName);
         return;
       }
       else { // 4. parallel, possible race!
 
-         wTable->second.push_back(Write(taskId, value, lineNo));
+         wTable->second.push_back(Write(taskId, value, lineNo, funcName));
          if(lastWrt.value == value) // 4.1 same value written
            return; // no determinism error, just return
          else { // 4.2 this is definitely determinism error
@@ -88,16 +90,16 @@ void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo)
             // code for recording errors
             auto key = make_pair(lastWrt.wrtTaskId, taskId);
             if(conflictTable.find(key) != conflictTable.end())
-              conflictTable[key].addresses.insert(Conflict(addr, lastWrt.lineNo, lineNo));
+              conflictTable[key].addresses.insert(Conflict(addr, lastWrt.lineNo, lastWrt.funcName, lineNo, funcName));
             else {
               conflictTable[key] = Report();
               conflictTable[key].task1Name = graph[lastWrt.wrtTaskId].name;
               conflictTable[key].task2Name = graph[taskId].name;
-              conflictTable[key].addresses.insert(Conflict(addr, lastWrt.lineNo, lineNo));
+              conflictTable[key].addresses.insert(Conflict(addr, lastWrt.lineNo, lastWrt.funcName, lineNo, funcName));
             }
 
             // 4.2.1 check conflicts with other parallel tasks
-            checkDetOnPreviousTasks(taskId, addr, value, lineNo);
+            checkDetOnPreviousTasks(taskId, addr, value, lineNo, funcName);
             return;
          }
       }
@@ -153,7 +155,11 @@ void Checker::processLogLines(string & line){
       ssin >> lineNumber;
       VALUE lineNo= stol(lineNumber);
 
-      saveWrite(taskID, address, val, lineNo);
+      // get function name
+      string funcName;
+      getline(ssin, funcName);
+
+      saveWrite(taskID, address, val, lineNo, funcName);
     }
     else if (operation.find("RD") != string::npos) {
       // it is read just return for now.
@@ -273,7 +279,8 @@ VOID Checker::reportConflicts() {
     int addressCount = 0;
 
     for(auto conf = it->second.addresses.begin(); conf != it->second.addresses.end(); conf++) {
-      cout << "      " <<  conf->addr << " lines: " << conf->lineNo1 << " " << conf->lineNo2 << endl;
+      cout << "      " <<  conf->addr << " lines: " << conf->funcName1 << ": " << conf->lineNo1;
+      cout << ", "<< conf->funcName2 << ": " << conf->lineNo2 << endl;
       addressCount++;
       if(addressCount == 10) // we want to print at most 10 addresses if they are too many.
         break;
