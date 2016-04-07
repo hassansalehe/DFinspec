@@ -17,11 +17,12 @@
 
 #include "Logger.h"
 
-std::mutex guardLock;
 
 ////pthread_mutex_t g_lock;
 
 // static attributes redefined
+std::mutex INS::guardLock;
+
 FILEPTR INS::logger;
 FILEPTR INS::HBlogger;
 INTEGER INS::taskIDSeed = 0;

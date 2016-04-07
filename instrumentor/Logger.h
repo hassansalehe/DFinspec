@@ -66,6 +66,10 @@ class INS {
 
     // keeping track of the last reader from a memory location
     static unordered_map<ADDRESS, INTEGER> lastReader;
+
+public:
+    // global lock to protect metadata
+    static std::mutex guardLock;
 };
 
 #endif

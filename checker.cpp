@@ -14,7 +14,7 @@
 
 #include "checker.h"  // header
 
-#define VERBOSE
+//#define VERBOSE
 
 void Checker::checkDetOnPreviousTasks(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo, string & funcName) {
   auto wTable = writes.find(addr);
