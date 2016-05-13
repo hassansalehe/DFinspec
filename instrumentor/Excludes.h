@@ -71,7 +71,7 @@ namespace INS {
    // the signatures accordingly.
    void InitializeSignatures() {
      std::ifstream signatureFile;
-     signatureFile.open("/home/hmatar/ADFinspec/instrumentor/ADFSchedulerSignatures.txt"/*, std::ifstream::in*/);
+     signatureFile.open("/home/hmatar/workspace/ADFinspec/instrumentor/ADFSchedulerSignatures.h"/*, std::ifstream::in*/);
 
      // check if file does not exist
      if(!signatureFile.good()) {
