@@ -29,59 +29,36 @@ string BugValidator::trim(string sentence) {
 
 BugValidator::BugValidator(char * IRlogName)
 {
-
   vector<Instruction> * currentTask = NULL;
-
   string sttmt; // program statement
   ifstream IRcode(IRlogName); //  open IRlog file
+
   while( getline( IRcode, sttmt ) )
   {
-     // skip if line is empty
-     if(sttmt.find_first_not_of(' ') == string::npos)
-       continue;
+    if( isEmpty(sttmt) ) continue; // skip empty line
+    if( isDebugCall(sttmt) ) continue; // skip debug call
 
-     // if is a debug call
-     if (sttmt.find("llvm.dbg.declare") != string::npos)
-       continue;
+    sttmt = trim( sttmt ); // trim spaces
+    if ( isValid(sttmt) ) { // check if normal statement
 
-     sttmt = trim(sttmt); // trim spaces
+      INTEGER lineNo = getLineNumber( sttmt );
+      sttmt = sttmt.substr(sttmt.find_first_not_of(' ', sttmt.find_first_of(' ')));
+      Instruction instr = makeInstruction(sttmt);
+      instr.lineNo = lineNo;
+      currentTask->push_back(instr);
+      continue;
+    }
 
-     // check if normal statement
-     if ( regex_search (sttmt, regex("^[0-9]+: ") ))
-     {
-       // do something with
-       // get line number
-       smatch result;
-       regex_search(sttmt, result, regex("^[0-9]+") );
+    if( isTaskName(sttmt) ) { // else a new task name
+      cout << "Task name: " << sttmt << endl;
+      Tasks[sttmt] = vector<Instruction>();
+      currentTask = &Tasks[sttmt];
+      //map<string, map<INTEGER, vector<string>>> Tasks;
+      continue;
+    }
 
-       if(result.size() <= 0 || result.size()> 1 )
-       {
-         // a line should have only one line number
-         cerr << "Incorrect number of lines: " << IRlogName << endl;
-         exit(EXIT_FAILURE);
-       }
-
-       INTEGER lineNo = stoul(result[0]);
-        sttmt = sttmt.substr(sttmt.find_first_not_of(' ', sttmt.find_first_of(' ')));
-       Instruction instr = makeInstruction(sttmt);
-       instr.lineNo = lineNo;
-       currentTask->push_back(instr);
-       continue;
-     }
-
-     // else a new task name
-     if(sttmt.find_first_of(' ') == string::npos)
-     {
-       //
-       cout << "Task name: " << sttmt << endl;
-       Tasks[sttmt] = vector<Instruction>();
-       currentTask = &Tasks[sttmt];
-       //map<string, map<INTEGER, vector<string>>> Tasks;
-       continue;
-     }
-
-     // wierd string
-     cout << "Wierd program statement: " << sttmt << endl;
+    // got here :-(, wierd string!
+    cout << "Unexpected program statement: " << sttmt << endl;
   }
   IRcode.close();
   cout << "Tasks no: " << Tasks.size();
@@ -136,9 +113,7 @@ vector<string> BugValidator::splitInstruction(string stmt) {
   vector<string> segments2;
   // make individual words
   for(auto stmt : segments) {
-    string trimed = trim(stmt);
-    stringstream sg2(trimed);
-
+    stringstream sg2(trim(stmt));
     while( getline(sg2, tok, ' ') ) {
        segments2.push_back(tok);
     }
@@ -157,85 +132,78 @@ BOOL BugValidator::involveSimpleOperations(
 
   for(auto i = taskBody.begin(); i != taskBody.end(); i++)
   {
-     if(i->lineNo > lineNumber)
-          break;
-
-     if(i->lineNo == lineNumber)
-      instr  = *i;
-
+     if(i->lineNo > lineNumber) break;
+     if(i->lineNo == lineNumber) instr  = *i;
      index++;
   }
 
-    cout << "SAFET " << taskName << " " << instr.destination << "idx "<< index << endl;
+  cout << "SAFET " << taskName << " " << instr.destination << "idx "<< index << endl;
   // expected to be a store
   if(instr.oper == STORE) {
 
-     return isSafe(taskBody, index, instr.operand1);
-      cout << "A store " << instr.destination << endl;
+    return isSafe(taskBody, index, instr.operand1);
+    cout << "A store " << instr.destination << endl;
 
-      //bool r1 = isOnsimpleOperations(lineNumber - 1, istr.destination);
-      //bool r2 = isOnsimpleOperations(lineNumber - 1, istr.operand1);
+    //bool r1 = isOnsimpleOperations(lineNumber - 1, istr.destination);
+    //bool r2 = isOnsimpleOperations(lineNumber - 1, istr.operand1);
   }
   return false;
 }
 
-bool BugValidator::isSafe(vector<Instruction> & trace, INTEGER loc, string operand) {
-    if(loc < 0)
-        return true;
+bool BugValidator::isSafe(const vector<Instruction> & trace, INTEGER loc, string operand) {
+  if(loc < 0)
+      return true;
 
-    Instruction instr = trace.at(loc);
+  Instruction instr = trace.at(loc);
+  if(instr.oper == ALLOCA && instr.destination == operand)
+      return true;
 
-    if(instr.oper == ALLOCA && instr.destination == operand)
-        return true;
+  if( instr.oper == BITCAST ) {
+    if( instr.destination == operand)
+      return isSafe(trace, loc-1, instr.operand1);
+    else
+        return isSafe(trace, loc-1, operand);
+  }
 
-    //
-    if( instr.oper == BITCAST ) {
-      if( instr.destination == operand)
-        return isSafe(trace, loc-1, instr.operand1);
+  // used as parameter somewhere and might be a pointer
+  if(instr.oper == CALL) {
+      if(instr.raw.find(operand) != string::npos)
+        return false;
       else
           return isSafe(trace, loc-1, operand);
-    }
-
-    // used as parameter somewhere and might be a pointer
-    if(instr.oper == CALL) {
-        if(instr.raw.find(operand) != string::npos)
-          return false;
-        else
-            return isSafe(trace, loc-1, operand);
-    }
-    // MUL
-    if(instr.oper == MUL) {
-       if(instr.destination == operand)
-          return false;
-       else
-          return isSafe(trace, loc-1, operand);
-    }
-
-    // ADD
-    if(instr.oper == ADD || instr.oper == SUB) {
-       if(instr.destination == operand) {
-          bool t1 = isSafe(trace, loc-1, instr.operand1);
-          bool t2 = isSafe(trace, loc-1, instr.operand2);
-          return t1 && t2;
-      }
-   }
-
-   // STORE
-   if(instr.oper == STORE) {
+  }
+  // MUL
+  if(instr.oper == MUL) {
       if(instr.destination == operand)
-         return isSafe(trace, loc-1, instr.operand1);
-      return isSafe(trace, loc-1, operand);
-   }
+        return false;
+      else
+        return isSafe(trace, loc-1, operand);
+  }
 
-   // load
-   if(instr.oper == LOAD) {
-      if(instr.destination == operand)
-         return isSafe(trace, loc-1, instr.operand1);
-   }
+  // ADD
+  if(instr.oper == ADD || instr.oper == SUB) {
+      if(instr.destination == operand) {
+        bool t1 = isSafe(trace, loc-1, instr.operand1);
+        bool t2 = isSafe(trace, loc-1, instr.operand2);
+        return t1 && t2;
+    }
+  }
 
-   return isSafe(trace, loc-1, operand);
-    // GETEMEMENTSPTR
+  // STORE
+  if(instr.oper == STORE) {
+    if(instr.destination == operand)
+        return isSafe(trace, loc-1, instr.operand1);
+    return isSafe(trace, loc-1, operand);
+  }
 
+  // load
+  if(instr.oper == LOAD) {
+    if(instr.destination == operand)
+        return isSafe(trace, loc-1, instr.operand1);
+  }
+
+  return isSafe(trace, loc-1, operand);
+  // GETEMEMENTSPTR
 }
 //bool isOnsimpleOperations(lineNumber - 1, istr.operand1) {
 
