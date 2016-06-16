@@ -48,6 +48,7 @@ ADFAPPS = $(addsuffix _adf, $(APPS_COMMON))
 DWARFS_COMMON = $(DWARFDIR)/sparse_algebra/sparse_algebra                          \
 		$(DWARFDIR)/branch_bound/branch_bound                              \
 		$(DWARFDIR)/dense_algebra/dense_algebra                            \
+		$(DWARFDIR)/dense_algebra/matrix_multiplication/dense_algebra                            \
 		$(DWARFDIR)/finite_state_machine/finite_state_machine              \
 		$(DWARFDIR)/graph_models/graph_models                              \
 		$(DWARFDIR)/map_reduce/map_reduce                                  \

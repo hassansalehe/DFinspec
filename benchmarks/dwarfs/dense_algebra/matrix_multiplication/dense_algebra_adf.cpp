@@ -1,5 +1,7 @@
 #include <iostream>
 #include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "adf.h"
 
@@ -12,7 +14,7 @@ typedef struct indexes_s {
 /* command line parameters */
 long BSIZE = 100;
 long DIM = 10;
-int  num_threads = 1;
+int  num_threads = 20;
 int  num_tasks = 32;
 
 /* globals */
@@ -334,7 +336,7 @@ int main (int argc, char **argv)
 
 	Solve();
 
-	adf_go();
+	adf_start();
 
 	adf_taskwait();
 	adf_terminate();
