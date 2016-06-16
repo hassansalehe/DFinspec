@@ -1,0 +1,6 @@
+HBlog*
+Trace*
+*.iir
+*.o
+*_adf
+*.sif
