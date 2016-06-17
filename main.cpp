@@ -48,10 +48,11 @@ int main(int argc, char * argv[])
   log.close();
 
   // validate the detected nondeterminism bugs
-  BugValidator validator(argv[3]); // read IR file
+  BugValidator validator;
+  validator.parseTasksIR( argv[3] ); // read IR file
 
   // do the validation
-  validator.validate( aChecker.getConflictingPairs( ) );
+  validator.validate( aChecker.getConflictingPairs() );
 
   // take time at end of analyis
   high_resolution_clock::time_point t2 = high_resolution_clock::now();

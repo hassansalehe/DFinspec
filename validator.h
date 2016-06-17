@@ -48,7 +48,7 @@ class BugValidator {
 
 
   public:
-    BugValidator(char * IRlogName);
+    VOID parseTasksIR(char * IRlogName);
     void validate(CONFLICT_PAIRS & tasksAndLines);
 
   private:

@@ -99,6 +99,7 @@ class Checker {
   ~Checker();
 
   private:
+    VOID saveNondeterminismReport(INTEGER taskId, ADDRESS addr, VALUE lineNo, string& funcName, Write* write);
     VOID checkDetOnPreviousTasks(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo, string & funcName);
     unordered_map <INTEGER, SerialBagPtr> serial_bags; // hold bags of tasks
     unordered_map<INTEGER, Task> graph;  // in and out edges

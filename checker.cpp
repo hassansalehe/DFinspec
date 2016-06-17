@@ -26,16 +26,8 @@ void Checker::checkDetOnPreviousTasks(INTEGER taskId, ADDRESS addr, VALUE value,
       auto HBfound = serial_bags[taskId]->HB.find(parWrite->wrtTaskId);
 
       if(HBfound == end && parWrite->value != value) {// 3. there's no happens-before
-	// code for recording errors
-	auto key = make_pair(parWrite->wrtTaskId, taskId);
-	if(conflictTable.find(key) != conflictTable.end())
-	  conflictTable[key].addresses.insert(Conflict(addr, parWrite->lineNo, parWrite->funcName, lineNo, funcName));
-	else {
-	  conflictTable[key] = Report();
-	  conflictTable[key].task1Name = graph[parWrite->wrtTaskId].name;
-	  conflictTable[key].task2Name = graph[taskId].name;
-	  conflictTable[key].addresses.insert(Conflict(addr, parWrite->lineNo, parWrite->funcName, lineNo, funcName));
-	}
+        // code for recording errors
+        saveNondeterminismReport(taskId, addr, lineNo, funcName, &(*parWrite));
       }
     }
   }
@@ -87,16 +79,8 @@ void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo,
            return; // no determinism error, just return
          else { // 4.2 this is definitely determinism error
 
-            // code for recording errors
-            auto key = make_pair(lastWrt.wrtTaskId, taskId);
-            if(conflictTable.find(key) != conflictTable.end())
-              conflictTable[key].addresses.insert(Conflict(addr, lastWrt.lineNo, lastWrt.funcName, lineNo, funcName));
-            else {
-              conflictTable[key] = Report();
-              conflictTable[key].task1Name = graph[lastWrt.wrtTaskId].name;
-              conflictTable[key].task2Name = graph[taskId].name;
-              conflictTable[key].addresses.insert(Conflict(addr, lastWrt.lineNo, lastWrt.funcName, lineNo, funcName));
-            }
+           // code for recording errors
+           saveNondeterminismReport(taskId, addr, lineNo, funcName, &lastWrt);
 
             // 4.2.1 check conflicts with other parallel tasks
             checkDetOnPreviousTasks(taskId, addr, value, lineNo, funcName);
@@ -106,6 +90,24 @@ void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo,
     }
   }
 }
+
+
+/**
+ * Records the nondeterminism warning to the conflicts table.
+ */
+VOID Checker::saveNondeterminismReport(INTEGER taskId, ADDRESS addr,  VALUE lineNo, string & funcName, Write* write) {
+  // code for recording errors
+  auto key = make_pair(write->wrtTaskId, taskId);
+  if(conflictTable.find(key) != conflictTable.end()) // exists
+    conflictTable[key].addresses.insert(Conflict(addr, write->lineNo, write->funcName, lineNo, funcName));
+  else { // add new
+    conflictTable[key] = Report();
+    conflictTable[key].task1Name = graph[write->wrtTaskId].name;
+    conflictTable[key].task2Name = graph[taskId].name;
+    conflictTable[key].addresses.insert(Conflict(addr, write->lineNo, write->funcName, lineNo, funcName));
+  }
+}
+
 
 // Adds a new task node in the simple happens-before graph
 // @params: logLine, a log entry the contains the task ids
