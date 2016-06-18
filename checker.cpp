@@ -2,7 +2,7 @@
 //  ADFinspec: a lightweight non-determinism checking
 //          tool for ADF applications
 //
-//    (c) 2015 - Hassan Salehe Matar & MSRC at Koc University
+//    (c) 2015, 2016 - Hassan Salehe Matar & MSRC at Koc University
 //      Copying or using this code by any means whatsoever
 //      without consent of the owner is strictly prohibited.
 //
@@ -16,24 +16,26 @@
 
 //#define VERBOSE
 
-void Checker::checkDetOnPreviousTasks(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo, string & funcName) {
-  auto wTable = writes.find(addr);
-  auto end = serial_bags[taskId]->HB.end();
+void Checker::checkDetOnPreviousTasks(const Action& writeAction ) {
+  auto wTable = writes.find(writeAction.addr);
+  auto end = serial_bags[writeAction.tid]->HB.end();
 
   // 4.2.1 check conflicts with other parallel tasks
   for(auto parWrite = wTable->second.begin(); parWrite != wTable->second.end(); parWrite++) {
-    if(parWrite->tid != taskId && parWrite->value != value) { // not write of same task and same value
-      auto HBfound = serial_bags[taskId]->HB.find(parWrite->tid);
-
-      if(HBfound == end && parWrite->value != value) {// 3. there's no happens-before
+    if(parWrite->tid != writeAction.tid && parWrite->value != writeAction.value) {
+      // not write of same task and same value
+      auto HBfound = serial_bags[writeAction.tid]->HB.find(parWrite->tid);
+      if(HBfound == end && parWrite->value != writeAction.value) {// 3. there's no happens-before
         // code for recording errors
-        saveNondeterminismReport(taskId, addr, lineNo, funcName, *parWrite);
+        saveNondeterminismReport(writeAction, *parWrite);
       }
     }
   }
 }
 
-void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo, string& funcName) {
+void Checker::saveWrite( const Action& writeAction ) {
+  VALUE lineNo = writeAction.lineNo;
+  string funcName = writeAction.funcName;
   // CASES
   // 1. first write -> just save
   // 2. nth write of the same task -> just save
@@ -44,47 +46,42 @@ void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo,
   //        write in the parallel writes,update and take it forward
   //        4.2.1 check conflicts with other parallel tasks
 
-  if(writes.find(addr) == writes.end()) { // 1. first write
-     writes[addr] = vector<Write>();
-     writes[addr].push_back(Write(taskId, value, lineNo, funcName));
+  if(writes.find(writeAction.addr) == writes.end()) { // 1. first write
+     writes[writeAction.addr] = vector<Action>();
+     writes[writeAction.addr].push_back( writeAction );
   }
   else {
-    auto wTable = writes.find(addr);
+    auto wTable = writes.find(writeAction.addr);
     auto lastWrt = wTable->second.back();
-    if(lastWrt.tid == taskId) { // 2. same writer
-      lastWrt.value = value;
-      lastWrt.lineNo = lineNo;
-      writes[addr].pop_back();
-      writes[addr].push_back(lastWrt);
+    if(lastWrt.tid == writeAction.tid) { // 2. same writer
+      writes[writeAction.addr].pop_back();
+      writes[writeAction.addr].push_back( writeAction );
       return;
     }
     else { // check race
-      auto HBfound = serial_bags[taskId]->HB.find(lastWrt.tid);
-      auto end = serial_bags[taskId]->HB.end();
+      auto HBfound = serial_bags[writeAction.tid]->HB.find(lastWrt.tid);
+      auto end = serial_bags[writeAction.tid]->HB.end();
       if(HBfound != end) {// 3. there's happens-before
-        lastWrt.tid = taskId;
-        lastWrt.value = value;
-        lastWrt.lineNo = lineNo;
-	writes[addr].pop_back();
-	writes[addr].push_back(lastWrt);
+	writes[writeAction.addr].pop_back();
+	writes[writeAction.addr].push_back( writeAction );
 
 	// check on the happens-before relations with the previous concurrent tasks
-	checkDetOnPreviousTasks(taskId, addr, value, lineNo, funcName);
+	checkDetOnPreviousTasks( writeAction );
         return;
       }
       else { // 4. parallel, possible race!
 
-         wTable->second.push_back(Write(taskId, value, lineNo, funcName));
-         if(lastWrt.value == value) // 4.1 same value written
+         wTable->second.push_back( writeAction );
+         if(lastWrt.value == writeAction.value) // 4.1 same value written
            return; // no determinism error, just return
          else { // 4.2 this is definitely determinism error
 
            // code for recording errors
-           saveNondeterminismReport(taskId, addr, lineNo, funcName, lastWrt);
+           saveNondeterminismReport(writeAction, lastWrt);
 
-            // 4.2.1 check conflicts with other parallel tasks
-            checkDetOnPreviousTasks(taskId, addr, value, lineNo, funcName);
-            return;
+           // 4.2.1 check conflicts with other parallel tasks
+           checkDetOnPreviousTasks( writeAction );
+           return;
          }
       }
     }
@@ -95,16 +92,17 @@ void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo,
 /**
  * Records the nondeterminism warning to the conflicts table.
  */
-VOID Checker::saveNondeterminismReport(INTEGER taskId, ADDRESS addr,  VALUE lineNo, string & funcName, const Write& prevWrite) {
+VOID Checker::saveNondeterminismReport(const Action& curWrite, const Action& prevWrite) {
+  Conflict report(curWrite, prevWrite);
   // code for recording errors
-  auto key = make_pair(prevWrite.tid, taskId);
+  auto key = make_pair(prevWrite.tid, curWrite.tid);
   if(conflictTable.find(key) != conflictTable.end()) // exists
-    conflictTable[key].addresses.insert(Conflict(addr, prevWrite.lineNo, prevWrite.funcName, lineNo, funcName));
+    conflictTable[key].addresses.insert( report );
   else { // add new
     conflictTable[key] = Report();
     conflictTable[key].task1Name = graph[prevWrite.tid].name;
-    conflictTable[key].task2Name = graph[taskId].name;
-    conflictTable[key].addresses.insert(Conflict(addr, prevWrite.lineNo, prevWrite.funcName, lineNo, funcName));
+    conflictTable[key].task2Name = graph[curWrite.tid].name;
+    conflictTable[key].addresses.insert( report );
   }
 }
 
@@ -145,20 +143,21 @@ void Checker::processLogLines(string & line){
     // if write
     if(operation.find("WR") != string::npos) {
 
+      Action action;
       string tempBuff;
-      ssin >> tempBuff; // address
 
-      ADDRESS address = (ADDRESS)stoul(tempBuff, 0, 16);
+      ssin >> tempBuff; // address
+      action.addr = (ADDRESS)stoul(tempBuff, 0, 16);
+
       ssin >> tempBuff; // value
-      VALUE val = stol(tempBuff);
+      action.value = stol(tempBuff);
 
       ssin >> tempBuff; // line number
-      VALUE lineNo = stol(tempBuff);
+      action.lineNo = stol(tempBuff);
 
-      string funcName;
-      getline(ssin, funcName); // get function name
-
-      saveWrite(taskID, address, val, lineNo, funcName);
+      getline(ssin, action.funcName); // get function name
+      action.tid = taskID;
+      saveWrite( action );
     }
     else if (operation.find("RD") != string::npos) {
       // it is read just return for now.

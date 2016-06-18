@@ -64,7 +64,7 @@ int main(int argc, char * argv[])
   aChecker.printHBGraph();
   aChecker.printHBGraphJS(); // print in JS format
 
-  cout << "Checker execution time: "<< duration << " microseconds" << endl;
+  cout << "Checker execution time: "<< duration/1000.0 << " milliseconds" << endl;
 
   return 0;
 }

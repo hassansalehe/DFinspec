@@ -37,6 +37,7 @@
 
 using namespace std;
 
+using Void = void;
 typedef        void        VOID;
 typedef      void *        ADDRESS;
 typedef    ofstream        FILEPTR;

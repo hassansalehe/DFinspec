@@ -20,9 +20,9 @@
 #include "validator.h"
 
 string BugValidator::trim(string sentence) {
-    size_t start = sentence.find_first_not_of(' ');
-    size_t end = sentence.find_last_not_of(' ');
-    return sentence.substr(start, (end -start)+1);
+  size_t start = sentence.find_first_not_of(' ');
+  size_t end = sentence.find_last_not_of(' ');
+  return sentence.substr(start, (end -start)+1);
 }
 
 VOID BugValidator::parseTasksIR(char * IRlogName)

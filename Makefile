@@ -2,7 +2,7 @@
 #//  ADFinspec: a lightweight non-determinism checking
 #//          tool for ADF applications
 #//
-#//    (c) 2015 - Hassan Salehe Matar & MSRC at Koc University
+#//    (c) 2015, 2016 - Hassan Salehe Matar & MSRC at Koc University
 #//      Copying or using this code by any means whatsoever
 #//      without consent of the owner is strictly prohibited.
 #//
@@ -22,7 +22,7 @@ else
 endif
 #CXX = g++
 CXXFLGS = -g -O3 -std=c++11
-DEPS = validator.h checker.h defs.h
+DEPS = validator.h checker.h action.h conflictReport.h defs.h
 OBJ = validator.o checker.o main.o
 TOOL = ADFinspec
 
