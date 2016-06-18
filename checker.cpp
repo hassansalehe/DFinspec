@@ -27,7 +27,7 @@ void Checker::checkDetOnPreviousTasks(INTEGER taskId, ADDRESS addr, VALUE value,
 
       if(HBfound == end && parWrite->value != value) {// 3. there's no happens-before
         // code for recording errors
-        saveNondeterminismReport(taskId, addr, lineNo, funcName, &(*parWrite));
+        saveNondeterminismReport(taskId, addr, lineNo, funcName, *parWrite);
       }
     }
   }
@@ -80,7 +80,7 @@ void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo,
          else { // 4.2 this is definitely determinism error
 
            // code for recording errors
-           saveNondeterminismReport(taskId, addr, lineNo, funcName, &lastWrt);
+           saveNondeterminismReport(taskId, addr, lineNo, funcName, lastWrt);
 
             // 4.2.1 check conflicts with other parallel tasks
             checkDetOnPreviousTasks(taskId, addr, value, lineNo, funcName);
@@ -95,16 +95,16 @@ void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo,
 /**
  * Records the nondeterminism warning to the conflicts table.
  */
-VOID Checker::saveNondeterminismReport(INTEGER taskId, ADDRESS addr,  VALUE lineNo, string & funcName, Write* write) {
+VOID Checker::saveNondeterminismReport(INTEGER taskId, ADDRESS addr,  VALUE lineNo, string & funcName, const Write& prevWrite) {
   // code for recording errors
-  auto key = make_pair(write->tid, taskId);
+  auto key = make_pair(prevWrite.tid, taskId);
   if(conflictTable.find(key) != conflictTable.end()) // exists
-    conflictTable[key].addresses.insert(Conflict(addr, write->lineNo, write->funcName, lineNo, funcName));
+    conflictTable[key].addresses.insert(Conflict(addr, prevWrite.lineNo, prevWrite.funcName, lineNo, funcName));
   else { // add new
     conflictTable[key] = Report();
-    conflictTable[key].task1Name = graph[write->tid].name;
+    conflictTable[key].task1Name = graph[prevWrite.tid].name;
     conflictTable[key].task2Name = graph[taskId].name;
-    conflictTable[key].addresses.insert(Conflict(addr, write->lineNo, write->funcName, lineNo, funcName));
+    conflictTable[key].addresses.insert(Conflict(addr, prevWrite.lineNo, prevWrite.funcName, lineNo, funcName));
   }
 }
 
@@ -145,21 +145,18 @@ void Checker::processLogLines(string & line){
     // if write
     if(operation.find("WR") != string::npos) {
 
-      string addr; // address
-      ssin >> addr;
+      string tempBuff;
+      ssin >> tempBuff; // address
 
-      ADDRESS address = (ADDRESS)stoul(addr, 0, 16);
-      string value;  // value
-      ssin >> value;
-      VALUE val = stol(value);
+      ADDRESS address = (ADDRESS)stoul(tempBuff, 0, 16);
+      ssin >> tempBuff; // value
+      VALUE val = stol(tempBuff);
 
-      string lineNumber; // line number
-      ssin >> lineNumber;
-      VALUE lineNo= stol(lineNumber);
+      ssin >> tempBuff; // line number
+      VALUE lineNo = stol(tempBuff);
 
-      // get function name
       string funcName;
-      getline(ssin, funcName);
+      getline(ssin, funcName); // get function name
 
       saveWrite(taskID, address, val, lineNo, funcName);
     }
