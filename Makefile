@@ -22,7 +22,7 @@ else
 endif
 #CXX = g++
 CXXFLGS = -g -O3 -std=c++11
-DEPS = DFchecker/validator.h DFchecker/checker.h DFchecker/action.h DFchecker/conflictReport.h defs.h
+DEPS = DFchecker/validator.h DFchecker/checker.h DFchecker/action.h DFchecker/conflictReport.h DFchecker/defs.h
 OBJ = validator.o checker.o main.o
 TOOL = ADFinspec
 
