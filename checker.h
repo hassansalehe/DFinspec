@@ -40,17 +40,19 @@ typedef struct Task {
 // used for non-determinism checking
 typedef struct Write {
 
-  INTEGER wrtTaskId;
-  VALUE value;
-  VALUE lineNo;
-  string funcName;
+  INTEGER tid;      // task id of writter
+  ADDRESS addr;     // destination address
+  VALUE value;      // value written
+  VALUE lineNo;     // source-line number
+  string funcName;  // source-function name
   Write(INTEGER tskId, VALUE val, VALUE ln, string fname):
-    wrtTaskId(tskId),
-    value(val),
-    lineNo(ln),
-    funcName(fname) {}
-} Write;
+    tid(tskId), value(val), lineNo(ln), funcName(fname) {}
 
+  Write(INTEGER tskId, ADDRESS adr, VALUE val, VALUE ln, string fname):
+    tid(tskId), addr(adr), value(val), lineNo(ln), funcName(fname) {}
+
+  Write() {}
+} Write;
 
 // This struct keeps the line information of the
 // address with determinism conflict

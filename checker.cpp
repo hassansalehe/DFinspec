@@ -22,8 +22,8 @@ void Checker::checkDetOnPreviousTasks(INTEGER taskId, ADDRESS addr, VALUE value,
 
   // 4.2.1 check conflicts with other parallel tasks
   for(auto parWrite = wTable->second.begin(); parWrite != wTable->second.end(); parWrite++) {
-    if(parWrite->wrtTaskId != taskId && parWrite->value != value) { // not write of same task and same value
-      auto HBfound = serial_bags[taskId]->HB.find(parWrite->wrtTaskId);
+    if(parWrite->tid != taskId && parWrite->value != value) { // not write of same task and same value
+      auto HBfound = serial_bags[taskId]->HB.find(parWrite->tid);
 
       if(HBfound == end && parWrite->value != value) {// 3. there's no happens-before
         // code for recording errors
@@ -51,7 +51,7 @@ void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo,
   else {
     auto wTable = writes.find(addr);
     auto lastWrt = wTable->second.back();
-    if(lastWrt.wrtTaskId == taskId) { // 2. same writer
+    if(lastWrt.tid == taskId) { // 2. same writer
       lastWrt.value = value;
       lastWrt.lineNo = lineNo;
       writes[addr].pop_back();
@@ -59,10 +59,10 @@ void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo,
       return;
     }
     else { // check race
-      auto HBfound = serial_bags[taskId]->HB.find(lastWrt.wrtTaskId);
+      auto HBfound = serial_bags[taskId]->HB.find(lastWrt.tid);
       auto end = serial_bags[taskId]->HB.end();
       if(HBfound != end) {// 3. there's happens-before
-        lastWrt.wrtTaskId = taskId;
+        lastWrt.tid = taskId;
         lastWrt.value = value;
         lastWrt.lineNo = lineNo;
 	writes[addr].pop_back();
@@ -97,12 +97,12 @@ void Checker::saveWrite(INTEGER taskId, ADDRESS addr, VALUE value, VALUE lineNo,
  */
 VOID Checker::saveNondeterminismReport(INTEGER taskId, ADDRESS addr,  VALUE lineNo, string & funcName, Write* write) {
   // code for recording errors
-  auto key = make_pair(write->wrtTaskId, taskId);
+  auto key = make_pair(write->tid, taskId);
   if(conflictTable.find(key) != conflictTable.end()) // exists
     conflictTable[key].addresses.insert(Conflict(addr, write->lineNo, write->funcName, lineNo, funcName));
   else { // add new
     conflictTable[key] = Report();
-    conflictTable[key].task1Name = graph[write->wrtTaskId].name;
+    conflictTable[key].task1Name = graph[write->tid].name;
     conflictTable[key].task2Name = graph[taskId].name;
     conflictTable[key].addresses.insert(Conflict(addr, write->lineNo, write->funcName, lineNo, funcName));
   }
