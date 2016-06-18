@@ -12,6 +12,9 @@
 
 // callbacks for instrumentation
 
+#ifndef LLVM_CALLBACKS_HPP
+#define LLVM_CALLBACKS_HPP
+
 #include <iostream>
 #include <pthread.h>
 #include <map>
@@ -59,4 +62,4 @@ extern "C" {
 
   map<unsigned int, Thread2Task> thr2TaskMap;
 };
-
+#endif // Callback.h
