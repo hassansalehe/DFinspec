@@ -49,16 +49,15 @@ void INS_Fini() {
 void INS_TaskStartFunc(void* taskName) {
   Thread2Task t2t;
   t2t.threadID = (unsigned int)pthread_self();
+  INS::guardLock.lock(); // protect the task id map
   t2t.taskID = INS::GenTaskID();
   t2t.active = true;
-  INS::guardLock.lock(); // protect the task id map
   thr2TaskMap[t2t.threadID] = t2t;
 #ifdef DEBUG
   cout << "Task_Started, (threadID: "<< t2t.threadID << ", taskID : " << thr2TaskMap[t2t.threadID].taskID <<") name: "<< (char *)taskName<< endl;
 #endif
-  INS::guardLock.unlock(); // protect the task id map
-
   INS::TaskStartLog(t2t.taskID, (char*)taskName);
+  INS::guardLock.unlock(); // protect the task id map
 }
 
 
@@ -74,9 +73,8 @@ void INS_TaskFinishFunc(void* addr) {
 #ifdef DEBUG
   cout << "Task_Ended: (threadID: " << threadID << ") taskID: " << thr2TaskMap[threadID].taskID << endl;
 #endif
-  INS::guardLock.unlock(); // release lock
-
   INS::TaskEndLog(t2t->second.taskID);
+  INS::guardLock.unlock(); // release lock
 }
 
 /** Callbacks for tokens */
@@ -89,14 +87,12 @@ void INS_RegInToken(void * tokenAddr, unsigned long size)
   if( t2t != thr2TaskMap.end() && t2t->second.active)
   {
     INTEGER value = getMemoryValue(tokenAddr, size);
-    INS::guardLock.unlock(); // release lock
     INS::TaskInTokenLog(t2t->second.taskID, tokenAddr, value);
 #ifdef DEBUG
     cout << "InToken: " << value << " addr: " << tokenAddr << endl;
 #endif
   }
-  else
-    INS::guardLock.unlock(); // release lock
+  INS::guardLock.unlock(); // release lock
 }
 
 void INS_RegOutToken(ADDRESS bufLocAddr, ADDRESS tokenAddr, unsigned long size)
@@ -108,14 +104,12 @@ void INS_RegOutToken(ADDRESS bufLocAddr, ADDRESS tokenAddr, unsigned long size)
   if( t2t != thr2TaskMap.end() && t2t->second.active)
   {
     INTEGER value = getMemoryValue(tokenAddr, size);
-    INS::guardLock.unlock(); // release lock
     INS::TaskOutTokenLog(t2t->second.taskID, bufLocAddr, value);
 #ifdef DEBUG
     cout << "OutToken: " << value << " addr: " << bufLocAddr << endl;
 #endif
   }
-  else
-    INS::guardLock.unlock(); // release lock
+  INS::guardLock.unlock(); // release lock
 }
 
 
@@ -141,14 +135,12 @@ void INS_AdfMemRead(void *addr, unsigned long size) {
   if( t2t != thr2TaskMap.end() && t2t->second.active)
   {
     INTEGER value = getMemoryValue(addr, size);
-    INS::guardLock.unlock(); // release lock
     INS::Read(t2t->second.taskID, addr, value);
 #ifdef DEBUG
     cout << "READ: addr: " << addr << " value: "<< value << " taskID: " << t2t->second.taskID << endl;
 #endif
   }
-  else
-    INS::guardLock.unlock(); // release lock
+  INS::guardLock.unlock(); // release lock
 }
 
 void INS_AdfMemRead1(void *addr) {
@@ -172,14 +164,12 @@ void INS_AdfMemWrite(void *addr, long int value, int lineNo, void * funcName) {
 
   if( t2t != thr2TaskMap.end() && t2t->second.active)
   {
-    INS::guardLock.unlock(); // release lock
     INS::Write(t2t->second.taskID, addr, (long int)value, lineNo, (char*)funcName);
 #ifdef DEBUG
     cout << "=WRITE: addr:" << addr << " value " << (long int)value << " taskID: " << t2t->second.taskID << " line number: " << lineNo << endl;
 #endif
   }
-  else
-    INS::guardLock.unlock(); // release lock
+  INS::guardLock.unlock(); // release lock
 }
 
 void INS_AdfMemWrite1(void *addr, long int value, int lineNo, void * funcName) {
@@ -207,11 +197,9 @@ void INS_AdfMemWriteFloat(void * addr, float value, int lineNo, void * funcName)
 #ifdef DEBUG
     cout << "WRITE: addr:" << addr << " value " << (long int)value << " float, taskID: " << t2t->second.taskID << endl;
 #endif
-    INS::guardLock.unlock(); // release lock
     INS::Write(t2t->second.taskID, addr, (long int)value, lineNo, (char*)funcName);
   }
-  else
-    INS::guardLock.unlock(); // release lock
+  INS::guardLock.unlock(); // release lock
 }
 
 void INS_AdfMemWriteDouble(void * addr, double value, int lineNo, void * funcName) {
@@ -227,9 +215,7 @@ void INS_AdfMemWriteDouble(void * addr, double value, int lineNo, void * funcNam
 #ifdef DEBUG
     cout << "WRITE: addr:" << addr << " value " << (long int)value << " double taskID: " << t2t->second.taskID << endl;
 #endif
-    INS::guardLock.unlock(); // release lock
     INS::Write(t2t->second.taskID, addr, (long int)value, lineNo, (char*)funcName);
   }
-  else
-    INS::guardLock.unlock(); // release lock
+  INS::guardLock.unlock(); // release lock
 }
