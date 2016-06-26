@@ -2,7 +2,7 @@
 //  ADFinspec: a lightweight non-determinism checking
 //          tool for ADF applications
 //
-//    (c) 2015 - Hassan Salehe Matar & MSRC at Koc University
+//    (c) 2015,2016 - Hassan Salehe Matar & MSRC at Koc University
 //      Copying or using this code by any means whatsoever
 //      without consent of the owner is strictly prohibited.
 //
@@ -18,6 +18,7 @@
 #include <iostream>
 #include <pthread.h>
 #include <unordered_map>
+#include <sstream>
 
 using namespace std;
 
@@ -53,13 +54,5 @@ extern "C" {
 
   void toolVptrUpdate(void *addr, void * value);
   void toolVptrLoad(void *addr, void * value);
-
-  typedef struct Thread2Task {
-    unsigned int threadID = 0;
-    unsigned int taskID = 0;
-    bool active = false;
-  } Thread2Task;
-
-  unordered_map<unsigned int, Thread2Task> thr2TaskMap;
 };
 #endif // Callback.h

@@ -30,6 +30,7 @@
 #include <ctime>
 #include <chrono>
 #include <regex>
+#include <sstream>
 
 #include <mutex>          // std::mutex
 //#include<//pthread.h>
@@ -49,6 +50,10 @@ typedef    set<int>        INTSET;
 typedef unordered_set<int> UNORD_INTSET;
 typedef        bool        BOOL;
 typedef vector<string>     STRVECTOR;
+using uint    =  unsigned int;
+using ulong   =  unsigned long;
+using lint    =  long int;
+using address =  void *;
 
 // for conflict task pairs
 typedef pair<string,string>     STRPAIR;

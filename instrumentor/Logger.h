@@ -18,9 +18,10 @@ This is a logger for all events in an ADF application
 #define LOGGER_H
 
 #include "defs.h"
+#include "TaskInfo.h"
 
 struct hash_function {
-  size_t operator()(const std::pair<ADDRESS,INTEGER> &p) const {
+  size_t operator()( const std::pair<ADDRESS,INTEGER> &p ) const {
     auto seed = std::hash<ADDRESS>{}(p.first);
     auto tid = std::hash<INTEGER>{}(p.second);
     //seed ^= tid + 0x9e3779b9 + (seed << 6) + (seed >> 2);
@@ -34,7 +35,7 @@ class INS {
 
   private:
     // a function to tell whether there is a happens-before relation between two tasks
-    static bool hasHB(INTEGER tID, INTEGER parentID);
+    static bool hasHB( INTEGER tID, INTEGER parentID );
 
     // a strictly increasing value, used as tasks unique id generator
     static INTEGER taskIDSeed;
@@ -79,14 +80,14 @@ class INS {
       struct tm * timeinfo = localtime(&currentTime);
 
       char buff[40];
-      strftime(buff,40,"%d-%m-%Y_%H.%M.%S",timeinfo);
-      string timeStr(buff);
+      strftime( buff, 40, "%d-%m-%Y_%H.%M.%S", timeinfo );
+      string timeStr( buff );
 
-      if(! logger.is_open())
-        logger.open("Tracelog_" + timeStr + ".txt",  ofstream::out | ofstream::trunc);
+      if(! logger.is_open() )
+        logger.open( "Tracelog_" + timeStr + ".txt",  ofstream::out | ofstream::trunc );
       if(! HBlogger.is_open())
-        HBlogger.open("HBlog_" + timeStr + ".txt",  ofstream::out | ofstream::trunc);
-      if(! logger.is_open() || ! HBlogger.is_open()) {
+        HBlogger.open( "HBlog_" + timeStr + ".txt",  ofstream::out | ofstream::trunc );
+      if(! logger.is_open() || ! HBlogger.is_open() ) {
         cerr << "Could not open log file \nExiting ..." << endl;
         exit(EXIT_FAILURE);
       }
@@ -111,60 +112,66 @@ class INS {
       //guardLock.unlock();
     }
 
-    static inline VOID TransactionBegin(INTEGER taskID) {
+    static inline VOID TransactionBegin( INTEGER taskID ) {
       // guardLock.lock();
       logger << taskID << " STTM " << funcNames[taskID] << endl;
       // guardLock.unlock();
     }
 
-    static inline VOID TransactionEnd(INTEGER taskID) {
+    static inline VOID TransactionEnd( INTEGER taskID ) {
       // guardLock.lock();
       logger << taskID << " EDTM "<< funcNames[taskID] << endl;
       // guardLock.unlock();
     }
 
     /** called when a task starts execution. retrieves parent task id */
-    static inline VOID TaskStartLog(INTEGER taskID, STRING taskName) {
+    static inline VOID TaskStartLog( TaskInfo& task, STRING taskName ) {
       // guardLock.lock();
-      funcNames[taskID] = taskName;
-      logger << taskID << " ST " << funcNames[taskID] << endl;
+      auto tid = task.taskID;
+      funcNames[tid] = taskName;
+      task.actionBuffer << tid << " ST " << funcNames[tid] << endl;
       // guardLock.unlock();
     }
 
     /** called when a task starts execution. retrieves parent task id */
-    static inline VOID TaskInTokenLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value) {
+    static inline VOID TaskInTokenLog( TaskInfo & task, ADDRESS bufLocAddr, INTEGER value ) {
       // guardLock.lock();
       INTEGER parentID = -1;
+      auto tid = task.taskID;
 
       // if streaming location address not null and there is a sender of the token
-      if(bufLocAddr && idMap.count(make_pair(bufLocAddr, value))) { // dependent through a streaming buffer
-        parentID = idMap[make_pair(bufLocAddr, value)];
+      auto key = make_pair( bufLocAddr, value );
+      if(bufLocAddr && idMap.count( key ) ) { // dependent through a streaming buffer
+        parentID = idMap[key];
 
-        if(parentID == taskID) { // there was a bug where a task could send token to itself
+        if(parentID == tid) { // there was a bug where a task could send token to itself
           // guardLock.unlock();
           return; // do nothing, just return
         }
 
-        logger << taskID << " IT " << funcNames[taskID] << " " << parentID << endl;
-        HBlogger << taskID << " " << parentID << endl;
+        task.actionBuffer << tid << " IT " << funcNames[tid] << " " << parentID << endl;
+        HBlogger << tid << " " << parentID << endl;
 
         // there is a happens before between taskID and parentID:
         //parentID ---happens-before---> taskID
-        if(HB.find(taskID) == HB.end())
-          HB[taskID] = INTSET();
-        HB[taskID].insert(parentID);
+        if(HB.find( tid ) == HB.end())
+          HB[tid] = INTSET();
+        HB[tid].insert( parentID );
 
         // take the happens-before of the parentID
-        if(HB.find(parentID) != HB.end())
-          HB[taskID].insert(HB[parentID].begin(), HB[parentID].end());
+        if(HB.find( parentID ) != HB.end())
+          HB[tid].insert(HB[parentID].begin(), HB[parentID].end());
       }
       // guardLock.unlock();
     }
 
     /** called before the task terminates. */
-    static inline VOID TaskEndLog(INTEGER taskID) {
+    static inline VOID TaskEndLog( TaskInfo& task ) {
       // guardLock.lock();
-      logger << taskID << " ED " << funcNames[taskID] << endl;
+      auto tid = task.taskID;
+      task.actionBuffer << tid << " ED " << funcNames[tid] << endl;
+      logger << task.actionBuffer.str(); // print to file
+      task.actionBuffer.str(""); // clear buffer
       // guardLock.unlock();
     }
 
@@ -172,25 +179,31 @@ class INS {
      * stores the buffer address of the token and the value stored in
      * the buffer for the succeeding task
      */
-    static inline VOID TaskOutTokenLog(INTEGER taskID, ADDRESS bufLocAddr, INTEGER value) {
+    static inline VOID TaskOutTokenLog( TaskInfo & task, ADDRESS bufLocAddr, INTEGER value ) {
       // guardLock.lock();
-      idMap[make_pair(bufLocAddr, value)] = taskID;
-      logger << taskID << " OT " << funcNames[taskID] << endl;
+      auto tid = task.taskID;
+      auto key = make_pair(bufLocAddr, value );
+      idMap[key] = tid;
+      task.actionBuffer << tid << " OT " << funcNames[tid] << endl;
+      logger << task.actionBuffer.str(); // print to file
+      task.actionBuffer.str(""); // clear buffer
       // guardLock.unlock();
     }
 
     /** provides the address of memory a task reads from */
-    static inline VOID Read(INTEGER taskID, ADDRESS addr, INTEGER value) {
+    static inline VOID Read( TaskInfo & task, ADDRESS addr, INTEGER value ) {
       return; // logging reads currently disabled because we don't use reads to check non-determinism
       // guardLock.lock();
-      logger << taskID << " RD " << addr << " " << value << endl;
+      auto tid = task.taskID;
+      task.actionBuffer << tid << " RD " << addr << " " << value << endl;
       // guardLock.unlock();
     }
 
     /** stores a write action */
-    static inline VOID Write(INTEGER taskID, ADDRESS addr, INTEGER value, INTEGER lineNo, STRING funcName) {
+    static inline VOID Write( TaskInfo & task, ADDRESS addr, INTEGER value, INTEGER lineNo, STRING funcName ) {
       // guardLock.lock();
-      logger << taskID << " WR " <<  addr << " " << value << " " << lineNo << " " << funcName << endl;
+      auto tid = task.taskID;
+      task.actionBuffer << tid << " WR " <<  addr << " " << value << " " << lineNo << " " << funcName << endl;
       // guardLock.unlock();
     }
 };
