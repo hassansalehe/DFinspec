@@ -20,6 +20,18 @@ This is a logger for all events in an ADF application
 
 #include "defs.h"
 
+struct hash_function {
+  size_t operator()(const std::pair<ADDRESS,INTEGER> &p) const {
+    auto seed = std::hash<ADDRESS>{}(p.first);
+    auto tid = std::hash<INTEGER>{}(p.second);
+    //seed ^= tid + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    //return seed;
+    // presumably addr and tid are 32 bit
+    return (seed << 32) + tid;
+
+    }
+};
+
 class INS {
 
   public:
@@ -56,7 +68,7 @@ class INS {
     static unordered_map<INTEGER, STRING>funcNames;
 
     // mapping buffer location, value with task id
-    static map<pair<ADDRESS,INTEGER>, INTEGER> idMap;
+    static unordered_map<pair<ADDRESS,INTEGER>, INTEGER, hash_function> idMap;
 
     // keeping the happens-before relation between tasks
     static unordered_map<INTEGER, INTSET> HB;

@@ -53,9 +53,9 @@ void INS_TaskStartFunc(void* taskName) {
   t2t.active = true;
   INS::guardLock.lock(); // protect the task id map
   thr2TaskMap[t2t.threadID] = t2t;
-//#ifdef DEBUG
+#ifdef DEBUG
   cout << "Task_Started, (threadID: "<< t2t.threadID << ", taskID : " << thr2TaskMap[t2t.threadID].taskID <<") name: "<< (char *)taskName<< endl;
-//#endif
+#endif
   INS::guardLock.unlock(); // protect the task id map
 
   INS::TaskStartLog(t2t.taskID, (char*)taskName);
@@ -71,9 +71,9 @@ void INS_TaskFinishFunc(void* addr) {
   if(t2t != thr2TaskMap.end())
      thr2TaskMap[threadID].active = false;
 
-//#ifdef DEBUG
+#ifdef DEBUG
   cout << "Task_Ended: (threadID: " << threadID << ") taskID: " << thr2TaskMap[threadID].taskID << endl;
-//#endif
+#endif
   INS::guardLock.unlock(); // release lock
 
   INS::TaskEndLog(t2t->second.taskID);

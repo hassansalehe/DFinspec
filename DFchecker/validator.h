@@ -52,7 +52,7 @@ class BugValidator {
     void validate(CONFLICT_PAIRS & tasksAndLines);
 
   private:
-    map<string, vector<Instruction>> Tasks;
+    unordered_map<string, vector<Instruction>> Tasks;
     string trim(string sentence);
     STRVECTOR splitInstruction(string stmt);
     Instruction makeInstruction(string stmt);

@@ -27,7 +27,7 @@ FILEPTR INS::logger;
 FILEPTR INS::HBlogger;
 INTEGER INS::taskIDSeed = 0;
 unordered_map<INTEGER, STRING> INS::funcNames;
-map<pair<ADDRESS,INTEGER>, INTEGER> INS::idMap;
+unordered_map<pair<ADDRESS,INTEGER>, INTEGER, hash_function> INS::idMap;
 unordered_map<INTEGER, INTSET> INS::HB;
 unordered_map<ADDRESS, INTEGER> INS::lastWriter;
 unordered_map<ADDRESS, INTEGER> INS::lastReader;

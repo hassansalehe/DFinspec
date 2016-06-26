@@ -17,7 +17,7 @@
 
 #include <iostream>
 #include <pthread.h>
-#include <map>
+#include <unordered_map>
 
 using namespace std;
 
@@ -60,6 +60,6 @@ extern "C" {
     bool active = false;
   } Thread2Task;
 
-  map<unsigned int, Thread2Task> thr2TaskMap;
+  unordered_map<unsigned int, Thread2Task> thr2TaskMap;
 };
 #endif // Callback.h
