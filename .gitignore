@@ -2,5 +2,10 @@ HBlog*
 Trace*
 *.iir
 *.o
+*.o-*
+*.a
 *_adf
 *.sif
+
+# input files to the benchmarks
+smallcontent.txt

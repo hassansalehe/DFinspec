@@ -33,7 +33,7 @@ namespace {
 // /// AdfSanitizer: instrument the code in module to find memory accesses
  struct AdfSanitizer : public FunctionPass {
    AdfSanitizer() : FunctionPass(ID) {}
-   const char *getPassName() const override;
+   StringRef getPassName() const override;
    bool runOnFunction(Function &F) override;
    bool doInitialization(Module &M) override;
    bool doFinalization(Module &M) override {
@@ -112,7 +112,7 @@ namespace {
 //
  char AdfSanitizer::ID = 0;
 //
- const char *AdfSanitizer::getPassName() const {
+ StringRef AdfSanitizer::getPassName() const {
    return "AdfSanitizer";
  }
 
@@ -669,11 +669,11 @@ bool AdfSanitizer::instrumentLoadOrStore(Instruction *I, const DataLayout &DL) {
           lineNo = Loc->getLine();
        if(lineNo == 1172)
        {
-         errs() << "Unknown ";
-         Val->getType()->dump();
-         I->dump();
+         errs() << "Unknown Value\n";
+         //Val->getType()->dump();
+         //I->dump();
          errs() << "Idx " << Idx << " Alignment " << Alignment << "\n";
-         LineNo->dump();
+         //LineNo->dump();
          errs() << "Computed:  " << lineNo << "\n";
          //errs() << INS::demangleName(F.getName()) << "\n";
          errs() << "========\n";

@@ -23,7 +23,7 @@ namespace {
     static char ID;  // Instrumentation Pass identification, replacement for typeid.
 
     TokenDetector() : FunctionPass(ID) {}
-    const char *getPassName() const override{ return "TokenDetector"; }
+    StringRef getPassName() const override{ return "TokenDetector"; }
 
     bool doInitialization(Module &M) override {
       INS::InitializeSignatures();
