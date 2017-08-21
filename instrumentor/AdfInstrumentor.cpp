@@ -379,6 +379,7 @@ static bool isAtomic(Instruction *I) {
   if (INS::DontInstrument(F.getName()))
      return false;
 
+  //errs() << "Instrumenting function: " << INS::demangleName (F.getName()) << "\n";
   bool Res = false;
   bool HasCalls = false;
   bool isTaskBody = INS::isTaskBodyFunction( F.getName() );
@@ -679,6 +680,7 @@ bool AdfSanitizer::instrumentLoadOrStore(Instruction *I, const DataLayout &DL) {
          errs() << "========\n";
        }
 #endif
+
        IRB.CreateCall(OnAccessFunc,
 		{IRB.CreatePointerCast(Addr, IRB.getInt8PtrTy()),
 		 //IRB.CreatePointerCast(Val, Val->getType())
@@ -691,6 +693,8 @@ bool AdfSanitizer::instrumentLoadOrStore(Instruction *I, const DataLayout &DL) {
                    //IRB.CreatePointerCast(Val, Val->getType())
                    Val, LineNo, funcNamePtr
                 });
+
+  //errs() << "Line No: " << *LineNo << " \n";
 
   }else
     IRB.CreateCall(OnAccessFunc,

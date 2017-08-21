@@ -28,6 +28,7 @@ class Action {
   ADDRESS addr;     // destination address
   VALUE value;      // value written
   VALUE lineNo;     // source-line number
+  INTEGER funcID;   // identifier of the action function
   string funcName;  // source-function name
   Action(INTEGER tskId, VALUE val, VALUE ln, string fname):
     tid(tskId), value(val), lineNo(ln), funcName(fname) {}

@@ -47,7 +47,11 @@ class INS {
     static FILEPTR HBlogger;
 
     // storing task names
-    static unordered_map<INTEGER, STRING>funcNames;
+    static unordered_map<INTEGER, STRING>taskNames;
+
+    // storing function name pointers
+    static unordered_map<STRING, INTEGER>funcNames;
+    static INTEGER funcIDSeed;
 
     // mapping buffer location, value with task id
     static unordered_map<pair<ADDRESS,INTEGER>, INTEGER, hash_function> idMap;
@@ -114,13 +118,13 @@ class INS {
 
     static inline VOID TransactionBegin( INTEGER taskID ) {
       // guardLock.lock();
-      logger << taskID << " STTM " << funcNames[taskID] << endl;
+      logger << taskID << " STTM " << taskNames[taskID] << endl;
       // guardLock.unlock();
     }
 
     static inline VOID TransactionEnd( INTEGER taskID ) {
       // guardLock.lock();
-      logger << taskID << " EDTM "<< funcNames[taskID] << endl;
+      logger << taskID << " EDTM "<< taskNames[taskID] << endl;
       // guardLock.unlock();
     }
 
@@ -128,12 +132,12 @@ class INS {
     static inline VOID TaskStartLog( TaskInfo& task, STRING taskName ) {
       // guardLock.lock();
       auto tid = task.taskID;
-      funcNames[tid] = taskName;
-      task.actionBuffer << tid << " ST " << funcNames[tid] << endl;
+      taskNames[tid] = taskName;
+      task.actionBuffer << tid << " B " << taskNames[tid] << endl;
       // guardLock.unlock();
     }
 
-    /** called when a task starts execution. retrieves parent task id */
+    /** called when a task starts execution and retrieves parent task id */
     static inline VOID TaskInTokenLog( TaskInfo & task, ADDRESS bufLocAddr, INTEGER value ) {
       // guardLock.lock();
       INTEGER parentID = -1;
@@ -149,7 +153,7 @@ class INS {
           return; // do nothing, just return
         }
 
-        task.actionBuffer << tid << " IT " << funcNames[tid] << " " << parentID << endl;
+        task.actionBuffer << tid << " C " << taskNames[tid] << " " << parentID << endl;
         HBlogger << tid << " " << parentID << endl;
 
         // there is a happens before between taskID and parentID:
@@ -169,7 +173,7 @@ class INS {
     static inline VOID TaskEndLog( TaskInfo& task ) {
       // guardLock.lock();
       auto tid = task.taskID;
-      task.actionBuffer << tid << " ED " << funcNames[tid] << endl;
+      task.actionBuffer << tid << " E " << taskNames[tid] << endl;
       logger << task.actionBuffer.str(); // print to file
       task.actionBuffer.str(""); // clear buffer
       // guardLock.unlock();
@@ -184,7 +188,7 @@ class INS {
       auto tid = task.taskID;
       auto key = make_pair(bufLocAddr, value );
       idMap[key] = tid;
-      task.actionBuffer << tid << " OT " << funcNames[tid] << endl;
+      task.actionBuffer << tid << " S " << taskNames[tid] << endl;
       logger << task.actionBuffer.str(); // print to file
       task.actionBuffer.str(""); // clear buffer
       // guardLock.unlock();
@@ -195,7 +199,7 @@ class INS {
       return; // logging reads currently disabled because we don't use reads to check non-determinism
       // guardLock.lock();
       auto tid = task.taskID;
-      task.actionBuffer << tid << " RD " << addr << " " << value << endl;
+      task.actionBuffer << tid << " R " << addr << " " << value << endl;
       // guardLock.unlock();
     }
 
@@ -203,7 +207,18 @@ class INS {
     static inline VOID Write( TaskInfo & task, ADDRESS addr, INTEGER value, INTEGER lineNo, STRING funcName ) {
       // guardLock.lock();
       auto tid = task.taskID;
-      task.actionBuffer << tid << " WR " <<  addr << " " << value << " " << lineNo << " " << funcName << endl;
+
+      int funcID = 0;
+      if( funcNames.find(funcName) == funcNames.end() ) { // new function
+        funcID = funcIDSeed++;
+        funcNames[funcName] = funcID;
+
+        // print to the log file
+        task.actionBuffer << funcID << " F " << funcName << endl;
+      }
+
+      funcID = funcNames[funcName];
+      task.actionBuffer << tid << " W " <<  addr << " " << value << " " << lineNo << " " << funcID << endl;
       // guardLock.unlock();
     }
 };

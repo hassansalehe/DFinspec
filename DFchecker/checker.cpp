@@ -13,6 +13,7 @@
 // this file implements the checking tool functionalities.
 
 #include "checker.h"  // header
+#include "sigManager.h" // for managing function names
 
 //#define VERBOSE
 
@@ -140,8 +141,17 @@ void Checker::processLogLines(string & line){
     ssin >> taskID; // get task id
     ssin >> operation; // get operation
 
+    // Check if this is just function name
+    if(operation.find("F") != string::npos) {
+      int funcID = taskID;
+
+      string funcName;
+      getline(ssin, funcName); // get function name
+      cout << "Function name: " << funcName << endl;
+
+    }
     // if write
-    if(operation.find("WR") != string::npos) {
+    else if(operation.find("W") != string::npos) {
 
       Action action;
       string tempBuff;
@@ -155,16 +165,18 @@ void Checker::processLogLines(string & line){
       ssin >> tempBuff; // line number
       action.lineNo = stol(tempBuff);
 
-      getline(ssin, action.funcName); // get function name
+      ssin >> tempBuff; // function ID
+      action.funcID = stol(tempBuff);
+
       action.tid = taskID;
       saveWrite( action );
     }
-    else if (operation.find("RD") != string::npos) {
+    else if (operation.find("R") != string::npos) {
       // it is read just return for now.
       return;
     }
     // if new task creation, parents terminated
-    else if(operation.find("ST") != string::npos) {
+    else if(operation.find("B") != string::npos) {
 
       ssin >> taskName; // get task name
 
