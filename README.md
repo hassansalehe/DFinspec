@@ -1,13 +1,13 @@
-#  This is a tool to detect non-determinism in ADF applications. 
+#  This is a tool to detect non-determinism in ADF applications.
 
 ### Copyright notice: ###
 
-  (c) 2015, 2016 - Hassan Salehe Matar & MSRC at Koc University.
-    Copying or using this code by any means whatsoever 
+  Copyright (c) 2015 - 2017 Hassan Salehe Matar & MSRC at Koc University.
+    Copying or using this code by any means whatsoever
     without consent of the owner is strictly prohibited.
 
 
-### Contacts: 
+### Contacts:
      hmatar-at-ku-dot-edu-dot-tr
 
 

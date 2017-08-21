@@ -2,7 +2,7 @@
 //  ADFinspec: a lightweight non-determinism checking
 //          tool for ADF applications
 //
-//    (c) 2015,2016 - Hassan Salehe Matar & MSRC at Koc University
+//    Copyright (c) 2015 - 2017 Hassan Salehe Matar & MSRC at Koc University
 //      Copying or using this code by any means whatsoever
 //      without consent of the owner is strictly prohibited.
 //
