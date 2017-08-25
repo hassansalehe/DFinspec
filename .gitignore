@@ -6,6 +6,11 @@ Trace*
 *.a
 *_adf
 *.sif
+*.so
+build/
+ADFinspec
 
 # input files to the benchmarks
 smallcontent.txt
+mediumcontent.txt
+largecontent.txt

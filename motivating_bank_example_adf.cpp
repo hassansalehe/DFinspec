@@ -30,7 +30,7 @@ void OpenAccountTask()
       adf_pass_token(outtokens[0], &token, sizeof(token));    /* pass tokens */
       adf_pass_token(outtokens[1], &token, sizeof(token));    /* pass tokens */
       adf_pass_token(outtokens[2], &token, sizeof(token));    /* pass tokens */
-      
+
       // stop task
       adf_task_stop();
    });
@@ -42,19 +42,19 @@ void OpenAccountTask()
  */
 void CommissionTask()
 {
-   
+
    void *intokens[] = {&token1}; // for receiving token
    adf_create_task(1, 1, intokens, [=] (token_t *tokens) -> void
    {
       int token;
       float rate = 0.2; // commission rate
-      
+
       // copy token value
       memcpy(&token, tokens->value, sizeof(token));
-      
+
       // add commission
-      balance += (balance * rate);
-      
+      balance -= (balance * rate);
+
       // end task
       adf_task_stop();
    });
@@ -63,7 +63,7 @@ void CommissionTask()
 
 /**
  * This task deposits 200 to the account balance
- * 
+ *
  */
 void DepositTask()
 {
@@ -72,12 +72,12 @@ void DepositTask()
    {
       int token;
       int amount = 200;
-      
+
       // receive token
       memcpy(&token, tokens->value, sizeof(token));
 
       balance += amount;
-            
+
       adf_task_stop();
    });
 }
@@ -92,10 +92,10 @@ void WithdrawTask()
    {
       int token;
       int amount = 500; // amount to withdraw
-      
+
       // receive token
       memcpy(&token, tokens->value, sizeof(token));
-      
+
       balance -= amount; // deduce amount withdrawn
       adf_task_stop(); // terminate task task
    });
@@ -106,20 +106,20 @@ void WithdrawTask()
  */
 int main(int argc, char** argv)
 {
-   
+
    adf_init(num_threads); // initialize the ADF scheduler
-   
+
    CommissionTask(); // generate comission task instance
    DepositTask(); // generate deposit task instance
    WithdrawTask(); // generate withdraw task instance
    OpenAccountTask(); // generate the initial task instance
 
    adf_start();  // start sceduling dataflow tasks
-   
+
    adf_taskwait(); // wait completion of all tasks
-   
+
    adf_terminate(); // terminate ADF scheduler
-   
+
    return 0;
 }
 
