@@ -137,12 +137,7 @@ void INS_AdfMemRead( address addr, ulong size, int lineNo, address funcName  ) {
   if( t2t != taskInfos.end() && t2t->second.active ) {
 
     TaskInfo & taskInfo = t2t->second;
-
-    Action action(taskInfo.taskID, addr, value, lineNo, funcName);
-    action.isWrite = false;
-    taskInfo.saveMemoryAction(action);
-
-    INS::Read( taskInfo, addr, value );
+    INS::Read( taskInfo, addr, value, lineNo, (char*)funcName );
 
   #ifdef DEBUG
     cout << "READ: addr: " << addr << " value: "<< value << " taskID: " << t2t->second.taskID << endl;

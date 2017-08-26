@@ -194,11 +194,15 @@ class INS {
     }
 
     /** provides the address of memory a task reads from */
-    static inline VOID Read( TaskInfo & task, ADDRESS addr, INTEGER value ) {
+    static inline VOID Read( TaskInfo & task, ADDRESS addr, INTEGER value, INTEGER lineNo, STRING funcName ) {
       return; // logging reads currently disabled because we don't use reads to check non-determinism
       // guardLock.lock();
       auto tid = task.taskID;
-      task.actionBuffer << tid << " RD " << addr << " " << value << endl;
+
+      Action action(task.taskID, addr, value, lineNo, funcName);
+      action.isWrite = false;
+      task.saveMemoryAction(action);
+
       // guardLock.unlock();
     }
 

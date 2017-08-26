@@ -513,7 +513,7 @@ void ParseCommandLine(int argc, char **argv)
 	char c;
 
 	//HASSAN input_file_name = (char*) "largecontent.txt";
-	input_file_name = (char*) "mediumcontent.txt";
+	input_file_name = (char*) "smallcontent.txt";
 	num_threads = 1;
 	print_results = false;
 
