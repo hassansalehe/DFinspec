@@ -47,11 +47,7 @@ class INS {
     static FILEPTR HBlogger;
 
     // storing task names
-    static unordered_map<INTEGER, STRING>taskNames;
-
-    // storing function name pointers
-    static unordered_map<STRING, INTEGER>funcNames;
-    static INTEGER funcIDSeed;
+    static unordered_map<INTEGER, STRING>funcNames;
 
     // mapping buffer location, value with task id
     static unordered_map<pair<ADDRESS,INTEGER>, INTEGER, hash_function> idMap;
@@ -118,13 +114,13 @@ class INS {
 
     static inline VOID TransactionBegin( INTEGER taskID ) {
       // guardLock.lock();
-      logger << taskID << " STTM " << taskNames[taskID] << endl;
+      logger << taskID << " STTM " << funcNames[taskID] << endl;
       // guardLock.unlock();
     }
 
     static inline VOID TransactionEnd( INTEGER taskID ) {
       // guardLock.lock();
-      logger << taskID << " EDTM "<< taskNames[taskID] << endl;
+      logger << taskID << " EDTM "<< funcNames[taskID] << endl;
       // guardLock.unlock();
     }
 
@@ -132,12 +128,12 @@ class INS {
     static inline VOID TaskStartLog( TaskInfo& task, STRING taskName ) {
       // guardLock.lock();
       auto tid = task.taskID;
-      taskNames[tid] = taskName;
-      task.actionBuffer << tid << " B " << taskNames[tid] << endl;
+      funcNames[tid] = taskName;
+      task.actionBuffer << tid << " ST " << funcNames[tid] << endl;
       // guardLock.unlock();
     }
 
-    /** called when a task starts execution and retrieves parent task id */
+    /** called when a task starts execution. retrieves parent task id */
     static inline VOID TaskInTokenLog( TaskInfo & task, ADDRESS bufLocAddr, INTEGER value ) {
       // guardLock.lock();
       INTEGER parentID = -1;
@@ -153,7 +149,7 @@ class INS {
           return; // do nothing, just return
         }
 
-        task.actionBuffer << tid << " C " << taskNames[tid] << " " << parentID << endl;
+        task.actionBuffer << tid << " IT " << funcNames[tid] << " " << parentID << endl;
         HBlogger << tid << " " << parentID << endl;
 
         // there is a happens before between taskID and parentID:
@@ -173,7 +169,10 @@ class INS {
     static inline VOID TaskEndLog( TaskInfo& task ) {
       // guardLock.lock();
       auto tid = task.taskID;
-      task.actionBuffer << tid << " E " << taskNames[tid] << endl;
+
+      task.printMemoryActions();
+      task.actionBuffer << tid << " ED " << funcNames[tid] << endl;
+
       logger << task.actionBuffer.str(); // print to file
       task.actionBuffer.str(""); // clear buffer
       // guardLock.unlock();
@@ -188,7 +187,7 @@ class INS {
       auto tid = task.taskID;
       auto key = make_pair(bufLocAddr, value );
       idMap[key] = tid;
-      task.actionBuffer << tid << " S " << taskNames[tid] << endl;
+      task.actionBuffer << tid << " OT " << funcNames[tid] << endl;
       logger << task.actionBuffer.str(); // print to file
       task.actionBuffer.str(""); // clear buffer
       // guardLock.unlock();
@@ -199,7 +198,7 @@ class INS {
       return; // logging reads currently disabled because we don't use reads to check non-determinism
       // guardLock.lock();
       auto tid = task.taskID;
-      task.actionBuffer << tid << " R " << addr << " " << value << endl;
+      task.actionBuffer << tid << " RD " << addr << " " << value << endl;
       // guardLock.unlock();
     }
 
@@ -208,17 +207,13 @@ class INS {
       // guardLock.lock();
       auto tid = task.taskID;
 
-      int funcID = 0;
-      if( funcNames.find(funcName) == funcNames.end() ) { // new function
-        funcID = funcIDSeed++;
-        funcNames[funcName] = funcID;
+      Action action(task.taskID, addr, value, lineNo, funcName);
+      action.isWrite = true;
+      //action.funcID = funcNames[funcName];
+      action.funcName = funcName;
+      task.saveMemoryAction(action);
 
-        // print to the log file
-        task.actionBuffer << funcID << " F " << funcName << endl;
-      }
-
-      funcID = funcNames[funcName];
-      task.actionBuffer << tid << " W " <<  addr << " " << value << " " << lineNo << " " << funcID << endl;
+      /////task.actionBuffer << tid << " WR " <<  addr << " " << value << " " << lineNo << " " << funcName << endl;
       // guardLock.unlock();
     }
 };

@@ -174,7 +174,7 @@ static RegisterStandardPasses
     std::string BitSizeStr = utostr(BitSize);
     SmallString<32> ReadName("INS_AdfMemRead" + ByteSizeStr);
     TsanRead[i] = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
-        ReadName, IRB.getVoidTy(), IRB.getInt8PtrTy(), nullptr));
+        ReadName, IRB.getVoidTy(), IRB.getInt8PtrTy(), IRB.getInt64Ty(), IRB.getInt8PtrTy(), nullptr));
 
     SmallString<32> WriteName("INS_AdfMemWrite" + ByteSizeStr);
     INS_MemWrite[i] = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
@@ -379,7 +379,6 @@ static bool isAtomic(Instruction *I) {
   if (INS::DontInstrument(F.getName()))
      return false;
 
-  //errs() << "Instrumenting function: " << INS::demangleName (F.getName()) << "\n";
   bool Res = false;
   bool HasCalls = false;
   bool isTaskBody = INS::isTaskBodyFunction( F.getName() );
@@ -647,22 +646,17 @@ bool AdfSanitizer::instrumentLoadOrStore(Instruction *I, const DataLayout &DL) {
   else
     OnAccessFunc = IsWrite ? TsanUnalignedWrite[Idx] : TsanUnalignedRead[Idx];
 
+  Constant* LineNo = getLineNumber(I);
+
   if(IsWrite)
   {
-
     Value *Val = cast<StoreInst>(I)->getValueOperand();
-    Constant* LineNo = getLineNumber(I);
-    if(Val->getType()->isFloatTy())
-    {
-      Value* args[] = {Addr, Val, LineNo, funcNamePtr};
-      IRB.CreateCall(INS_MemWriteFloat, args);
-    }
-    else if(Val->getType()->isDoubleTy())
-    {
-      Value* args[] = {Addr, Val, LineNo, funcNamePtr};
-      IRB.CreateCall(INS_MemWriteDouble, args);
-    }
-    else if(Val->getType()->isIntegerTy())
+    Value* args[] = {Addr, Val, LineNo, funcNamePtr};
+    if( Val->getType()->isFloatTy() )
+      IRB.CreateCall( INS_MemWriteFloat, args );
+    else if( Val->getType()->isDoubleTy() )
+      IRB.CreateCall( INS_MemWriteDouble, args );
+    else if( Val->getType()->isIntegerTy() )
     {
 #ifdef DEBUG
        unsigned lineNo = 0;
@@ -680,7 +674,6 @@ bool AdfSanitizer::instrumentLoadOrStore(Instruction *I, const DataLayout &DL) {
          errs() << "========\n";
        }
 #endif
-
        IRB.CreateCall(OnAccessFunc,
 		{IRB.CreatePointerCast(Addr, IRB.getInt8PtrTy()),
 		 //IRB.CreatePointerCast(Val, Val->getType())
@@ -694,11 +687,10 @@ bool AdfSanitizer::instrumentLoadOrStore(Instruction *I, const DataLayout &DL) {
                    Val, LineNo, funcNamePtr
                 });
 
-  //errs() << "Line No: " << *LineNo << " \n";
-
-  }else
-    IRB.CreateCall(OnAccessFunc,
-		 {IRB.CreatePointerCast(Addr, IRB.getInt8PtrTy())});
+  }
+  else { // this is read action
+    IRB.CreateCall(OnAccessFunc, {Addr, LineNo, funcNamePtr});
+  }
   //if (IsWrite) NumInstrumentedWrites++;
   //else         NumInstrumentedReads++;
   return true;

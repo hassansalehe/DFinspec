@@ -22,11 +22,11 @@ target_compile_features(ADFTokenDetectorPass PRIVATE cxx_range_for cxx_auto_type
 
 # LLVM is (typically) built with no C++ RTTI. We need to match that.
 set_target_properties(ADFInstrumentationPass PROPERTIES
-    COMPILE_FLAGS "-fno-rtti -g"
+    COMPILE_FLAGS "-fno-rtti"
 )
 
 set_target_properties(ADFTokenDetectorPass PROPERTIES
-    COMPILE_FLAGS "-fno-rtti -g"
+    COMPILE_FLAGS "-fno-rtti"
 )
 
 
