@@ -9,6 +9,7 @@ Trace*
 *.so
 build/
 ADFinspec
+flowGraph.js
 
 # input files to the benchmarks
 smallcontent.txt

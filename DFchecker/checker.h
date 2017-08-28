@@ -18,7 +18,6 @@
 
 // includes and definitions
 #include "defs.h"
-
 #include "action.h" // defines Action class
 #include "conflictReport.h" // defines Conflict and Report structs
 
@@ -57,8 +56,11 @@ class Checker {
   ~Checker();
 
   private:
+    /** Constructs action object from the log file */
+    VOID constructMemoryAction(stringstream & ssin, string & opType, int taskID);
+
     VOID saveNondeterminismReport(const Action& curWrite, const Action& write);
-    VOID checkDetOnPreviousTasks(const Action& write);
+
     unordered_map <INTEGER, SerialBagPtr> serial_bags; // hold bags of tasks
     unordered_map<INTEGER, Task> graph;  // in and out edges
     unordered_map<ADDRESS, vector<Action>> writes; // for writes

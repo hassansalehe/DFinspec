@@ -16,28 +16,11 @@
 
 //#define VERBOSE
 
-void Checker::checkDetOnPreviousTasks(const Action& writeAction ) {
-  auto wTable = writes.find(writeAction.addr);
-  auto end = serial_bags[writeAction.tid]->HB.end();
-
-  // 4.2.1 check conflicts with other parallel tasks
-  for(auto parWrite = wTable->second.begin(); parWrite != wTable->second.end(); parWrite++) {
-    if(parWrite->tid != writeAction.tid && parWrite->value != writeAction.value) {
-      // not write of same task and same value
-      auto HBfound = serial_bags[writeAction.tid]->HB.find(parWrite->tid);
-      if(HBfound == end && parWrite->value != writeAction.value) {// 3. there's no happens-before
-        // code for recording errors
-        saveNondeterminismReport(writeAction, *parWrite);
-      }
-    }
-  }
-}
-
-void Checker::saveWrite( const Action& writeAction ) {
-  VALUE lineNo = writeAction.lineNo;
-  string funcName = writeAction.funcName;
+void Checker::saveWrite( const Action& newAction ) {
+  VALUE lineNo = newAction.lineNo;
+  string funcName = newAction.funcName;
   // CASES
-  // 1. first write -> just save
+  // 1. first action -> just save
   // 2. nth write of the same task -> just save
   // 3. a previous write in a happens-before -> just save
   // 4. previous write is parallel:
@@ -46,44 +29,36 @@ void Checker::saveWrite( const Action& writeAction ) {
   //        write in the parallel writes,update and take it forward
   //        4.2.1 check conflicts with other parallel tasks
 
-  if(writes.find(writeAction.addr) == writes.end()) { // 1. first write
-     writes[writeAction.addr] = vector<Action>();
-     writes[writeAction.addr].push_back( writeAction );
-  }
-  else {
-    auto wTable = writes.find(writeAction.addr);
-    auto lastWrt = wTable->second.back();
-    if(lastWrt.tid == writeAction.tid) { // 2. same writer
-      writes[writeAction.addr].pop_back();
-      writes[writeAction.addr].push_back( writeAction );
-      return;
+  auto perAddrActions = writes.find(newAction.addr);
+  if(perAddrActions == writes.end()) // 1. first action
+     writes[newAction.addr] = vector<Action>();
+
+  writes[newAction.addr].push_back( newAction ); // save
+
+  vector<Action> & AddrActions = writes[newAction.addr];
+
+  for(auto lastWrt = AddrActions.begin(); lastWrt != AddrActions.end(); lastWrt++) {
+
+    // actions of same task
+    if( newAction.tid == lastWrt->tid) continue;
+
+    auto HBfound = serial_bags[newAction.tid]->HB.find(lastWrt->tid);
+    auto end = serial_bags[newAction.tid]->HB.end();
+
+    if(HBfound != end) continue; // 3. there's happens-before
+
+    // 4. parallel, possible race! ((check race))
+
+    // check write-write case (different values written)
+    if(newAction.isWrite && lastWrt->isWrite && newAction.value != lastWrt->value) {
+      // code for recording errors
+      saveNondeterminismReport(newAction, *lastWrt);
     }
-    else { // check race
-      auto HBfound = serial_bags[writeAction.tid]->HB.find(lastWrt.tid);
-      auto end = serial_bags[writeAction.tid]->HB.end();
-      if(HBfound != end) {// 3. there's happens-before
-	writes[writeAction.addr].pop_back();
-	writes[writeAction.addr].push_back( writeAction );
 
-	// check on the happens-before relations with the previous concurrent tasks
-	checkDetOnPreviousTasks( writeAction );
-        return;
-      }
-      else { // 4. parallel, possible race!
-
-         wTable->second.push_back( writeAction );
-         if(lastWrt.value == writeAction.value) // 4.1 same value written
-           return; // no determinism error, just return
-         else { // 4.2 this is definitely determinism error
-
-           // code for recording errors
-           saveNondeterminismReport(writeAction, lastWrt);
-
-           // 4.2.1 check conflicts with other parallel tasks
-           checkDetOnPreviousTasks( writeAction );
-           return;
-         }
-      }
+    // Check if read-after-write or write-after-read
+    else if(newAction.isWrite != lastWrt->isWrite) {
+         // code for recording errors
+         saveNondeterminismReport(newAction, *lastWrt);
     }
   }
 }
@@ -109,7 +84,7 @@ VOID Checker::saveNondeterminismReport(const Action& curWrite, const Action& pre
 
 // Adds a new task node in the simple happens-before graph
 // @params: logLine, a log entry the contains the task ids
-void Checker:: addTaskNode(string & logLine) {
+void Checker::addTaskNode(string & logLine) {
     stringstream ssin(logLine);
     int sibId;
     int parId;
@@ -128,8 +103,33 @@ void Checker:: addTaskNode(string & logLine) {
     graph[sibId].inEdges.insert(parId);
 }
 
+/** Constructs action object from the log file */
+void Checker::constructMemoryAction(stringstream & ssin, string & operation, int taskID) {
+    Action action;
+    string tempBuff;
 
-void Checker::processLogLines(string & line){
+    ssin >> tempBuff; // address
+    action.addr = (ADDRESS)stoul(tempBuff, 0, 16);
+
+    ssin >> tempBuff; // value
+    action.value = stol(tempBuff);
+
+    ssin >> tempBuff; // line number
+    action.lineNo = stol(tempBuff);
+
+    getline(ssin, action.funcName); // get function name
+    action.tid = taskID;
+    if(operation == "WR")
+      action.isWrite = true;
+    else {
+      return;
+      action.isWrite = false;
+    }
+
+    saveWrite( action );
+}
+
+void Checker::processLogLines(string & line) {
 
     stringstream ssin(line); // split string
 
@@ -140,28 +140,11 @@ void Checker::processLogLines(string & line){
     ssin >> taskID; // get task id
     ssin >> operation; // get operation
 
-    // if write
-    if(operation.find("WR") != string::npos) {
-
-      Action action;
-      string tempBuff;
-
-      ssin >> tempBuff; // address
-      action.addr = (ADDRESS)stoul(tempBuff, 0, 16);
-
-      ssin >> tempBuff; // value
-      action.value = stol(tempBuff);
-
-      ssin >> tempBuff; // line number
-      action.lineNo = stol(tempBuff);
-
-      getline(ssin, action.funcName); // get function name
-      action.tid = taskID;
-      saveWrite( action );
+    if(operation.find("WR") != string::npos) { // write action
+      constructMemoryAction(ssin, operation, taskID);
     }
-    else if (operation.find("RD") != string::npos) {
-      // it is read just return for now.
-      return;
+    else if (operation.find("RD") != string::npos) { // read action
+      constructMemoryAction(ssin, operation, taskID);
     }
     // if new task creation, parents terminated
     else if(operation.find("ST") != string::npos) {
