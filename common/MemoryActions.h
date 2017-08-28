@@ -29,6 +29,8 @@ class MemoryActions {
 
   public:
 
+    int tid;
+
     // Default constructor
     MemoryActions() {
       isEmpty = true;
@@ -49,6 +51,7 @@ class MemoryActions {
        if (isEmpty ) {
          first = action;
          isEmpty = false;
+         tid = action.tid;
        }
        else if ( action.isWrite ) {
          lastWrite = action;

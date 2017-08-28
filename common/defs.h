@@ -60,4 +60,38 @@ typedef pair<string,string>     STRPAIR;
 typedef set<pair<int,int>>      INT_PAIRS;
 typedef map<STRPAIR, INT_PAIRS> CONFLICT_PAIRS;
 
+enum OPERATION {
+  ALLOCA,
+  BITCAST,
+  CALL,
+  GETELEMENTPTR,
+  STORE,
+  LOAD,
+  RET,
+  ADD,
+  SUB,
+  MUL,
+  DIV,
+  SHL,
+};
+
+static string OperRepresentation(OPERATION op) {
+
+  switch(op) {
+    case ALLOCA: return "ALLOCA";
+    case BITCAST: return "BITCAST";
+    case CALL: return "CALL";
+    case GETELEMENTPTR: return "GETELEMENTPTR";
+    case STORE: return "STORE";
+    case LOAD: return "LOAD";
+    case RET: return "RET";
+    case ADD: return "ADD";
+    case SUB: return "SUB";
+    case MUL: return "MUL";
+    case DIV: return "DIV";
+    case SHL: return "SHL";
+    default:
+      return "UNKNOWN";
+  }
+};
 #endif

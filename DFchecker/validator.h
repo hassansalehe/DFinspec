@@ -17,35 +17,10 @@
 
 // includes and definitions
 #include "defs.h"
-
-enum OPERATION {
-  ALLOCA,
-  BITCAST,
-  CALL,
-  GETELEMENTPTR,
-  STORE,
-  LOAD,
-  RET,
-  MUL,
-  ADD,
-  SUB,
-  SHL,
-};
-
-typedef struct Instruction {
-  INTEGER lineNo;
-  string destination;
-  string type;
-  OPERATION oper;
-  string operand1;
-  string operand2;
-
-  // raw
-  string raw;
-} Instruction;
+#include "instruction.h"
+#include "operationSet.h"
 
 class BugValidator {
-
 
   public:
     VOID parseTasksIR(char * IRlogName);
@@ -53,12 +28,11 @@ class BugValidator {
 
   private:
     unordered_map<string, vector<Instruction>> Tasks;
-    string trim(string sentence);
-    STRVECTOR splitInstruction(string stmt);
-    Instruction makeInstruction(string stmt);
     bool involveSimpleOperations(string task1, INTEGER line1);
     bool isSafe(const vector<Instruction> & trace, INTEGER loc, string operand);
     //INTEGER getLineNumber(const string & statement);
+
+    OperationSet operationSet;
 
     // Helper functions
     inline bool isEmpty(const string& statement) {

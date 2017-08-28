@@ -33,16 +33,22 @@ class Conflict {
 
   string funcName1;
   string funcName2;
-  Conflict(ADDRESS _addr, VALUE ln1, string fname1, VALUE ln2, string fname2):
-    addr(_addr), lineNo1(ln1), lineNo2(ln2), funcName1(fname1), funcName2(fname2){}
+
+  bool isWrite1;
+  bool isWrite2;
+  Conflict(ADDRESS _addr, VALUE ln1, string fname1, VALUE ln2, string fname2, bool actype1, bool actype2):
+    addr(_addr), lineNo1(ln1), lineNo2(ln2), funcName1(fname1), funcName2(fname2),
+    isWrite1(actype1), isWrite2(actype2){}
 
   Conflict(const Action& curWrite, const Action& prevWrite) {
     lineNo1 = prevWrite.lineNo;
     funcName1 = prevWrite.funcName;
+    isWrite1 = prevWrite.isWrite;
 
     addr = curWrite.addr;
     lineNo2 = curWrite.lineNo;
     funcName2 = curWrite.funcName;
+    isWrite2 = curWrite.isWrite;
   }
 
   bool operator<(const Conflict &RHS) const {

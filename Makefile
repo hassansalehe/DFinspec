@@ -22,7 +22,10 @@ else
 endif
 #CXX = g++
 CXXFLGS = -g -O3 -std=c++11
-DEPS = DFchecker/validator.h DFchecker/checker.h common/action.h DFchecker/conflictReport.h common/defs.h
+DEPS = DFchecker/validator.h DFchecker/checker.h DFchecker/operationSet.h	\
+       DFchecker/conflictReport.h common/action.h DFchecker/instruction.h	\
+       DFchecker/sigManager.h
+
 OBJ = validator.o checker.o main.o
 TOOL = ADFinspec
 INC= -I./common
@@ -39,4 +42,4 @@ $(TOOL): $(OBJ)
 .PHONY: clean
 
 clean:
-	rm -rf *.o  *~ $(TOOL) Tracelog* HBlog*
+	rm -rf *.o  *~ $(TOOL) tests/*.o Tracelog* HBlog*
