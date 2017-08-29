@@ -47,7 +47,11 @@ class INS {
     static FILEPTR HBlogger;
 
     // storing task names
-    static unordered_map<INTEGER, STRING>funcNames;
+    static unordered_map<INTEGER, STRING>taskNames;
+
+    // storing function name pointers
+    static unordered_map<STRING, INTEGER>funcNames;
+    static INTEGER funcIDSeed;
 
     // mapping buffer location, value with task id
     static unordered_map<pair<ADDRESS,INTEGER>, INTEGER, hash_function> idMap;
@@ -101,6 +105,23 @@ class INS {
       return taskID;
     }
 
+    /** registers the function if not registered yet.
+     * Also prints the function to standard output
+     */
+    static inline VOID RegisterFunction(STRING funcName) {
+
+      // guardLock.lock();
+      int funcID = 0;
+      if( funcNames.find(funcName) == funcNames.end() ) { // new function
+        funcID = funcIDSeed++;
+        funcNames[funcName] = funcID;
+
+        // print to the log file
+        logger << funcID << " F " << funcName << endl;
+      }
+      // guardLock.unlock();
+    }
+
     /** close file used in logging */
     static inline VOID Finalize() {
       //guardLock.lock();
@@ -114,27 +135,27 @@ class INS {
 
     static inline VOID TransactionBegin( INTEGER taskID ) {
       // guardLock.lock();
-      logger << taskID << " STTM " << funcNames[taskID] << endl;
+      logger << taskID << " BTM " << taskNames[taskID] << endl;
       // guardLock.unlock();
     }
 
     static inline VOID TransactionEnd( INTEGER taskID ) {
       // guardLock.lock();
-      logger << taskID << " EDTM "<< funcNames[taskID] << endl;
+      logger << taskID << " ETM "<< taskNames[taskID] << endl;
       // guardLock.unlock();
     }
 
-    /** called when a task starts execution. retrieves parent task id */
-    static inline VOID TaskStartLog( TaskInfo& task, STRING taskName ) {
+    /** called when a task begins execution and retrieves parent task id */
+    static inline VOID TaskBeginLog( TaskInfo& task, STRING taskName ) {
       // guardLock.lock();
       auto tid = task.taskID;
-      funcNames[tid] = taskName;
-      task.actionBuffer << tid << " ST " << funcNames[tid] << endl;
+      taskNames[tid] = taskName;
+      task.actionBuffer << tid << " B " << taskNames[tid] << endl;
       // guardLock.unlock();
     }
 
-    /** called when a task starts execution. retrieves parent task id */
-    static inline VOID TaskInTokenLog( TaskInfo & task, ADDRESS bufLocAddr, INTEGER value ) {
+    /** called when a task begins execution. retrieves parent task id */
+    static inline VOID TaskReceiveTokenLog( TaskInfo & task, ADDRESS bufLocAddr, INTEGER value ) {
       // guardLock.lock();
       INTEGER parentID = -1;
       auto tid = task.taskID;
@@ -149,7 +170,7 @@ class INS {
           return; // do nothing, just return
         }
 
-        task.actionBuffer << tid << " IT " << funcNames[tid] << " " << parentID << endl;
+        task.actionBuffer << tid << " C " << taskNames[tid] << " " << parentID << endl;
         HBlogger << tid << " " << parentID << endl;
 
         // there is a happens before between taskID and parentID:
@@ -171,7 +192,7 @@ class INS {
       auto tid = task.taskID;
 
       task.printMemoryActions();
-      task.actionBuffer << tid << " ED " << funcNames[tid] << endl;
+      task.actionBuffer << tid << " E " << taskNames[tid] << endl;
 
       logger << task.actionBuffer.str(); // print to file
       task.actionBuffer.str(""); // clear buffer
@@ -182,12 +203,12 @@ class INS {
      * stores the buffer address of the token and the value stored in
      * the buffer for the succeeding task
      */
-    static inline VOID TaskOutTokenLog( TaskInfo & task, ADDRESS bufLocAddr, INTEGER value ) {
+    static inline VOID TaskSendTokenLog( TaskInfo & task, ADDRESS bufLocAddr, INTEGER value ) {
       // guardLock.lock();
       auto tid = task.taskID;
       auto key = make_pair(bufLocAddr, value );
       idMap[key] = tid;
-      task.actionBuffer << tid << " OT " << funcNames[tid] << endl;
+      task.actionBuffer << tid << " S " << taskNames[tid] << endl;
       logger << task.actionBuffer.str(); // print to file
       task.actionBuffer.str(""); // clear buffer
       // guardLock.unlock();
@@ -195,11 +216,14 @@ class INS {
 
     /** provides the address of memory a task reads from */
     static inline VOID Read( TaskInfo & task, ADDRESS addr, INTEGER value, INTEGER lineNo, STRING funcName ) {
-      return; // logging reads currently disabled because we don't use reads to check non-determinism
+      //return; // logging reads currently disabled because we don't use reads to check non-determinism
       // guardLock.lock();
-      auto tid = task.taskID;
 
-      Action action(task.taskID, addr, value, lineNo, funcName);
+      // register function if not registered yet
+      RegisterFunction(funcName);
+
+      int funcID = funcNames[funcName];
+      Action action(task.taskID, addr, value, lineNo, funcID);
       action.isWrite = false;
       task.saveMemoryAction(action);
 
@@ -209,15 +233,17 @@ class INS {
     /** stores a write action */
     static inline VOID Write( TaskInfo & task, ADDRESS addr, INTEGER value, INTEGER lineNo, STRING funcName ) {
       // guardLock.lock();
-      auto tid = task.taskID;
 
-      Action action(task.taskID, addr, value, lineNo, funcName);
+      // register function signature if not registered yet
+      RegisterFunction(funcName);
+
+      int funcID = funcNames[funcName];
+      Action action(task.taskID, addr, value, lineNo, funcID);
       action.isWrite = true;
-      //action.funcID = funcNames[funcName];
       action.funcName = funcName;
       task.saveMemoryAction(action);
 
-      /////task.actionBuffer << tid << " WR " <<  addr << " " << value << " " << lineNo << " " << funcName << endl;
+      /////task.actionBuffer << tid << " W " <<  addr << " " << value << " " << lineNo << " " << funcName << endl;
       // guardLock.unlock();
     }
 };

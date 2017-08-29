@@ -13,6 +13,7 @@
 // this file implements the checking tool functionalities.
 
 #include "checker.h"  // header
+#include "sigManager.h" // for managing function names
 
 //#define VERBOSE
 
@@ -116,15 +117,21 @@ void Checker::constructMemoryAction(stringstream & ssin, string & operation, int
     ssin >> tempBuff; // line number
     action.lineNo = stol(tempBuff);
 
-    getline(ssin, action.funcName); // get function name
-    action.taskId = taskID;
-    if(operation == "WR")
-      action.isWrite = true;
-    else {
-      return;
-      action.isWrite = false;
-    }
+    ssin >> action.funcId; // get function id
 
+    action.taskId = taskID;
+    if(operation == "W")
+      action.isWrite = true;
+    else
+      action.isWrite = false;
+
+#ifdef DEBUG // check if data correctly set.
+    cout << "Action constructed: ";
+    ostringstream buff;
+    action.printAction(buff);
+    cout << buff.str();
+    cout << endl;
+#endif
     saveWrite( action );
 }
 
@@ -139,14 +146,27 @@ void Checker::processLogLines(string & line) {
   ssin >> taskID; // get task id
   ssin >> operation; // get operation
 
-  if(operation.find("WR") != string::npos) { // write action
+  if(operation.find("W") != string::npos) { // write action
     constructMemoryAction(ssin, operation, taskID);
   }
-  else if (operation.find("RD") != string::npos) { // read action
+  else if (operation.find("R") != string::npos) { // read action
     constructMemoryAction(ssin, operation, taskID);
+    cout << "Fucking with ReaD\n";
+  }
+  // Check if this is just function name
+  else if(operation.find("F") != string::npos) {
+
+    // task id position is func ID in this case
+    int funcID = taskID;
+
+    string funcName;
+    getline(ssin, funcName); // get function name
+
+    // save the function name
+    signatureManager.addFuncName(funcName, funcID);
   }
   // if new task creation, parents terminated
-  else if(operation.find("ST") != string::npos) {
+  else if(operation.find("B") != string::npos) {
 
     ssin >> taskName; // get task name
 
@@ -176,7 +196,6 @@ void Checker::processLogLines(string & line) {
       // or construct your own by cloning the parent's
 
       // 1.find the parent bag which can be inherited
-
       SerialBagPtr taskBag = NULL;
       auto inEdge = graph[taskID].inEdges.begin();
       for(; inEdge != graph[taskID].inEdges.end(); inEdge++) {
@@ -200,7 +219,6 @@ void Checker::processLogLines(string & line) {
 
       // 2. merge the HBs of the parent nodes
       inEdge = graph[taskID].inEdges.begin();
-
       for(; inEdge != graph[taskID].inEdges.end(); inEdge++) {
 
         auto aBag = serial_bags[*inEdge];
@@ -249,7 +267,7 @@ VOID Checker::reportConflicts() {
   cout << "                                                            " << endl;
   cout << "                                                            " << endl;
   cout << "                                                            " << endl;
-  cout << "        Non-determinism checking report                     " << endl;
+  cout << "              Non-determinism checking report               " << endl;
   cout << "                                                            " << endl;
 
 #ifdef VERBOSE // print full summary
@@ -274,6 +292,10 @@ VOID Checker::reportConflicts() {
   }
 
 #else
+
+  // print appropriate message in case no errors found
+  if(! conflictTasksAndLines.size() )
+    cout << "                 No nondeterminism found!                 " << endl;
 
   // a pair of conflicting task body with a set of line numbers
   for(auto it = conflictTasksAndLines.begin(); it!= conflictTasksAndLines.end(); it++)

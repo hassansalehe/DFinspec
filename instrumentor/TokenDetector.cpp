@@ -75,8 +75,8 @@ namespace {
       IRBuilder<> fIRB(M.getContext());
       Type * IntTy = M.getDataLayout().getIntPtrType(M.getContext());
 
-      Function * INS_RegOutToken = checkSanitizerInterfaceFunction(
-	M.getOrInsertFunction("INS_RegOutToken", fIRB.getVoidTy(),
+      Function * INS_RegSendToken = checkSanitizerInterfaceFunction(
+	M.getOrInsertFunction("INS_RegSendToken", fIRB.getVoidTy(),
 		fIRB.getInt8PtrTy(), fIRB.getInt8PtrTy(), IntTy, nullptr));
 
       //loop through the function body to find memcpy calls
@@ -98,7 +98,7 @@ namespace {
 
 	      if(isa<MemCpyInst>(M)) { // memcpy(newtoken->value, tokendata, token_size);
 		// for accessing tokens
-		IRB.CreateCall(INS_RegOutToken,
+		IRB.CreateCall(INS_RegSendToken,
 		    {IRB.CreatePointerCast(M->getArgOperand(0), IRB.getInt8PtrTy()), // newtoken
 		    IRB.CreatePointerCast(M->getArgOperand(1), IRB.getInt8PtrTy()),  // tokendata
 		    IRB.CreateIntCast(M->getArgOperand(2), IntTy, false)});       // tokensize

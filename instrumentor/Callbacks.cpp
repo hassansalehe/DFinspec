@@ -29,12 +29,20 @@ lint getMemoryValue( address addr, ulong size )
   if( size == sizeof(int) )
      return *(static_cast<int *>(addr));
 
+  if( size == sizeof(float) )
+    return *(static_cast<float *>(addr));
+
+  if( size == sizeof(double) )
+    return *(static_cast<double *>(addr));
+
   if( size == sizeof(long) )
      return *(static_cast<long *>(addr));
 
    if( size == sizeof(long long) )
      return *(static_cast<long long *>(addr));
-   return -1;
+
+   // else, get the best value possible.
+   return *(static_cast<long long *>(addr));
 }
 
 // to initialize the logger
@@ -47,7 +55,7 @@ void INS_Fini() {
   INS::Finalize();
 }
 
-void INS_TaskStartFunc( void* taskName ) {
+void INS_TaskBeginFunc( void* taskName ) {
 
   auto threadID = static_cast<uint>( pthread_self() );
   INS::guardLock.lock(); // protect the task id map
@@ -59,9 +67,9 @@ void INS_TaskStartFunc( void* taskName ) {
   t2t.active = true;
 
 #ifdef DEBUG
-  cout << "Task_Started, (threadID: "<< t2t.threadID << ", taskID : " << taskInfos[t2t.threadID].taskID <<") name: "<< (char *)taskName<< endl;
+  cout << "Task_Began, (threadID: "<< t2t.threadID << ", taskID : " << taskInfos[t2t.threadID].taskID <<") name: "<< (char *)taskName<< endl;
 #endif
-  INS::TaskStartLog(t2t, (char*)taskName);
+  INS::TaskBeginLog(t2t, (char*)taskName);
   INS::guardLock.unlock(); // release lock
 }
 
@@ -83,7 +91,7 @@ void INS_TaskFinishFunc( void* addr ) {
 }
 
 /** Callbacks for tokens */
-void INS_RegInToken( address tokenAddr, ulong size )
+void INS_RegReceiveToken( address tokenAddr, ulong size )
 {
   uint threadID = (uint)pthread_self();
   INTEGER value = getMemoryValue( tokenAddr, size );
@@ -91,14 +99,14 @@ void INS_RegInToken( address tokenAddr, ulong size )
   INS::guardLock.lock(); // protect the task id map
   auto t2t = taskInfos.find(threadID);
   if( t2t != taskInfos.end() && t2t->second.active )
-    INS::TaskInTokenLog( t2t->second, tokenAddr, value );
+    INS::TaskReceiveTokenLog( t2t->second, tokenAddr, value );
   #ifdef DEBUG
-    cout << "InToken: " << value << " addr: " << tokenAddr << endl;
+    cout << "ReceiveToken: " << value << " addr: " << tokenAddr << endl;
   #endif
   INS::guardLock.unlock(); // release lock
 }
 
-void INS_RegOutToken( ADDRESS bufLocAddr, ADDRESS tokenAddr, ulong size ) {
+void INS_RegSendToken( ADDRESS bufLocAddr, ADDRESS tokenAddr, ulong size ) {
 
   uint threadID = (uint)pthread_self();
   INTEGER value = getMemoryValue( tokenAddr, size );
@@ -106,9 +114,9 @@ void INS_RegOutToken( ADDRESS bufLocAddr, ADDRESS tokenAddr, ulong size ) {
   INS::guardLock.lock(); // protect the task id map
   auto t2t = taskInfos.find( threadID );
   if( t2t != taskInfos.end() && t2t->second.active )
-    INS::TaskOutTokenLog( t2t->second, bufLocAddr, value );
+    INS::TaskSendTokenLog( t2t->second, bufLocAddr, value );
   #ifdef DEBUG
-    cout << "OutToken: " << value << " addr: " << bufLocAddr << endl;
+    cout << "SendToken: " << value << " addr: " << bufLocAddr << endl;
   #endif
   INS::guardLock.unlock(); // release lock
 }
@@ -129,7 +137,7 @@ void toolVptrLoad( address addr, address value ) {
 /** Callbacks for store operations  */
 void INS_AdfMemRead( address addr, ulong size, int lineNo, address funcName  ) {
 
-  INTEGER value = getMemoryValue( addr, size );
+  lint value = getMemoryValue( addr, size );
   uint threadID = (uint)pthread_self();
 
   INS::guardLock.lock(); // protect the task id map

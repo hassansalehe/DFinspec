@@ -10,6 +10,10 @@ Trace*
 build/
 ADFinspec
 flowGraph.js
+*_adf_base
+*_adf_instr
+checkerResult.txt
+temp
 
 # input files to the benchmarks
 smallcontent.txt

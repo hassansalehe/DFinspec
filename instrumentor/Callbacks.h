@@ -34,8 +34,8 @@ extern "C" {
   void AdfCreateTask(void **intokens, void* fn);
 
   // callbacks for tokens
-  void INS_RegInToken(void * tokenAddr, unsigned long size);
-  void INS_RegOutToken(void * bufferAddr, void * tokenAddr, unsigned long size);
+  void INS_RegReceiveToken(void * tokenAddr, unsigned long size);
+  void INS_RegSendToken(void * bufferAddr, void * tokenAddr, unsigned long size);
 
   // callbacks for memory access, race detection
   void INS_AdfMemRead8(void *addr, int lineNo, void * funcName);
@@ -49,7 +49,7 @@ extern "C" {
   void INS_AdfMemWriteDouble(void * addr, double value, int lineNo, void * funcName);
 
   // task begin and end callbacks
-  void INS_TaskStartFunc(void* addr);
+  void INS_TaskBeginFunc(void* addr);
   void INS_TaskFinishFunc(void* addr);
 
   void toolVptrUpdate(void *addr, void * value);

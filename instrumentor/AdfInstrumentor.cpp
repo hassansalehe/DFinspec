@@ -74,16 +74,16 @@ namespace {
    Type *IntptrTy;
    IntegerType *OrdTy;
 //   // Callbacks to run-time library are computed in doInitialization.
-     Function *INS_TaskStartFunc;
+     Function *INS_TaskBeginFunc;
      Function *INS_TaskFinishFunc;
 
      // register every new instrumented function
      Value *funcNamePtr = NULL;
-     Function *INS_TaskStartFunc2;
+     Function *INS_TaskBeginFunc2;
 
      // callbacks for registering tokens
-     Function *INS_RegInToken;
-     //Function *INS_RegOutToken;
+     Function *INS_RegReceiveToken;
+     //Function *INS_RegSendToken;
 
      // callback for task creation
      Function *AdfCreateTask;
@@ -137,23 +137,23 @@ static RegisterStandardPasses
 
 
   // callbacks for tokens collection
-  INS_RegInToken = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
-      "INS_RegInToken", IRB.getVoidTy(), IRB.getInt8PtrTy(),  IRB.getInt8Ty(), nullptr));
+  INS_RegReceiveToken = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
+      "INS_RegReceiveToken", IRB.getVoidTy(), IRB.getInt8PtrTy(),  IRB.getInt8Ty(), nullptr));
 
-  //INS_RegOutToken = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
-  //    "INS_RegOutToken", IRB.getVoidTy(), IRB.getInt8PtrTy(),  IRB.getInt8PtrTy(), IntptrTy, nullptr));
+  //INS_RegSendToken = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
+  //    "INS_RegSendToken", IRB.getVoidTy(), IRB.getInt8PtrTy(),  IRB.getInt8PtrTy(), IntptrTy, nullptr));
 
   // callback for task creation
  AdfCreateTask = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
       "AdfCreateTask", IRB.getVoidTy(), IRB.getInt8PtrTy(),  nullptr));
 
 
-  INS_TaskStartFunc = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
-      "INS_TaskStartFunc", IRB.getVoidTy(), IRB.getInt8PtrTy(), nullptr));
+  INS_TaskBeginFunc = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
+      "INS_TaskBeginFunc", IRB.getVoidTy(), IRB.getInt8PtrTy(), nullptr));
 
   // register every executed function.
-  INS_TaskStartFunc2 = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
-      "INS_TaskStartFunc2", IRB.getVoidTy(), IRB.getInt8PtrTy(), nullptr));
+  INS_TaskBeginFunc2 = checkSanitizerInterfaceFunction(M.getOrInsertFunction(
+      "INS_TaskBeginFunc2", IRB.getVoidTy(), IRB.getInt8PtrTy(), nullptr));
 
   INS_TaskFinishFunc = checkSanitizerInterfaceFunction(
       M.getOrInsertFunction("INS_TaskFinishFunc", IRB.getVoidTy(), nullptr));
@@ -391,7 +391,7 @@ static bool isAtomic(Instruction *I) {
 
     IRBuilder<> IRB(F.getEntryBlock().getFirstNonPHI());
     Value *taskName = IRB.CreateGlobalStringPtr(name, "taskName");
-    IRB.CreateCall(INS_TaskStartFunc, {IRB.CreatePointerCast(taskName, IRB.getInt8PtrTy())});
+    IRB.CreateCall(INS_TaskBeginFunc, {IRB.CreatePointerCast(taskName, IRB.getInt8PtrTy())});
 
     Res = true;
 
@@ -413,13 +413,13 @@ static bool isAtomic(Instruction *I) {
   StringRef funcName = INS::demangleName(F.getName());
   IRBuilder<> IRB(F.getEntryBlock().getFirstNonPHI());
   funcNamePtr = IRB.CreateGlobalStringPtr(funcName, "functionName");
-  //IRB.CreateCall(INS_TaskStartFunc2, {IRB.CreatePointerCast(funcNamePtr, IRB.getInt8PtrTy())});
+  //IRB.CreateCall(INS_TaskBeginFunc2, {IRB.CreatePointerCast(funcNamePtr, IRB.getInt8PtrTy())});
 
 //else return false;
    /*
    if ( isTaskBodyFunction(F) ) {
        instrumentReturns(F);
-       instrumentOutTokens();
+       instrumentSendTokens();
 
    }
   //SymbolTableList<Argument> attSet =
@@ -472,7 +472,7 @@ static bool isAtomic(Instruction *I) {
           if(isTaskBody && INS::isPassTokenFunc(calledF->getName()))
           {
             IRBuilder<> IRB(&Inst);
-            IRB.CreateCall(INS_RegOutToken,
+            IRB.CreateCall(INS_RegSendToken,
               {IRB.CreatePointerCast(M->getArgOperand(0), IRB.getInt8PtrTy()),
                IRB.CreatePointerCast(M->getArgOperand(1), IRB.getInt8PtrTy()),
                IRB.CreateIntCast(M->getArgOperand(2), IntptrTy, false)});
@@ -573,7 +573,7 @@ static bool isAtomic(Instruction *I) {
 	//errs() << "memTransfer HHHHHHHHHHHHHHHHH";
 	//Inst->dump();
 	// for accessing tokens
-	IRB.CreateCall(INS_RegInToken,
+	IRB.CreateCall(INS_RegReceiveToken,
 	    {//IRB.CreatePointerCast(M->getArgOperand(0), IRB.getInt8PtrTy()),
 	    IRB.CreatePointerCast(M->getArgOperand(1), IRB.getInt8PtrTy()),
 	    IRB.CreateIntCast(M->getArgOperand(2), IntptrTy, false)});
@@ -583,12 +583,12 @@ static bool isAtomic(Instruction *I) {
     }
 
   // Instrument function entry/exit points if there were instrumented accesses.
-  // insert call at the start of the task
+  // insert call at the beginning of the task
   if (isTaskBody && (Res || HasCalls) /*!HASSAN && ClInstrumentFuncEntryExit*/) {
     IRBuilder<> IRB(F.getEntryBlock().getFirstNonPHI());
     Value *ReturnAddress = IRB.CreateCall(Intrinsic::getDeclaration(F.getParent(), Intrinsic::returnaddress),
                                          IRB.getInt32(0));
-    //IRB.CreateCall(INS_TaskStartFunc, ReturnAddress);
+    //IRB.CreateCall(INS_TaskBeginFunc, ReturnAddress);
     if(isTaskBody) {  // instrument returns of a task body to track when it finishes.
       for (auto RetInst : RetVec) {
         IRBuilder<> IRBRet(RetInst);

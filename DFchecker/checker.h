@@ -20,6 +20,7 @@
 #include "defs.h"
 #include "action.h" // defines Action class
 #include "conflictReport.h" // defines Conflict and Report structs
+#include "sigManager.h" // for managing function names
 
 using namespace std;
 
@@ -66,6 +67,9 @@ class Checker {
     unordered_map<ADDRESS, vector<Action>> writes; // for writes
     map<pair<INTEGER, INTEGER>, Report> conflictTable;
     CONFLICT_PAIRS conflictTasksAndLines;
+
+    // For holding function signatures.
+    SigManager signatureManager;
 };
 
 #endif // end checker.h

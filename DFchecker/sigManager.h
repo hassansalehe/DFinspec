@@ -15,7 +15,7 @@
 #ifndef SigManager_HPP_
 #define SigManager_HPP_
 
-#include <map>
+#include <unordered_map>
 #include <cassert>
 
 using namespace std;
@@ -25,7 +25,7 @@ using namespace std;
 class SigManager {
 
 private:
-  map<int, string> functions;
+  unordered_map<INTEGER, string> functions;
 
 public:
   /**
@@ -37,14 +37,22 @@ public:
     functions[id] = name;
   }
 
+  /**
+   * Returns the function signature given the function id
+   */
   string getFuncName(int id) {
 
     assert(functions.find(id) == functions.end());
     return functions[id];
-
   }
 
+  /**
+   * Returns the function name identifier
+   */
   int getFuncId(string name) {
+    for(auto i = functions.begin(); i != functions.end(); i++)
+       if(i->second == name)
+         return i->first;
 
     return 0; // FIXME
   }
