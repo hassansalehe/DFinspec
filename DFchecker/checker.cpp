@@ -130,87 +130,93 @@ void Checker::constructMemoryAction(stringstream & ssin, string & operation, int
 
 void Checker::processLogLines(string & line) {
 
-    stringstream ssin(line); // split string
+  stringstream ssin(line); // split string
 
-    int taskID;
-    string taskName;
-    string operation;
+  int taskID;
+  string taskName;
+  string operation;
 
-    ssin >> taskID; // get task id
-    ssin >> operation; // get operation
+  ssin >> taskID; // get task id
+  ssin >> operation; // get operation
 
-    if(operation.find("WR") != string::npos) { // write action
-      constructMemoryAction(ssin, operation, taskID);
-    }
-    else if (operation.find("RD") != string::npos) { // read action
-      constructMemoryAction(ssin, operation, taskID);
-    }
-    // if new task creation, parents terminated
-    else if(operation.find("ST") != string::npos) {
+  if(operation.find("WR") != string::npos) { // write action
+    constructMemoryAction(ssin, operation, taskID);
+  }
+  else if (operation.find("RD") != string::npos) { // read action
+    constructMemoryAction(ssin, operation, taskID);
+  }
+  // if new task creation, parents terminated
+  else if(operation.find("ST") != string::npos) {
 
-      ssin >> taskName; // get task name
+    ssin >> taskName; // get task name
 
-      // we already know its parents
-      // use this information to inherit or greate new serial bag
-      auto parentTasks = graph[taskID].inEdges.begin();
+    // we already know its parents
+    // use this information to inherit or greate new serial bag
+    auto parentTasks = graph[taskID].inEdges.begin();
 
-      if(parentTasks == graph[taskID].inEdges.end()) { // if no HB tasks in graph
+    if(parentTasks == graph[taskID].inEdges.end()) { // if no HB tasks in graph
 
-	// check if has no serial bag
-	if(serial_bags.find(taskID) == serial_bags.end()) {
-	  auto newTaskbag = new SerialBag();
-	  if(graph.find(taskID) != graph.end()) {
+      // check if has no serial bag
+      if(serial_bags.find(taskID) == serial_bags.end()) {
+        auto newTaskbag = new SerialBag();
+        if(graph.find(taskID) != graph.end()) {
 
-	    // specify number of tasks dependent of this task
-	    newTaskbag->outBufferCount = graph[taskID].outEdges.size();
-	  }
-	  else //put it in the simple HB graph
-	    graph[taskID] = Task();
+          // specify number of tasks dependent of this task
+          newTaskbag->outBufferCount = graph[taskID].outEdges.size();
+        }
+        else //put it in the simple HB graph
+          graph[taskID] = Task();
 
-	  graph[taskID].name = taskName; // save the name of the task
-	  serial_bags[taskID] = newTaskbag;
-	}
-      }
-      else { // has parent tasks
-	// look for the parents serial bags and inherit them
-	// or construct your own by cloning the parent's
-
-	// 1.find the parent bag which can be inherited
-	SerialBagPtr taskBag = NULL;
-	auto inEdge = graph[taskID].inEdges.begin();
-	for(; inEdge != graph[taskID].inEdges.end(); inEdge++) {
-	  // take with outstr 1 and longest
-	  auto curBag = serial_bags[*inEdge];
-	  if(curBag->outBufferCount == 1) {
-	    serial_bags.erase(*inEdge);
-	    graph[taskID].inEdges.erase(*inEdge);
-	    taskBag = curBag;
-	    curBag->HB.insert(*inEdge);
-	    break;  // could optimize by looking all bags
-	  }
-	}
-	if(!taskBag)
-	  taskBag = new SerialBag(); // no bag inherited
-
-	// the number of inheriting bags
-	taskBag->outBufferCount = graph[taskID].outEdges.size();
-
-	// 2. merge the HBs of the parent nodes
-	inEdge = graph[taskID].inEdges.begin();
-	for(; inEdge != graph[taskID].inEdges.end(); inEdge++) {
-	  auto aBag = serial_bags[*inEdge];
-
-	  taskBag->HB.insert(aBag->HB.begin(), aBag->HB.end()); // merging...
-	  taskBag->HB.insert(*inEdge); // parents happen-before me
-
-	  aBag->outBufferCount--; // for inheriting bags
-	  if(!aBag->outBufferCount)
-	    serial_bags.erase(*inEdge);
-	}
-	graph[taskID].name = taskName; // set the name of the task
-	serial_bags[taskID] = taskBag; // 3. add the bag to serial_bags
+        graph[taskID].name = taskName; // save the name of the task
+        serial_bags[taskID] = newTaskbag;
       }
     }
+    else { // has parent tasks
+      // look for the parents serial bags and inherit them
+      // or construct your own by cloning the parent's
+
+      // 1.find the parent bag which can be inherited
+
+      SerialBagPtr taskBag = NULL;
+      auto inEdge = graph[taskID].inEdges.begin();
+      for(; inEdge != graph[taskID].inEdges.end(); inEdge++) {
+
+        // take with outstr 1 and longest
+        auto curBag = serial_bags[*inEdge];
+        if(curBag->outBufferCount == 1) {
+          serial_bags.erase(*inEdge);
+          graph[taskID].inEdges.erase(*inEdge);
+          taskBag = curBag;
+          curBag->HB.insert(*inEdge);
+          break;  // could optimize by looking all bags
+        }
+      }
+
+      if(!taskBag)
+        taskBag = new SerialBag(); // no bag inherited
+
+      // the number of inheriting bags
+      taskBag->outBufferCount = graph[taskID].outEdges.size();
+
+      // 2. merge the HBs of the parent nodes
+      inEdge = graph[taskID].inEdges.begin();
+
+      for(; inEdge != graph[taskID].inEdges.end(); inEdge++) {
+
+        auto aBag = serial_bags[*inEdge];
+
+        taskBag->HB.insert(aBag->HB.begin(), aBag->HB.end()); // merging...
+        taskBag->HB.insert(*inEdge); // parents happen-before me
+
+        aBag->outBufferCount--; // for inheriting bags
+        if(!aBag->outBufferCount)
+          serial_bags.erase(*inEdge);
+      }
+
+      graph[taskID].name = taskName; // set the name of the task
+      serial_bags[taskID] = taskBag; // 3. add the bag to serial_bags
+    }
+  }
 }
 
 CONFLICT_PAIRS & Checker::getConflictingPairs() {
