@@ -29,7 +29,7 @@ class MemoryActions {
 
   public:
 
-    int tid;
+    int taskId;
 
     // Default constructor
     MemoryActions() {
@@ -51,7 +51,7 @@ class MemoryActions {
        if (isEmpty ) {
          first = action;
          isEmpty = false;
-         tid = action.tid;
+         taskId = action.taskId;
        }
        else if ( action.isWrite ) {
          lastWrite = action;
