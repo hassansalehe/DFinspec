@@ -24,7 +24,7 @@ using namespace std;
 
 class Action {
  public:
-  INTEGER tid;      // task id of writter
+  INTEGER taskId;      // task id of writter
   ADDRESS addr;     // destination address
   VALUE value;      // value written
   VALUE lineNo;     // source-line number
@@ -32,17 +32,17 @@ class Action {
   bool isWrite;     // true if this action is "write"
 
   Action(INTEGER tskId, VALUE val, VALUE ln, string fname):
-    tid(tskId), value(val), lineNo(ln), funcName(fname) {}
+    taskId(tskId), value(val), lineNo(ln), funcName(fname) {}
 
   Action(INTEGER tskId, ADDRESS adr, VALUE val, VALUE ln, string fname):
-    tid(tskId),
+    taskId(tskId),
     addr(adr),
     value(val),
     lineNo(ln),
     funcName(fname) {}
 
   Action(INTEGER tskId, address adr, lint val, int ln, address fname ):
-    tid(tskId),
+    taskId(tskId),
     addr(adr),
     value(val),
     lineNo(ln) {
@@ -62,7 +62,7 @@ class Action {
 
     if ( isWrite ) type = " WR ";
 
-    buff << tid << type <<  addr << " " << value << " " << lineNo << " " << funcName << endl;
+    buff << taskId << type <<  addr << " " << value << " " << lineNo << " " << funcName << endl;
 
   }
 

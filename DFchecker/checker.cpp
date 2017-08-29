@@ -17,8 +17,7 @@
 //#define VERBOSE
 
 void Checker::saveWrite( const Action& newAction ) {
-  VALUE lineNo = newAction.lineNo;
-  string funcName = newAction.funcName;
+
   // CASES
   // 1. first action -> just save
   // 2. nth write of the same task -> just save
@@ -40,10 +39,10 @@ void Checker::saveWrite( const Action& newAction ) {
   for(auto lastWrt = AddrActions.begin(); lastWrt != AddrActions.end(); lastWrt++) {
 
     // actions of same task
-    if( newAction.tid == lastWrt->tid) continue;
+    if( newAction.taskId == lastWrt->taskId) continue;
 
-    auto HBfound = serial_bags[newAction.tid]->HB.find(lastWrt->tid);
-    auto end = serial_bags[newAction.tid]->HB.end();
+    auto HBfound = serial_bags[newAction.taskId]->HB.find(lastWrt->taskId);
+    auto end = serial_bags[newAction.taskId]->HB.end();
 
     if(HBfound != end) continue; // 3. there's happens-before
 
@@ -70,13 +69,13 @@ void Checker::saveWrite( const Action& newAction ) {
 VOID Checker::saveNondeterminismReport(const Action& curWrite, const Action& prevWrite) {
   Conflict report(curWrite, prevWrite);
   // code for recording errors
-  auto key = make_pair(prevWrite.tid, curWrite.tid);
+  auto key = make_pair(prevWrite.taskId, curWrite.taskId);
   if(conflictTable.find(key) != conflictTable.end()) // exists
     conflictTable[key].addresses.insert( report );
   else { // add new
     conflictTable[key] = Report();
-    conflictTable[key].task1Name = graph[prevWrite.tid].name;
-    conflictTable[key].task2Name = graph[curWrite.tid].name;
+    conflictTable[key].task1Name = graph[prevWrite.taskId].name;
+    conflictTable[key].task2Name = graph[curWrite.taskId].name;
     conflictTable[key].addresses.insert( report );
   }
 }
@@ -118,7 +117,7 @@ void Checker::constructMemoryAction(stringstream & ssin, string & operation, int
     action.lineNo = stol(tempBuff);
 
     getline(ssin, action.funcName); // get function name
-    action.tid = taskID;
+    action.taskId = taskID;
     if(operation == "WR")
       action.isWrite = true;
     else {
@@ -260,8 +259,8 @@ VOID Checker::reportConflicts() {
     int addressCount = 0;
 
     for(auto conf = it->second.addresses.begin(); conf != it->second.addresses.end(); conf++) {
-      cout << "      " <<  conf->addr << " lines: " << conf->funcName1 << ": " << conf->lineNo1;
-      cout << ", "<< conf->funcName2 << ": " << conf->lineNo2 << endl;
+      cout << "      " <<  conf->addr << " lines: " << conf->taskName1 << ": " << conf->lineNo1;
+      cout << ", "<< conf->taskName2 << ": " << conf->lineNo2 << endl;
       addressCount++;
       if(addressCount == 10) // we want to print at most 10 addresses if they are too many.
         break;
