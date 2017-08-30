@@ -43,6 +43,7 @@ int main(int argc, char * argv[])
 
   ifstream log(argv[1]); //  log file
   while( getline(log, logLine) ) {
+    // processes log file and detects nondeterminism
     aChecker.processLogLines(logLine);
   }
   log.close();
@@ -51,8 +52,8 @@ int main(int argc, char * argv[])
   BugValidator validator;
   validator.parseTasksIR( argv[3] ); // read IR file
 
-  // do the validation
-  validator.validate( aChecker.getConflictingPairs() );
+  // do the validation to eliminate commutative operations
+  aChecker.checkCommutativeOperations( validator );
 
   // take time at end of analyis
   high_resolution_clock::time_point t2 = high_resolution_clock::now();

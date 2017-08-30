@@ -18,6 +18,7 @@
 
 // includes and definitions
 #include "validator.h"
+#include "conflictReport.h"
 
 VOID BugValidator::parseTasksIR(char * IRlogName)
 {
@@ -65,38 +66,39 @@ VOID BugValidator::parseTasksIR(char * IRlogName)
  * Checks for commutative task operations which have been
  * flagged as conflicts.
  */
-VOID BugValidator::validate(CONFLICT_PAIRS & tasksAndLines) {
+VOID BugValidator::validate(Report & conflictSet) {
 
-  // for each task pair
-  auto taskPair = tasksAndLines.begin();
-  while(taskPair != tasksAndLines.end()) {
-     auto it = taskPair++;
-     string task1 = it->first.first;
-     string task2 = it->first.second;
-     cout << task1 << " <--> "<< task2 << endl;// << it->second << endl;
+  // get task names
+  string task1 = conflictSet.task1Name;
+  string task2 = conflictSet.task2Name;
 
-     // iterate over all line pairs
-     auto lPair = it->second.begin();
-     while(lPair != it->second.end())
-     {
-        auto temPair = lPair++;
+  // for each action pair
+  auto  conflict  = conflictSet.buggyAccesses.begin();
+  while(conflict != conflictSet.buggyAccesses.end()) {
 
-        INTEGER line1 = temPair->first;
-        INTEGER line2 = temPair->second;
-        cout << "Lines " << line1 << " <--> " << line2 << endl;
-
-        operationSet.clear(); // clear set of commuting operations
-
-        // check if line1 operations commute
-        if( involveSimpleOperations( task1, line1 ) &&
-	    // check if line2 operations commute
-            involveSimpleOperations(  task2, line2)) {
-            it->second.erase(temPair);
-            cout << "THERE IS SAFETY line1: " << line1 << " line2: " << line2 << endl;
-        }
+     // skip commutativity check if read-write conflict
+     if(conflict->action1.isWrite != conflict->action2.isWrite) {
+       conflict++;
+       continue;
      }
-     if(it->second.empty())
-       tasksAndLines.erase(it);
+     cout << task1 << " <--> "<< task2 << endl;
+
+     INTEGER line1 = conflict->action1.lineNo;
+     INTEGER line2 = conflict->action2.lineNo;
+     cout << "Lines " << line1 << " <--> " << line2 << endl;
+
+     operationSet.clear(); // clear set of commuting operations
+
+     // check if line1 operations commute
+     if( involveSimpleOperations( task1, line1 ) &&
+       // check if line2 operations commute
+       involveSimpleOperations( task2, line2 )) {
+       //it->second.erase(temPair);
+       conflict = conflictSet.buggyAccesses.erase( conflict );
+       cout << "THERE IS SAFETY line1: " << line1 << " line2: " << line2 << endl;
+     }
+     else
+        conflict++;
   }
 }
 

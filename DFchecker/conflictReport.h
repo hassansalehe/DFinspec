@@ -28,27 +28,15 @@ using namespace std;
 class Conflict {
  public:
   ADDRESS addr;
-  VALUE lineNo1;
-  VALUE lineNo2;
 
-  string taskName1;
-  string taskName2;
+  Action action1;
+  Action action2;
 
-  bool isWrite1;
-  bool isWrite2;
-  Conflict(ADDRESS _addr, VALUE ln1, string tname1, VALUE ln2, string tname2, bool actype1, bool actype2):
-    addr(_addr), lineNo1(ln1), lineNo2(ln2), taskName1(tname1), taskName2(tname2),
-    isWrite1(actype1), isWrite2(actype2){}
+  Conflict(const Action& curMemAction, const Action& prevMemAction) {
 
-  Conflict(const Action& curWrite, const Action& prevWrite) {
-    lineNo1 = prevWrite.lineNo;
-    taskName1 = prevWrite.funcName;
-    isWrite1 = prevWrite.isWrite;
-
-    addr = curWrite.addr;
-    lineNo2 = curWrite.lineNo;
-    taskName2 = curWrite.funcName;
-    isWrite2 = curWrite.isWrite;
+    action1 = curMemAction;
+    action2 = prevMemAction;
+    addr = curMemAction.addr;
   }
 
   bool operator<(const Conflict &RHS) const {
@@ -63,7 +51,7 @@ class Report {
  public:
   string task1Name;
   string  task2Name;
-  set<Conflict> addresses;
+  set<Conflict> buggyAccesses;
 }; // end Report
 
 #endif // end conflictReport.h

@@ -20,16 +20,16 @@
 #include "action.h"
 
 class MemoryActions {
-  private:
+  public:
     bool isEmpty;
     bool isThereLastWrite;
 
     Action first;
     Action lastWrite;
 
-  public:
 
     int taskId;
+    ADDRESS addr;     // destination address
 
     // Default constructor
     MemoryActions() {
@@ -52,16 +52,24 @@ class MemoryActions {
          first = action;
          isEmpty = false;
          taskId = action.taskId;
+         addr = action.addr;
        }
-       else if ( action.isWrite ) {
+
+       if ( action.isWrite ) {
          lastWrite = action;
          isThereLastWrite = true;
        }
     }
 
     void printActions(ostringstream & os) {
+      if( isThereLastWrite ) {
+        // means we have both first and last actions
+        first.printActionNN( os );
+        os << " :: ";
+        lastWrite.printAction( os );
+      }
+      else
         if(! isEmpty ) first.printAction( os );
-        if( isThereLastWrite ) lastWrite.printAction( os );
     }
 
 };

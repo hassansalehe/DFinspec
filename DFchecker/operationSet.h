@@ -34,8 +34,6 @@ class OperationSet {
      */
     bool isCommutative(OPERATION op) {
 
-      cout << "CHecking if commutative\n";
-
      // compare with other operation
      for(auto i = operations.begin(); i != operations.end(); i++) {
       switch(op) {

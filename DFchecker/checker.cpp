@@ -14,10 +14,11 @@
 
 #include "checker.h"  // header
 #include "sigManager.h" // for managing function names
+#include "MemoryActions.h"
 
 //#define VERBOSE
 
-void Checker::saveWrite( const Action& newAction ) {
+void Checker::saveTaskActions( const MemoryActions& taskActions ) {
 
   // CASES
   // 1. first action -> just save
@@ -29,36 +30,44 @@ void Checker::saveWrite( const Action& newAction ) {
   //        write in the parallel writes,update and take it forward
   //        4.2.1 check conflicts with other parallel tasks
 
-  auto perAddrActions = writes.find(newAction.addr);
+  auto perAddrActions = writes.find( taskActions.addr );
   if(perAddrActions == writes.end()) // 1. first action
-     writes[newAction.addr] = vector<Action>();
+     writes[taskActions.addr] = vector<MemoryActions>();
 
-  writes[newAction.addr].push_back( newAction ); // save
-
-  vector<Action> & AddrActions = writes[newAction.addr];
+  writes[taskActions.addr].push_back( taskActions ); // save
+  vector<MemoryActions> & AddrActions = writes[taskActions.addr];
 
   for(auto lastWrt = AddrActions.begin(); lastWrt != AddrActions.end(); lastWrt++) {
 
     // actions of same task
-    if( newAction.taskId == lastWrt->taskId) continue;
+    if( taskActions.taskId == lastWrt->taskId) continue;
 
-    auto HBfound = serial_bags[newAction.taskId]->HB.find(lastWrt->taskId);
-    auto end = serial_bags[newAction.taskId]->HB.end();
+    auto HBfound = serial_bags[taskActions.taskId]->HB.find(lastWrt->taskId);
+    auto end = serial_bags[taskActions.taskId]->HB.end();
 
     if(HBfound != end) continue; // 3. there's happens-before
 
     // 4. parallel, possible race! ((check race))
 
     // check write-write case (different values written)
-    if(newAction.isWrite && lastWrt->isWrite && newAction.value != lastWrt->value) {
+    // 4.1 both write to shared memory
+    if((taskActions.isThereLastWrite && lastWrt->isThereLastWrite) &&
+       (taskActions.lastWrite.value != lastWrt->lastWrite.value)) { // write different values
       // code for recording errors
-      saveNondeterminismReport(newAction, *lastWrt);
+      saveNondeterminismReport(taskActions.lastWrite, lastWrt->lastWrite);
     }
-
-    // Check if read-after-write or write-after-read
-    else if(newAction.isWrite != lastWrt->isWrite) {
-         // code for recording errors
-         saveNondeterminismReport(newAction, *lastWrt);
+    // 4.2 read-after-write or write-after-read conflicts
+    // (a) taskActions is read-only and lastWrt is a writer
+    else if(((!taskActions.isThereLastWrite) && (!taskActions.first.isWrite)) // read-only
+            && lastWrt->isThereLastWrite ) { // the other task is writer.
+      // code for recording errors
+      saveNondeterminismReport(taskActions.first, lastWrt->lastWrite);
+    }
+    // (b) lastWrt is read-only and taskActions is a writer
+    else if(((!lastWrt->isThereLastWrite) && (!lastWrt->first.isWrite)) // read-only
+            && taskActions.isThereLastWrite ) { // the other task is writer.
+      // code for recording errors
+      saveNondeterminismReport(taskActions.lastWrite, lastWrt->first);
     }
   }
 }
@@ -66,18 +75,19 @@ void Checker::saveWrite( const Action& newAction ) {
 
 /**
  * Records the nondeterminism warning to the conflicts table.
+ * This is per pair of concurrent tasks.
  */
-VOID Checker::saveNondeterminismReport(const Action& curWrite, const Action& prevWrite) {
-  Conflict report(curWrite, prevWrite);
+VOID Checker::saveNondeterminismReport(const Action& curMemAction, const Action& prevMemAction) {
+  Conflict report(curMemAction, prevMemAction);
   // code for recording errors
-  auto key = make_pair(prevWrite.taskId, curWrite.taskId);
-  if(conflictTable.find(key) != conflictTable.end()) // exists
-    conflictTable[key].addresses.insert( report );
+  auto taskPair = make_pair(curMemAction.taskId, prevMemAction.taskId);
+  if(conflictTable.find(taskPair) != conflictTable.end()) // exists
+    conflictTable[taskPair].buggyAccesses.insert( report );
   else { // add new
-    conflictTable[key] = Report();
-    conflictTable[key].task1Name = graph[prevWrite.taskId].name;
-    conflictTable[key].task2Name = graph[curWrite.taskId].name;
-    conflictTable[key].addresses.insert( report );
+    conflictTable[taskPair] = Report();
+    conflictTable[taskPair].task1Name = graph[curMemAction.taskId].name;
+    conflictTable[taskPair].task2Name = graph[prevMemAction.taskId].name;
+    conflictTable[taskPair].buggyAccesses.insert( report );
   }
 }
 
@@ -104,10 +114,9 @@ void Checker::addTaskNode(string & logLine) {
 }
 
 /** Constructs action object from the log file */
-void Checker::constructMemoryAction(stringstream & ssin, string & operation, int taskID) {
-    Action action;
-    string tempBuff;
+void Checker::constructMemoryAction(stringstream & ssin, string & operation, Action & action) {
 
+    string tempBuff;
     ssin >> tempBuff; // address
     action.addr = (ADDRESS)stoul(tempBuff, 0, 16);
 
@@ -119,7 +128,6 @@ void Checker::constructMemoryAction(stringstream & ssin, string & operation, int
 
     ssin >> action.funcId; // get function id
 
-    action.taskId = taskID;
     if(operation == "W")
       action.isWrite = true;
     else
@@ -132,7 +140,6 @@ void Checker::constructMemoryAction(stringstream & ssin, string & operation, int
     cout << buff.str();
     cout << endl;
 #endif
-    saveWrite( action );
 }
 
 void Checker::processLogLines(string & line) {
@@ -146,12 +153,25 @@ void Checker::processLogLines(string & line) {
   ssin >> taskID; // get task id
   ssin >> operation; // get operation
 
-  if(operation.find("W") != string::npos) { // write action
-    constructMemoryAction(ssin, operation, taskID);
-  }
-  else if (operation.find("R") != string::npos) { // read action
-    constructMemoryAction(ssin, operation, taskID);
-    cout << "Fucking with ReaD\n";
+  if(operation.find("W") != string::npos || // write action, or
+     operation.find("R") != string::npos) { // read action
+    Action action;
+    action.taskId = taskID;
+    constructMemoryAction(ssin, operation, action);
+    MemoryActions memActions( action ); // save first action
+
+    if( !ssin.eof() ) { // there are still tokens
+      string separator;
+      ssin >> separator;
+      ssin >> taskID;
+      Action lastWAction;
+      lastWAction.taskId = taskID;
+      ssin >> operation;
+      constructMemoryAction(ssin, operation, lastWAction);
+      memActions.storeAction( lastWAction ); // save second action
+    }
+
+    saveTaskActions( memActions ); // save the actions
   }
   // Check if this is just function name
   else if(operation.find("F") != string::npos) {
@@ -237,24 +257,22 @@ void Checker::processLogLines(string & line) {
   }
 }
 
-CONFLICT_PAIRS & Checker::getConflictingPairs() {
+void Checker::checkCommutativeOperations(BugValidator & validator) {
 
   // generate simplified version of conflicts from scratch
   conflictTasksAndLines.clear();
 
   // a pair of conflicting task body with a set of line numbers
-  for(auto it = conflictTable.begin(); it != conflictTable.end(); ++it) {
-    pair<string, string> namesPair = make_pair(it->second.task1Name, it->second.task2Name);
-    if(conflictTasksAndLines.find(namesPair) == conflictTasksAndLines.end())
-      conflictTasksAndLines[namesPair] = set<pair<int,int>>();
+  for(auto it = conflictTable.begin(); it != conflictTable.end(); ) {
 
-    // get line numbers
-    for(auto conf = it->second.addresses.begin(); conf != it->second.addresses.end(); conf++) {
-      pair<int,int> lines = make_pair(conf->lineNo1, conf->lineNo2);
-      conflictTasksAndLines[namesPair].insert(lines);
-    }
+    Report & report = it->second;
+    validator.validate( report );
+
+    if( !report.buggyAccesses.size() )
+       it = conflictTable.erase(it);
+    else
+      ++it;
   }
-  return conflictTasksAndLines;
 }
 
 
@@ -270,21 +288,26 @@ VOID Checker::reportConflicts() {
   cout << "              Non-determinism checking report               " << endl;
   cout << "                                                            " << endl;
 
+  // print appropriate message in case no errors found
+  if(! conflictTable.size() )
+    cout << "                 No nondeterminism found!                 " << endl;
 #ifdef VERBOSE // print full summary
-  cout << " The following " << conflictTable.size() <<" task pairs have conflicts: " << endl;
+  else
+    cout << " The following " << conflictTable.size() <<" task pairs have conflicts: " << endl;
 
   for(auto it = conflictTable.begin(); it != conflictTable.end(); ++it) {
     cout << "    "<< it->first.first << " ("<< it->second.task1Name<<")  <--> ";
     cout << it->first.second << " (" << it->second.task2Name << ")";
-    cout << " on "<< it->second.addresses.size() << " memory addresses" << endl;
+    cout << " on "<< it->second.buggyAccesses.size() << " memory addresses" << endl;
 
-    if(it->second.addresses.size() > 10)
+    if(it->second.buggyAccesses.size() > 10)
       cout << "    showing at most 10 addresses                        " << endl;
     int addressCount = 0;
 
-    for(auto conf = it->second.addresses.begin(); conf != it->second.addresses.end(); conf++) {
-      cout << "      " <<  conf->addr << " lines: " << conf->taskName1 << ": " << conf->lineNo1;
-      cout << ", "<< conf->taskName2 << ": " << conf->lineNo2 << endl;
+    Report & report = it->second;
+    for(auto conf = report.buggyAccesses.begin(); conf != report.buggyAccesses.end(); conf++) {
+      cout << "      " <<  conf->addr << " lines: " << report.task1Name << ": " << conf->action1.lineNo;
+      cout << ", "<< report.task2Name << ": " << conf->action2.lineNo << endl;
       addressCount++;
       if(addressCount == 10) // we want to print at most 10 addresses if they are too many.
         break;
@@ -293,16 +316,13 @@ VOID Checker::reportConflicts() {
 
 #else
 
-  // print appropriate message in case no errors found
-  if(! conflictTasksAndLines.size() )
-    cout << "                 No nondeterminism found!                 " << endl;
-
   // a pair of conflicting task body with a set of line numbers
-  for(auto it = conflictTasksAndLines.begin(); it!= conflictTasksAndLines.end(); it++)
+  for(auto it = conflictTable.begin(); it!= conflictTable.end(); it++)
   {
-    cout << it->first.first << " <--> " << it->first.second << ": line numbers  {";
-    for(auto ot = it->second.begin(); ot != it->second.end(); ot++)
-      cout << ot->first <<" - "<< ot->second << ", ";
+    Report & report = it->second;
+    cout << report.task1Name << " <--> " << report.task2Name << ": line numbers  {";
+    for(auto conflict = report.buggyAccesses.begin(); conflict != report.buggyAccesses.end(); conflict++)
+      cout << conflict->action1.lineNo <<" - "<< conflict->action2.lineNo << ", ";
     cout << "}" << endl;
   }
 #endif

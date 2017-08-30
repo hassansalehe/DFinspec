@@ -21,6 +21,8 @@
 #include "action.h" // defines Action class
 #include "conflictReport.h" // defines Conflict and Report structs
 #include "sigManager.h" // for managing function names
+#include "MemoryActions.h"
+#include "validator.h"
 
 using namespace std;
 
@@ -44,11 +46,11 @@ typedef SerialBag * SerialBagPtr;
 class Checker {
   public:
   VOID addTaskNode(string & logLine);
-  VOID saveWrite( const Action & writeAction );
+  VOID saveTaskActions( const MemoryActions & taskActions );
   VOID processLogLines(string & line);
 
   // a pair of conflicting task body with a set of line numbers
-  CONFLICT_PAIRS & getConflictingPairs();
+  VOID checkCommutativeOperations( BugValidator & validator );
 
   VOID reportConflicts();
   VOID printHBGraph();
@@ -58,13 +60,13 @@ class Checker {
 
   private:
     /** Constructs action object from the log file */
-    VOID constructMemoryAction(stringstream & ssin, string & opType, int taskID);
+    VOID constructMemoryAction(stringstream & ssin, string & opType, Action & action);
 
     VOID saveNondeterminismReport(const Action& curWrite, const Action& write);
 
     unordered_map <INTEGER, SerialBagPtr> serial_bags; // hold bags of tasks
     unordered_map<INTEGER, Task> graph;  // in and out edges
-    unordered_map<ADDRESS, vector<Action>> writes; // for writes
+    unordered_map<ADDRESS, vector<MemoryActions>> writes; // for writes
     map<pair<INTEGER, INTEGER>, Report> conflictTable;
     CONFLICT_PAIRS conflictTasksAndLines;
 

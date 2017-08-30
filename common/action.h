@@ -52,14 +52,24 @@ class Action {
   Action() {}
 
   /**
-   * Generates string representation of the action and stores in "buff"
+   * Generates string representation of the action and stores in "buff".
+   * It appends '\n' at the end of the string
    */
   void printAction(ostringstream & buff) {
+    printActionNN( buff );
+    buff << endl;
+  }
+
+  /**
+   * Generates string representation of the action and stores in "buff".
+   * It does not append '\n' at the end of. the string
+   */
+  void printActionNN(ostringstream & buff) {
     string type = " R ";
 
     if ( isWrite ) type = " W ";
 
-    buff << taskId << type <<  addr << " " << value << " " << lineNo << " " << funcId << endl;
+    buff << taskId << type <<  addr << " " << value << " " << lineNo << " " << funcId;
 
   }
 

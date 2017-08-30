@@ -19,12 +19,13 @@
 #include "defs.h"
 #include "instruction.h"
 #include "operationSet.h"
+#include "conflictReport.h"
 
 class BugValidator {
 
   public:
     VOID parseTasksIR(char * IRlogName);
-    void validate(CONFLICT_PAIRS & tasksAndLines);
+    void validate(Report & report);
 
   private:
     unordered_map<string, vector<Instruction>> Tasks;
