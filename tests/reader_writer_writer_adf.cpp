@@ -7,7 +7,7 @@ using namespace std;
 int   num_threads = 2;
 
 // balance
-float balance = 1000;
+double ResearchPosition = 1000;
 
 // tokens
 int token1;
@@ -30,7 +30,7 @@ void InitialTask()
 }
 
 
-void Task1()
+void ReaderWriterTask()
 {
    void *intokens[] = {&token1}; // for receiving token
    adf_create_task(1, 1, intokens, [=] (token_t *tokens) -> void
@@ -40,8 +40,10 @@ void Task1()
       // copy token value
       memcpy(&token, tokens->value, sizeof(token));
 
-      // add commission
-      balance += 200;
+      // read research position
+      int rp = ResearchPosition;
+
+      ResearchPosition = 230;
 
       // end task
       adf_task_stop();
@@ -49,18 +51,21 @@ void Task1()
 }
 
 
-void Task2()
+void WriterTask()
 {
    void *intokens[] = {&token2}; // for receiving token
    adf_create_task(1, 1, intokens, [=] (token_t *tokens) -> void
    {
       int token;
-      int amount = 300;
+
+      // read
+      int temp = ResearchPosition;
 
       // receive token
       memcpy(&token, tokens->value, sizeof(token));
 
-      balance -= amount;
+      // write to research position
+      ResearchPosition = 711;
 
       adf_task_stop();
    });
@@ -75,8 +80,8 @@ int main(int argc, char** argv)
    adf_init(num_threads); // initialize the ADF scheduler
 
    InitialTask(); // generate comission task instance
-   Task1(); // generate deposit task instance
-   Task2(); // generate withdraw task instance
+   WriterTask(); // generate deposit task instance
+   ReaderWriterTask(); // generate withdraw task instance
 
    adf_start();  // start sceduling dataflow tasks
 

@@ -45,17 +45,19 @@ ADFAPPS = $(addsuffix _adf, $(APPS_COMMON))
 # dwarfs
 # -------------------------------------------
 
-DWARFS_COMMON = $(DWARFDIR)/sparse_algebra/sparse_algebra                          \
-		$(DWARFDIR)/branch_bound/branch_bound                              \
-		$(DWARFDIR)/dense_algebra/dense_algebra                            \
-		$(DWARFDIR)/dense_algebra/matrix_multiplication/dense_algebra                            \
-		$(DWARFDIR)/finite_state_machine/finite_state_machine              \
-		$(DWARFDIR)/graph_models/graph_models                              \
-		$(DWARFDIR)/map_reduce/map_reduce                                  \
-		$(DWARFDIR)/spectral_methods/spectral_methods                      \
-		$(DWARFDIR)/structured_grid/structured_grid                        \
-		$(DWARFDIR)/combinatorial_logic/combinatorial_logic                \
+DWARFS_COMMON = $(DWARFDIR)/sparse_algebra/sparse_algebra                       \
+		$(DWARFDIR)/branch_bound/branch_bound                           \
+		$(DWARFDIR)/dense_algebra/dense_algebra                         \
+		$(DWARFDIR)/dense_algebra/matrix_multiplication/dense_algebra   \
+		$(DWARFDIR)/finite_state_machine/finite_state_machine           \
+		$(DWARFDIR)/graph_models/graph_models                           \
+		$(DWARFDIR)/map_reduce/map_reduce                               \
+		$(DWARFDIR)/spectral_methods/spectral_methods                   \
+		$(DWARFDIR)/structured_grid/structured_grid                     \
+		$(DWARFDIR)/combinatorial_logic/combinatorial_logic             \
 		$(DWARFDIR)/../../tests/commute       				\
+		$(DWARFDIR)/../../tests/reader_writer       			\
+		$(DWARFDIR)/../../tests/reader_writer_writer			\
 		$(DWARFDIR)/../../tests/motivating_bank_example			\
 		$(DWARFDIR)/unstructured_grid/unstructured_grid
 
