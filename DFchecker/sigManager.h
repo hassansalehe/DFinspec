@@ -31,7 +31,7 @@ public:
   /**
    * Stores function "name" with id "id"
    */
-  void addFuncName(string name, int id) {
+  void addFuncName(string name, INTEGER id) {
 
     assert(functions.find(id) == functions.end());
     functions[id] = name;
@@ -40,16 +40,16 @@ public:
   /**
    * Returns the function signature given the function id
    */
-  string getFuncName(int id) {
+  string getFuncName(INTEGER id) {
 
-    assert(functions.find(id) == functions.end());
+    assert(functions.find(id) != functions.end());
     return functions[id];
   }
 
   /**
    * Returns the function name identifier
    */
-  int getFuncId(string name) {
+  INTEGER getFuncId(string name) {
     for(auto i = functions.begin(); i != functions.end(); i++)
        if(i->second == name)
          return i->first;

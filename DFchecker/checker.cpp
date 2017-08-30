@@ -16,7 +16,7 @@
 #include "sigManager.h" // for managing function names
 #include "MemoryActions.h"
 
-//#define VERBOSE
+#define VERBOSE
 
 void Checker::saveTaskActions( const MemoryActions& taskActions ) {
 
@@ -301,13 +301,14 @@ VOID Checker::reportConflicts() {
     cout << " on "<< it->second.buggyAccesses.size() << " memory addresses" << endl;
 
     if(it->second.buggyAccesses.size() > 10)
-      cout << "    showing at most 10 addresses                        " << endl;
+      cout << "    showing at most 10 addresses:                       " << endl;
     int addressCount = 0;
 
     Report & report = it->second;
     for(auto conf = report.buggyAccesses.begin(); conf != report.buggyAccesses.end(); conf++) {
-      cout << "      " <<  conf->addr << " lines: " << report.task1Name << ": " << conf->action1.lineNo;
-      cout << ", "<< report.task2Name << ": " << conf->action2.lineNo << endl;
+      cout << "      " <<  conf->addr << " lines: " << signatureManager.getFuncName( conf->action1.funcId )
+           << ": " << conf->action1.lineNo;
+      cout << ", "<< signatureManager.getFuncName( conf->action2.funcId) << ": " << conf->action2.lineNo << endl;
       addressCount++;
       if(addressCount == 10) // we want to print at most 10 addresses if they are too many.
         break;

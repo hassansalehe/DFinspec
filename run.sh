@@ -23,10 +23,10 @@ cd $HOME
 make  || { echo 'Building ADFinspec failed' ; exit 1; }
 
 ### 2. ###
-mkdir -p build
+mkdir -p .build
 mkdir -p bin
 
-cd build/
+cd .build/
 
 rm -rf *  > /dev/null 2>&1
 
