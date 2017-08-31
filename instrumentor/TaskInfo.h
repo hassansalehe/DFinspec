@@ -25,6 +25,12 @@ typedef struct TaskInfo {
   uint taskID = 0;
   bool active = false;
 
+  char * taskName;
+
+  // stores pointers of signatures of functions executed by task
+  // for faster acces
+  unordered_map<STRING, INTEGER> functions;
+
   // stores memory actions performed by task.
   unordered_map<address, MemoryActions> memoryLocations;
 
@@ -58,6 +64,25 @@ typedef struct TaskInfo {
     for(auto it = memoryLocations.begin(); it != memoryLocations.end(); ++it)
       it->second.printActions( actionBuffer );
   }
+
+  /** HELPER FUNCTIONS */
+
+  /**
+   * returns ID if function registered before, otherwise 0.
+   */
+   INTEGER getFunctionId( STRING funcName ) {
+    auto fd = functions.find( funcName );
+    if( fd == functions.end() ) return 0;
+
+    return fd->second;
+   }
+
+   /**
+    * Registers function for faster access.
+    */
+   void registerFunction(STRING funcName, INTEGER funcId ) {
+     functions[funcName] = funcId;
+   }
 
 } TaskInfo;
 
