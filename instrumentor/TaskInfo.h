@@ -42,18 +42,21 @@ typedef struct TaskInfo {
    * The rules for storing this information are
    * explained in MemoryActions.h
    */
-  void saveMemoryAction(Action & action) {
+  inline void saveMemoryAction(Action & action) {
 
-    auto loc = memoryLocations.find(action.addr);
-    if(loc == memoryLocations.end()) {
+    MemoryActions & loc = memoryLocations[action.addr];
+    loc.storeAction( action );
+  }
 
-      MemoryActions memActions( action );
-      memoryLocations[action.addr] = memActions;
-    }
-    else {
-      loc->second.storeAction( action );
-    }
+  inline void saveReadAction(ADDRESS & addr, INTEGER & lineNo, const INTEGER funcID) {
 
+    MemoryActions & loc = memoryLocations[addr];
+    if( loc.hasWrite() )
+         return;
+
+    Action action( taskID, addr, 0, lineNo, funcID );
+    action.isWrite = false;
+    loc.storeAction( action );
   }
 
   /**
@@ -70,10 +73,11 @@ typedef struct TaskInfo {
   /**
    * returns ID if function registered before, otherwise 0.
    */
-   INTEGER getFunctionId( STRING funcName ) {
+   inline INTEGER getFunctionId( const STRING funcName ) {
     auto fd = functions.find( funcName );
-    if( fd == functions.end() ) return 0;
-
+    if( fd == functions.end() ) {
+      return 0;
+    }
     return fd->second;
    }
 

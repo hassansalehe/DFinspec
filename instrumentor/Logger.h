@@ -36,7 +36,7 @@ class INS {
 
   private:
     // a function to tell whether there is a happens-before relation between two tasks
-    static bool hasHB( INTEGER tID, INTEGER parentID );
+    static inline bool hasHB( INTEGER tID, INTEGER parentID );
 
     // a strictly increasing value, used as tasks unique id generator
     static atomic<INTEGER> taskIDSeed;
@@ -46,6 +46,7 @@ class INS {
 
     // a file pointer for the HB log file
     static FILEPTR HBlogger;
+    static ostringstream HBloggerBuffer;
 
     // storing function name pointers
     static unordered_map<STRING, INTEGER>funcNames;
@@ -104,7 +105,7 @@ class INS {
     /** registers the function if not registered yet.
      * Also prints the function to standard output
      */
-    static inline INTEGER RegisterFunction(STRING funcName) {
+    static inline INTEGER RegisterFunction(const STRING funcName) {
 
       guardLock.lock();
       int funcID = 0;
@@ -122,6 +123,10 @@ class INS {
     /** close file used in logging */
     static inline VOID Finalize() {
       guardLock.lock();
+
+      // Write HB relations to file
+      HBlogger << HBloggerBuffer.str();
+
       idMap.clear(); HB.clear();
       lastReader.clear(); lastWriter.clear();
 
@@ -131,15 +136,11 @@ class INS {
     }
 
     static inline VOID TransactionBegin( TaskInfo & task ) {
-      guardLock.lock();
-      logger << task.taskID << " BTM " << task.taskName << endl;
-      guardLock.unlock();
+      task.actionBuffer << task.taskID << " BTM " << task.taskName << endl;
     }
 
     static inline VOID TransactionEnd( TaskInfo & task ) {
-      guardLock.lock();
-      logger << task.taskID << " ETM "<< task.taskName << endl;
-      guardLock.unlock();
+      task.actionBuffer << task.taskID << " ETM "<< task.taskName << endl;
     }
 
     /** called when a task begins execution and retrieves parent task id */
@@ -158,24 +159,22 @@ class INS {
       if(bufLocAddr && idMap.count( key ) ) { // dependent through a streaming buffer
         parentID = idMap[key];
 
-        if(parentID == tid) { // there was a bug where a task could send token to itself
-          guardLock.unlock();
-          return; // do nothing, just return
+        if(parentID != tid) { // there was a bug where a task could send token to itself
+
+          HBloggerBuffer << tid << " " << parentID << endl;
+
+          // there is a happens before between taskID and parentID:
+          //parentID ---happens-before---> taskID
+          if(HB.find( tid ) == HB.end())
+            HB[tid] = INTSET();
+          HB[tid].insert( parentID );
+
+          // take the happens-before of the parentID
+          if(HB.find( parentID ) != HB.end())
+            HB[tid].insert(HB[parentID].begin(), HB[parentID].end());
+
+          task.actionBuffer << tid << " C " << task.taskName << " " << parentID << endl;
         }
-
-        HBlogger << tid << " " << parentID << endl;
-
-        // there is a happens before between taskID and parentID:
-        //parentID ---happens-before---> taskID
-        if(HB.find( tid ) == HB.end())
-          HB[tid] = INTSET();
-        HB[tid].insert( parentID );
-
-        // take the happens-before of the parentID
-        if(HB.find( parentID ) != HB.end())
-          HB[tid].insert(HB[parentID].begin(), HB[parentID].end());
-
-        task.actionBuffer << tid << " C " << task.taskName << " " << parentID << endl;
       }
       guardLock.unlock();
     }
@@ -204,14 +203,11 @@ class INS {
 
       guardLock.lock(); //  protect file descriptor & idMap
       idMap[key] = task.taskID;
-      logger << task.actionBuffer.str(); // print to file
       guardLock.unlock();
-
-      task.actionBuffer.str(""); // clear buffer
     }
 
     /** provides the address of memory a task reads from */
-    static inline VOID Read( TaskInfo & task, ADDRESS addr, INTEGER value, INTEGER lineNo, STRING funcName ) {
+    static inline VOID Read( TaskInfo & task, ADDRESS addr, INTEGER lineNo, STRING funcName ) {
       INTEGER funcID = task.getFunctionId( funcName );
 
       // register function if not registered yet
@@ -220,9 +216,7 @@ class INS {
         task.registerFunction( funcName, funcID );
       }
 
-      Action action(task.taskID, addr, value, lineNo, funcID);
-      action.isWrite = false;
-      task.saveMemoryAction(action);
+      task.saveReadAction(addr, lineNo, funcID);
     }
 
     /** stores a write action */

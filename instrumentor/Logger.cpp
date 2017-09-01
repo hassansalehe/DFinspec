@@ -22,6 +22,7 @@ std::mutex INS::guardLock;
 
 FILEPTR INS::logger;
 FILEPTR INS::HBlogger;
+ostringstream INS::HBloggerBuffer;
 atomic<INTEGER> INS::taskIDSeed{ 0 };
 unordered_map<STRING, INTEGER> INS::funcNames;
 INTEGER INS::funcIDSeed = 1;

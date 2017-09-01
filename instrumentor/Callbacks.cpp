@@ -90,7 +90,6 @@ void INS_TaskFinishFunc( void* addr ) {
 /** Callbacks for tokens */
 void INS_RegReceiveToken( address tokenAddr, ulong size )
 {
-  uint threadID = (uint)pthread_self();
   INTEGER value = getMemoryValue( tokenAddr, size );
 
   INS::TaskReceiveTokenLog( taskInfo, tokenAddr, value );
@@ -101,7 +100,6 @@ void INS_RegReceiveToken( address tokenAddr, ulong size )
 
 void INS_RegSendToken( ADDRESS bufLocAddr, ADDRESS tokenAddr, ulong size ) {
 
-  uint threadID = (uint)pthread_self();
   INTEGER value = getMemoryValue( tokenAddr, size );
   INS::TaskSendTokenLog( taskInfo, bufLocAddr, value );
   #ifdef DEBUG
@@ -123,13 +121,13 @@ void toolVptrLoad( address addr, address value ) {
 }
 
 /** Callbacks for store operations  */
-void INS_AdfMemRead( address addr, ulong size, int lineNo, address funcName  ) {
+inline void INS_AdfMemRead( address addr, ulong size, int lineNo, address funcName  ) {
 
-  lint value = getMemoryValue( addr, size );
+  //lint value = getMemoryValue( addr, size );
   uint threadID = (uint)pthread_self();
 
   if( taskInfo.active ) {
-    INS::Read( taskInfo, addr, value, lineNo, (char*)funcName );
+    INS::Read( taskInfo, addr, lineNo, (char*)funcName );
 
   #ifdef DEBUG
     cout << "READ: addr: " << addr << " value: "<< value << " taskID: " << taskInfo.taskID << endl;
@@ -150,7 +148,7 @@ void INS_AdfMemRead8( address addr, int lineNo, address funcName  ) {
 }
 
 /** Callbacks for store operations  */
-void INS_AdfMemWrite( address addr, lint value, int lineNo, address funcName ) {
+inline void INS_AdfMemWrite( address addr, lint value, int lineNo, address funcName ) {
 
   uint threadID = (uint)pthread_self();
 

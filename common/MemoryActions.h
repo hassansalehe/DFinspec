@@ -47,18 +47,29 @@ class MemoryActions {
     // Stores action if
     // (a) is first action of task, or
     // (b) is last write action
-    void storeAction(Action & action) {
-       if (isEmpty ) {
+    inline void storeAction(Action & action) {
+       if ( isEmpty || action.isWrite ) {
          first = action;
          isEmpty = false;
          taskId = action.taskId;
          addr = action.addr;
+
+         isThereLastWrite = false;
        }
 
-       if ( action.isWrite ) {
-         lastWrite = action;
-         isThereLastWrite = true;
-       }
+       //if ( action.isWrite ) {
+       //  lastWrite = action;
+       //  isThereLastWrite = true;
+       //}
+    }
+    bool hasWrite() {
+      if( isEmpty )
+       return false;
+
+      if( first.isWrite )
+        return true;
+
+      return false;
     }
 
     void printActions(ostringstream & os) {
