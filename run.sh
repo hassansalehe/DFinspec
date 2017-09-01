@@ -35,8 +35,8 @@ rm -rf $INSTR_DIR/Makefile $INSTR_DIR/*.so $INSTR_DIR/CMakeFile $INSTR_DIR/*.cma
 cmake $INSTR_DIR
 make
 cp *.so $BIN_DIR/
-g++ -c -std=c++11 $INSTR_DIR/Logger.cpp -I$INSTR_DIR/../common -o $BIN_DIR/Logger.o  || { echo 'Compiling Logger.cpp failed' ; exit 1; }
-g++ -c -std=c++11 $INSTR_DIR/Callbacks.cpp -I$INSTR_DIR/../common -o $BIN_DIR/Callbacks.o  || { echo 'Compiling Callbacks.cpp failed' ; exit 1; }
+g++ -c -O3 -std=c++11 $INSTR_DIR/Logger.cpp -I$INSTR_DIR/../common -o $BIN_DIR/Logger.o  || { echo 'Compiling Logger.cpp failed' ; exit 1; }
+g++ -c -O3 -std=c++11 $INSTR_DIR/Callbacks.cpp -I$INSTR_DIR/../common -o $BIN_DIR/Callbacks.o  || { echo 'Compiling Callbacks.cpp failed' ; exit 1; }
 
 ### 3. ###
 echo -e "\033[1;95mDFinspec: Building the ADF runtime and the dwarf benchmarks.\033[m"
