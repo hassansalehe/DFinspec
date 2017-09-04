@@ -59,6 +59,13 @@ typedef struct TaskInfo {
     loc.storeAction( action );
   }
 
+  inline void saveWriteAction( ADDRESS addr, INTEGER value, INTEGER lineNo, INTEGER funcID) {
+     MemoryActions & loc = memoryLocations[addr];
+
+     bool isWrite = true;
+     loc.storeAction(taskID, addr, value, lineNo, funcID, isWrite);
+  }
+
   /**
    * Prints to ostringstream all memory access actions
    * recorded.

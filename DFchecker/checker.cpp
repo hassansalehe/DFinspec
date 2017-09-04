@@ -17,8 +17,9 @@
 #include "MemoryActions.h"
 
 #define VERBOSE
+#define CONC_THREASHOLD 5
 
-void Checker::saveTaskActions( const MemoryActions& taskActions ) {
+void Checker::saveTaskActions( const MemoryActions & taskActions ) {
 
   // CASES
   // 1. first action -> just save
@@ -32,13 +33,10 @@ void Checker::saveTaskActions( const MemoryActions& taskActions ) {
 
   auto perAddrActions = writes.find( taskActions.addr );
   if(perAddrActions == writes.end()) // 1. first action
-     writes[taskActions.addr] = vector<MemoryActions>();
+     writes[taskActions.addr] = list<MemoryActions>();
 
-  writes[taskActions.addr].push_back( taskActions ); // save
-  vector<MemoryActions> & AddrActions = writes[taskActions.addr];
-
+  list<MemoryActions> & AddrActions = writes[taskActions.addr];
   for(auto lastWrt = AddrActions.begin(); lastWrt != AddrActions.end(); lastWrt++) {
-
     // actions of same task
     if( taskActions.taskId == lastWrt->taskId) continue;
 
@@ -51,25 +49,28 @@ void Checker::saveTaskActions( const MemoryActions& taskActions ) {
 
     // check write-write case (different values written)
     // 4.1 both write to shared memory
-    if((taskActions.isThereLastWrite && lastWrt->isThereLastWrite) &&
-       (taskActions.lastWrite.value != lastWrt->lastWrite.value)) { // write different values
+    if( (taskActions.action.isWrite && lastWrt->action.isWrite) &&
+       (taskActions.action.value != lastWrt->action.value) ) { // write different values
       // code for recording errors
-      saveNondeterminismReport(taskActions.lastWrite, lastWrt->lastWrite);
+      saveNondeterminismReport( taskActions.action, lastWrt->action );
     }
     // 4.2 read-after-write or write-after-read conflicts
     // (a) taskActions is read-only and lastWrt is a writer
-    else if(((!taskActions.isThereLastWrite) && (!taskActions.first.isWrite)) // read-only
-            && lastWrt->isThereLastWrite ) { // the other task is writer.
+    else if( (!taskActions.action.isWrite) && lastWrt->action.isWrite ) {
       // code for recording errors
-      saveNondeterminismReport(taskActions.first, lastWrt->lastWrite);
+      saveNondeterminismReport(taskActions.action, lastWrt->action);
     }
     // (b) lastWrt is read-only and taskActions is a writer
-    else if(((!lastWrt->isThereLastWrite) && (!lastWrt->first.isWrite)) // read-only
-            && taskActions.isThereLastWrite ) { // the other task is writer.
+    else if( (!lastWrt->action.isWrite) && taskActions.action.isWrite ) { // the other task is writer.
       // code for recording errors
-      saveNondeterminismReport(taskActions.lastWrite, lastWrt->first);
+      saveNondeterminismReport(taskActions.action, lastWrt->action);
     }
   }
+
+  if (AddrActions.size() >= CONC_THREASHOLD)
+    AddrActions.pop_front(); // remove oldest element
+
+  writes[taskActions.addr].push_back( taskActions ); // save
 }
 
 
@@ -80,7 +81,10 @@ void Checker::saveTaskActions( const MemoryActions& taskActions ) {
 VOID Checker::saveNondeterminismReport(const Action& curMemAction, const Action& prevMemAction) {
   Conflict report(curMemAction, prevMemAction);
   // code for recording errors
-  auto taskPair = make_pair(curMemAction.taskId, prevMemAction.taskId);
+  const char * task1Name = graph[curMemAction.taskId].name.c_str();
+  const char * task2Name = graph[prevMemAction.taskId].name.c_str();
+
+  auto taskPair = make_pair(task1Name, task2Name);
   if(conflictTable.find(taskPair) != conflictTable.end()) // exists
     conflictTable[taskPair].buggyAccesses.insert( report );
   else { // add new
@@ -158,6 +162,12 @@ void Checker::processLogLines(string & line) {
     Action action;
     action.taskId = taskID;
     constructMemoryAction(ssin, operation, action);
+
+    if(action.funcId == 0) {
+     cout << "Warning function Id 0: " << line << endl;
+     exit(0);
+    }
+
     MemoryActions memActions( action ); // save first action
 
     if( !ssin.eof() ) { // there are still tokens
@@ -261,6 +271,24 @@ void Checker::checkCommutativeOperations(BugValidator & validator) {
 
   // generate simplified version of conflicts from scratch
   conflictTasksAndLines.clear();
+
+  // a pair of conflicting task body with a set of line numbers
+  for(auto it = conflictTable.begin(); it != conflictTable.end(); ++it) {
+    pair<string, string> namesPair = make_pair(it->second.task1Name, it->second.task2Name);
+    if(conflictTasksAndLines.find(namesPair) == conflictTasksAndLines.end())
+      conflictTasksAndLines[namesPair] = set<pair<int,int>>();
+
+    // erase duplicates
+    for(auto conf = it->second.buggyAccesses.begin(); conf != it->second.buggyAccesses.end(); ) {
+      pair<int,int> lines = make_pair(conf->action1.lineNo, conf->action2.lineNo);
+      auto inserted = conflictTasksAndLines[namesPair].insert(lines);
+      if(inserted.second == false) {
+        conf = it->second.buggyAccesses.erase( conf );
+      }
+      else
+        conf++;
+    }
+  }
 
   // a pair of conflicting task body with a set of line numbers
   for(auto it = conflictTable.begin(); it != conflictTable.end(); ) {

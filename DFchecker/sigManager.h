@@ -42,8 +42,12 @@ public:
    */
   string getFuncName(INTEGER id) {
 
-    assert(functions.find(id) != functions.end());
-    return functions[id];
+    auto fIdptr = functions.find( id );
+    if( fIdptr == functions.end() ) {
+      cout << "This function Id never exists: " << id << endl;
+    }
+    assert(fIdptr != functions.end());
+    return fIdptr->second;
   }
 
   /**

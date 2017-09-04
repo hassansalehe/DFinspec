@@ -23,6 +23,7 @@
 #include "sigManager.h" // for managing function names
 #include "MemoryActions.h"
 #include "validator.h"
+#include <list>
 
 using namespace std;
 
@@ -66,8 +67,8 @@ class Checker {
 
     unordered_map <INTEGER, SerialBagPtr> serial_bags; // hold bags of tasks
     unordered_map<INTEGER, Task> graph;  // in and out edges
-    unordered_map<ADDRESS, vector<MemoryActions>> writes; // for writes
-    map<pair<INTEGER, INTEGER>, Report> conflictTable;
+    unordered_map<ADDRESS, list<MemoryActions>> writes; // for writes
+    map<pair<STRING, STRING>, Report> conflictTable;
     CONFLICT_PAIRS conflictTasksAndLines;
 
     // For holding function signatures.

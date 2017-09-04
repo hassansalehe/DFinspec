@@ -47,15 +47,19 @@ VOID BugValidator::parseTasksIR(char * IRlogName)
     }
 
     if( isTaskName(sttmt) ) { // else a new task name
+#ifdef DEBUG
       cout << "Task name: " << sttmt << endl;
+#endif
       Tasks[sttmt] = vector<Instruction>();
       currentTask = &Tasks[sttmt];
       //map<string, map<INTEGER, vector<string>>> Tasks;
       continue;
     }
 
+#ifdef DEBUG
     // got here :-(, wierd string!
     cout << "Unexpected program statement: " << sttmt << endl;
+#endif
   }
   IRcode.close();
   cout << "Tasks no: " << Tasks.size() << endl;
@@ -81,12 +85,14 @@ VOID BugValidator::validate(Report & conflictSet) {
        conflict++;
        continue;
      }
+#ifdef DEBUG
      cout << task1 << " <--> "<< task2 << endl;
-
+#endif
      INTEGER line1 = conflict->action1.lineNo;
      INTEGER line2 = conflict->action2.lineNo;
+#ifdef DEBUG
      cout << "Lines " << line1 << " <--> " << line2 << endl;
-
+#endif
      operationSet.clear(); // clear set of commuting operations
 
      // check if line1 operations commute
@@ -95,7 +101,9 @@ VOID BugValidator::validate(Report & conflictSet) {
        involveSimpleOperations( task2, line2 )) {
        //it->second.erase(temPair);
        conflict = conflictSet.buggyAccesses.erase( conflict );
+#ifdef DEBUG
        cout << "THERE IS SAFETY line1: " << line1 << " line2: " << line2 << endl;
+#endif
      }
      else
         conflict++;
@@ -114,9 +122,9 @@ BOOL BugValidator::involveSimpleOperations(string taskName, INTEGER lineNumber) 
      if(i->lineNo == lineNumber) instr  = *i;
      index++;
   }
-
+#ifdef DEBUG
   cout << "SAFET " << taskName << " " << instr.destination << ", idx: "<< index << endl;
-
+#endif
   // expected to be a store
   if(instr.oper == STORE) {
     return isSafe(taskBody, index, instr.operand1);

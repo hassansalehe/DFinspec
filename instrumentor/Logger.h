@@ -109,13 +109,17 @@ class INS {
 
       guardLock.lock();
       int funcID = 0;
-      if( funcNames.find(funcName) == funcNames.end() ) { // new function
+      auto fd = funcNames.find(funcName);
+      if( fd == funcNames.end() ) { // new function
         funcID = funcIDSeed++;
         funcNames[funcName] = funcID;
 
         // print to the log file
         logger << funcID << " F " << funcName << endl;
       }
+      else
+         funcID = fd->second;
+
       guardLock.unlock();
       return funcID;
     }
@@ -230,10 +234,7 @@ class INS {
         task.registerFunction( funcName, funcID );
       }
 
-      Action action(task.taskID, addr, value, lineNo, funcID);
-      action.isWrite = true;
-      action.funcName = funcName;
-      task.saveMemoryAction(action);
+      task.saveWriteAction(addr, value, lineNo, funcID);
     }
 };
 #endif

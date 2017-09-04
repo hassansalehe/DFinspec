@@ -40,7 +40,7 @@ class Conflict {
   }
 
   bool operator<(const Conflict &RHS) const {
-    return addr < RHS.addr;
+    return addr < RHS.addr || action1.taskId < action2.taskId;
   }
 }; // end Conflict
 

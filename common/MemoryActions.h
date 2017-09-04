@@ -22,11 +22,8 @@
 class MemoryActions {
   public:
     bool isEmpty;
-    bool isThereLastWrite;
 
-    Action first;
-    Action lastWrite;
-
+    Action action;
 
     int taskId;
     ADDRESS addr;     // destination address
@@ -37,52 +34,53 @@ class MemoryActions {
     }
 
     // Constructor which accepts an action
-    MemoryActions(Action & action) {
+    MemoryActions(Action & act) {
 
       isEmpty = true;
-      isThereLastWrite = false;
-      storeAction( action );
+      storeAction( act );
     }
 
     // Stores action if
     // (a) is first action of task, or
     // (b) is last write action
-    inline void storeAction(Action & action) {
-       if ( isEmpty || action.isWrite ) {
-         first = action;
+    inline void storeAction(Action & act) {
+       if ( isEmpty || act.isWrite ) {
+         action = act;
          isEmpty = false;
          taskId = action.taskId;
          addr = action.addr;
-
-         isThereLastWrite = false;
        }
-
-       //if ( action.isWrite ) {
-       //  lastWrite = action;
-       //  isThereLastWrite = true;
-       //}
     }
+
+    inline void storeAction(uint & taskID, ADDRESS & adr,
+                  INTEGER & val, INTEGER & linNo,
+                  INTEGER & funcID, bool isWrite_) {
+
+         if(isEmpty || isWrite_) {
+           action.taskId = taskID;
+           action.addr = adr;
+           action.funcId = funcID;
+           action.value = val;
+           action.lineNo = linNo;
+           action.isWrite = isWrite_;
+           isEmpty = false;
+         }
+    }
+
+    /**
+     * Returns true if current action is a write
+     */
     bool hasWrite() {
-      if( isEmpty )
+      if( isEmpty || ( !action.isWrite ))
        return false;
 
-      if( first.isWrite )
-        return true;
-
-      return false;
+      return true;
     }
 
     void printActions(ostringstream & os) {
-      if( isThereLastWrite ) {
-        // means we have both first and last actions
-        first.printActionNN( os );
-        os << " :: ";
-        lastWrite.printAction( os );
-      }
-      else
-        if(! isEmpty ) first.printAction( os );
+      if( !isEmpty )
+        action.printAction( os );
     }
-
 };
 
 #endif // MemoryActions.h
