@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+# Copyright (c) 2017, Hassan Salehe Matar
+# All rights reserved.
+#
+# This file is part of DFinspec. For details, see
+# https://github.com/hassansalehe/DFinspec.
+#
+
+HOME=`pwd`
+
+## Benchmarks-related directories ##
+BENCHS_DIR=$HOME/benchmarks
+SRC=$BENCHS_DIR/src
+INC=$BENCHS_DIR/include
+STMSTL=$BENCHS_DIR/include/stm_stl
+ATOMICOPS=$BENCHS_DIR/include/atomic_ops
+TMMISC=$BENCHS_DIR/tmmisc
+
+# Instrumentation directory
+INSTR_DIR=$HOME/instrumentor
+BIN_DIR=$HOME/bin
+
+clang++ -Xclang -load -Xclang $BIN_DIR/libADFInstrumentationPass.so	\
+	-I${SRC} -I${INC} -I${STMSTL} -I${ATOMICOPS} -I${TMMISC} 	\
+	-DADF_STM -DADF -g -Wall -O0 -std=c++11 -pthread -lsfftw -litm	\
+	${BIN_DIR}/Callbacks.o ${BIN_DIR}/Logger.o -L${BENCHS_DIR}/lib 	\
+	${BENCHS_DIR}/obj/adf/adf.o -ladf "$@"
