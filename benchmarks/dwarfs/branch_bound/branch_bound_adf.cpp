@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <climits>
 #include <iostream>
+#include <vector>
 
 #include "adf.h"
 #include "list.h"
