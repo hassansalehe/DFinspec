@@ -43,6 +43,7 @@ class BugValidator {
     inline bool isDebugCall(const string& statement) {
       return statement.find("llvm.dbg.declare") != string::npos;
     }
+
     inline bool isValid(const string& sttmt) {
       // valid starts with line number, e.g. "42: "
       return regex_search (sttmt, regex("^[0-9]+: "));

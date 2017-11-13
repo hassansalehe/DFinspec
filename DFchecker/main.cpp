@@ -33,7 +33,14 @@ int main(int argc, char * argv[])
 
   Checker aChecker; // checker instance
   string logLine;
+
   ifstream HBlog(argv[2]); //  hb file
+  // check if HBlog file successfully opened
+  if(!HBlog.is_open()) {
+    cout << "ERROR!" << endl;
+    cout << "HBlog file: " << argv[2] << " could not open." << endl;
+    exit(-1);
+  }
 
   while( getline(HBlog, logLine) )
   {
@@ -42,6 +49,13 @@ int main(int argc, char * argv[])
   HBlog.close();
 
   ifstream log(argv[1]); //  log file
+  // check if trace file successfully opened
+  if(!log.is_open()) {
+    cout << "ERROR!" << endl;
+    cout << "Trace file: " << argv[1] << " could not open." << endl;
+    exit(-1);
+  }
+
   while( getline(log, logLine) ) {
     // processes log file and detects nondeterminism
     aChecker.processLogLines(logLine);
