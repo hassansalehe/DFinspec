@@ -1,5 +1,5 @@
 MAINDIR = $(PWD)
-BINDIR=$(MAINDIR)/../bin
+BINDIR=$(MAINDIR)/../../../bin
 INCDIR = $(MAINDIR)/include
 INCSTL = $(MAINDIR)/include/stm_stl
 INCATOMIC = $(MAINDIR)/include/atomic_ops
@@ -55,10 +55,10 @@ DWARFS_COMMON = $(DWARFDIR)/sparse_algebra/sparse_algebra                       
 		$(DWARFDIR)/spectral_methods/spectral_methods                   \
 		$(DWARFDIR)/structured_grid/structured_grid                     \
 		$(DWARFDIR)/combinatorial_logic/combinatorial_logic             \
-		$(DWARFDIR)/../../tests/commute       				\
-		$(DWARFDIR)/../../tests/reader_writer       			\
-		$(DWARFDIR)/../../tests/reader_writer_writer			\
-		$(DWARFDIR)/../../tests/motivating_bank_example			\
+		$(DWARFDIR)/../../adf_tests/commute       			\
+		$(DWARFDIR)/../../adf_tests/reader_writer       		\
+		$(DWARFDIR)/../../adf_tests/reader_writer_writer		\
+		$(DWARFDIR)/../../adf_tests/motivating_bank_example		\
 		$(DWARFDIR)/unstructured_grid/unstructured_grid
 
 ADFDWARFS = $(addsuffix _adf, $(DWARFS_COMMON))
@@ -77,7 +77,7 @@ $(OBJDIR)/adf/%.o: $(SRCDIR)/%.cpp
 
 .cpp.o:
 	$(APPNAME)
-	$(CXX) -Xclang -load -Xclang $(BINDIR)/libADFInstrumentationPass.so $(CXXFLAGS) $< -o $@
+	$(CXX) -Xclang -load -Xclang $(BINDIR)/libADFInstrumentPass.so $(CXXFLAGS) $< -o $@
 
 # --------------------------------------------------------------------------------
 # Rules to compile library
@@ -129,7 +129,7 @@ APPS= $(ADFDWARFS)
 
 $(APPS): APPNAME=@ printf "\n$(subst .o,,$(lastword $(subst /, ,$@)))\n-------------------\n\n"
 $(APPS): %:%.o
-	$(CXX) -o $@ $< $(BINDIR)/Callbacks.o $(BINDIR)/Logger.o $(LDFLAGS)
+	$(CXX) -o $@ $< -L$(BINDIR) -lCallbacks -lLogger $(LDFLAGS)
 
 .PHONY: adf_apps_intro adf_apps
 adf_apps_intro:

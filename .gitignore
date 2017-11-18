@@ -7,7 +7,10 @@ Trace*
 *_adf
 *.sif
 *.so
+a.out
+bin/
 build/
+.build/
 ADFinspec
 flowGraph.js
 *_adf_base
