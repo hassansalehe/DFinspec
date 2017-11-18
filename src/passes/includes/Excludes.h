@@ -16,6 +16,7 @@
 #define EXCLUDES_H_P_P
 
 #include "Libs.h" // the LLVM includes put there
+#include "ADFSchedulerSignatures.h"
 
 using namespace llvm;
 using namespace std;
@@ -40,8 +41,7 @@ namespace INS {
    // This method parses the signature file and initializes
    // the signatures accordingly.
    void InitializeSignatures() {
-     std::ifstream signatureFile;
-     signatureFile.open("/home/hmatar/Research/DFinspec/passes/includes/ADFSchedulerSignatures.h"/*, std::ifstream::in*/);
+     dfinspec::ADFSchedulerSignatures signatureFile;
 
      // check if file does not exist
      if(!signatureFile.good()) {
@@ -56,7 +56,7 @@ namespace INS {
 
      if(signatureFile.is_open()) {
 
-       for (std::string line; std::getline(signatureFile, line); ) {
+       for (std::string line; signatureFile.getline(line); ) {
          StringRef key(line);
 
          if(key.startswith("TASK:")){ // task body name
