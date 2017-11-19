@@ -50,6 +50,9 @@
 #include "llvm/Support/Debug.h"
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
 #include "llvm/IR/LegacyPassManager.h"
+#include "llvm/Transforms/Utils/ModuleUtils.h"
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/Module.h"
 
 #include "OpenMPUtil.h"
 
@@ -70,17 +73,117 @@ struct OpenMPInstrumentorPass : public llvm::FunctionPass {
     return false;
   }
 
+  llvm::Constant* getLineNumber(llvm::Instruction* I) {
+
+    if (auto Loc = I->getDebugLoc()) {
+      llvm::IRBuilder<> IRB(I);
+      unsigned Line = Loc->getLine();
+      return llvm::ConstantInt::get(
+          llvm::Type::getInt32Ty(I->getContext()), Line);
+    }
+    else {
+      llvm::Constant* zero = llvm::ConstantInt::get(
+          llvm::Type::getInt32Ty(I->getContext()), 0);
+      return zero;
+    }
+  }
+
   bool runOnFunction(llvm::Function &F) override {
     // print function name
     llvm::errs().write_escaped(F.getName()) << '\n';
 
     // save the function body
-    dfinspec::logFunction(F);
-    return false;
+   // dfinspec::logFunction(F);
+
+    // return if main
+    if(F.getName() == "main")
+     return false;
+
+    const llvm::DataLayout &DL = F.getParent()->getDataLayout();
+    initializeCallbacks(*F.getParent());
+
+    // Instrument store instructions
+    for (auto &BB : F) {
+      for (auto &Inst : BB) {
+
+        if(llvm::StoreInst *instr = llvm::dyn_cast<llvm::StoreInst>(&Inst)) {
+
+          llvm::errs() << Inst << "\n";
+          llvm::Value * addr = instr->getPointerOperand();
+
+          llvm::Type *OrigPtrTy = addr->getType();
+          llvm:: Type *OrigTy = llvm::cast<llvm::PointerType>(OrigPtrTy)->getElementType();
+
+          assert(OrigTy->isSized());
+
+          uint32_t TypeSize = DL.getTypeStoreSizeInBits(OrigTy);
+
+          if (TypeSize != 8  && TypeSize != 16 && TypeSize != 32 && TypeSize != 64 && TypeSize != 128) {
+             llvm::errs() << "Unsual size \n";
+          }
+
+          llvm::IRBuilder<> IRB(&Inst);
+          llvm::Value *value = instr->getValueOperand();
+          llvm::Constant *LineNo = getLineNumber(&Inst);
+          llvm::StringRef name = F.getName();
+          llvm::Value *taskName = IRB.CreateGlobalStringPtr(name, "taskName");
+
+          llvm::Value *args[] = {addr, value, LineNo, taskName};
+
+          if(INS_MemWrite4) {
+
+            IRB.CreateCall(INS_MemWrite4, args);
+            //    {IRB.CreatePointerCast(addr, IRB.getInt8PtrTy()), value, 0, taskName});
+            //IRB.CreateCall(INS_TaskBeginFunc, {IRB.CreatePointerCast(taskName, IRB.getInt8PtrTy())});
+
+            llvm::errs() << Inst << "\n";
+          }
+        }
+      }
+    }
+
+    return true;
   }
+
+  private:
+  llvm::Constant * INS_MemWrite1;
+  llvm::Constant * INS_MemWrite2;
+  llvm::Constant * INS_MemWrite4;
+  llvm::Constant * INS_MemWrite8;
+  llvm::Constant * INS_MemWrite16;
+  llvm::Constant * INS_TaskBeginFunc;
+
+  void initializeCallbacks(llvm::Module & M);
 
 }; // end of OpenMPInstrumentorPass
 } // end of namespace
+
+void OpenMPInstrumentorPass::initializeCallbacks(llvm::Module & M) {
+  llvm::IRBuilder<> IRB(M.getContext());
+
+  INS_MemWrite1 = M.getOrInsertFunction(
+      "INS_AdfMemWrite1", IRB.getVoidTy(), IRB.getInt8PtrTy(),
+      IRB.getInt64Ty(), IRB.getInt8Ty(), nullptr);
+
+  INS_MemWrite2 = M.getOrInsertFunction(
+      "INS_AdfMemWrite2", IRB.getVoidTy(), IRB.getInt8PtrTy(),
+      IRB.getInt64Ty(), IRB.getInt8Ty(), nullptr);
+
+  INS_MemWrite4 = M.getOrInsertFunction(
+      "INS_AdfMemWrite4", IRB.getVoidTy(), IRB.getInt8PtrTy(),
+      IRB.getInt64Ty(), IRB.getInt8Ty(), nullptr);
+
+  INS_MemWrite8 = M.getOrInsertFunction(
+      "INS_AdfMemWrite8", IRB.getVoidTy(), IRB.getInt8PtrTy(),
+      IRB.getInt64Ty(), IRB.getInt8Ty(), nullptr);
+
+  INS_MemWrite16 = M.getOrInsertFunction(
+      "INS_AdfMemWrite16", IRB.getVoidTy(), IRB.getInt8PtrTy(),
+      IRB.getInt64Ty(), IRB.getInt8Ty(), nullptr);
+
+  INS_TaskBeginFunc = M.getOrInsertFunction(
+      "INS_TaskBeginFunc", IRB.getVoidTy(), IRB.getInt8PtrTy(), nullptr);
+}
 
 char OpenMPInstrumentorPass::ID = 0;
 
