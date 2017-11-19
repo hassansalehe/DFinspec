@@ -9,6 +9,7 @@
 
 HOME=`pwd`
 BIN_DIR=$HOME/bin
+OPENMP_DIR=$BIN_DIR
 
 # The usage function, details how to use this tool
 Usage() {
@@ -40,13 +41,16 @@ elif [ $1 == "--help" ]; then
 elif [ $1 == "--openmp" ]; then
 
   shift
-  clang -Xclang -load -Xclang ${BIN_DIR}/libOpenMPInstrumentPass.so	\
-        -I./lib -g -Wall -O0 -fopenmp --std=c11 -pthread "$@"
+
+  clang++ -Xclang -load -Xclang ${BIN_DIR}/libOpenMPInstrumentPass.so	\
+      -g -Wall -O0 -I${OPENMP_DIR}/include -L${OPENMP_DIR}/lib		\
+      -Wl,--rpath,${OPENMP_DIR}/lib -fopenmp --std=c++11 -pthread "$@"	\
+      -L${BIN_DIR} -lOpenmpCallbacks -pthread
 
 elif [ $1 == "--adf" ]; then
 
   shift
-  if [ $# -eq 0 ]; then 
+  if [ $# -eq 0 ]; then
     echo "Error: no source file supplied"
     Usage
     exit 1

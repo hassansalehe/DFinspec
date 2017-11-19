@@ -26,6 +26,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/common)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/passes/includes)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/detector)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/bin/include)
+link_directories(${CMAKE_SOURCE_DIR}/bin)
 
 # List of source files for the checker module
 set(DETECTOR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/detector)
@@ -38,6 +40,9 @@ add_library(ADFTokenDetectorPass MODULE src/passes/TokenDetector.cpp)
 add_library(OpenMPInstrumentPass MODULE src/passes/OpenMPInstrumentor.cpp )
 add_library(Logger STATIC src/passes/Logger.cpp)
 add_library(Callbacks STATIC src/passes/Callbacks.cpp)
+add_library(OpenmpCallbacks STATIC
+     src/passes/OpenmpCallbacks.cpp
+     src/passes/Logger.cpp)
 
 # Use C++11 to compile our pass (i.e., supply -std=c++11).
 target_compile_features(ADFInstrumentPass PRIVATE cxx_range_for cxx_auto_type)
@@ -48,10 +53,12 @@ target_compile_features(Logger PRIVATE cxx_range_for cxx_auto_type)
 
 # Add compiler flags. LLVM is (typically) built with no C++ RTTI.
 set_target_properties(
-     ADFInstrumentPass ADFTokenDetectorPass
-     OpenMPInstrumentPass
-     DFchecker Logger Callbacks PROPERTIES
-     COMPILE_FLAGS "-g -O3 -std=c++11 -fno-rtti")
+     ADFInstrumentPass ADFTokenDetectorPass OpenMPInstrumentPass
+     DFchecker Logger OpenmpCallbacks Callbacks PROPERTIES
+     COMPILE_FLAGS "-g -O3 -std=c++11 -fno-rtti -fPIC")
+
+set_target_properties(OpenmpCallbacks PROPERTIES
+     COMPILE_FLAGS " -DLIBOMP_OMPT_SUPPORT=on -fPIC -g -O3 -std=c++11 -fno-rtti -fopenmp")
 
 # Get proper shared-library behavior (where symbols are not necessarily
 # resolved when the shared library is linked) on OS X.
