@@ -20,8 +20,8 @@ procNo=`cat /proc/cpuinfo | grep processor | wc -l`
 
 ### 1. Install OpenMP
 echo -e "\033[1;95mDFinspec: Installing OpenMP runtime.\033[m"
-git clone https://github.com/llvm-mirror/openmp.git openmp
-cd openmp/runtime
+git clone https://github.com/llvm-mirror/openmp.git .openmp
+cd .openmp/runtime
 mkdir -p build && cd build
 cmake -G Ninja -D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang++	\
       -D CMAKE_BUILD_TYPE=Debug -D CMAKE_INSTALL_PREFIX:PATH=$BIN_DIR	\
