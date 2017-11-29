@@ -1,11 +1,13 @@
-#  This is a tool to detect non-determinism in ADF applications.
+#  This is a tool to detect non-determinism in shared memory dataflow applications.
+This tool currently detects non-determinism in OpeMP applications, however,
+you can get more information in a relevant paper
+[here](http://www.sciencedirect.com/science/article/pii/S016781911730193X).
 
 ### Copyright notice: ###
 
-  Copyright (c) 2015 - 2017 Hassan Salehe Matar & MSRC at Koc University.
+  Copyright (c) 2015 - 2017 Hassan Salehe Matar.
     Copying or using this code by any means whatsoever
     without consent of the owner is strictly prohibited.
-
 
 ### Contacts:
      hmatar-at-ku-dot-edu-dot-tr
@@ -17,8 +19,9 @@ One of the following compilers is required.
   clang++ 3.3. or later
 
 ### How to compile the tool: ###
-  Under the main directory, on the console/terminal run the command "make".
+Under the main directory, on the console/terminal run the command `$ ./install.sh`.
 
 ### How to run: ###
-
-Given the log files traceLog.txt and HBlog.txt, the log files you collected after instrumenting and running your ADF application, execute the command "./ADFinspec traceLog.txt HBlog.txt"
+```bash
+$ dfinspec <source_code_file> <gcc/clang_compiler_parameters>"
+```
