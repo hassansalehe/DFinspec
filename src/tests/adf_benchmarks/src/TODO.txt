@@ -1,0 +1,96 @@
+
+
+- Token renaming
+
+- implement statistics = for example, how many times are threads blocked in the ready queue, maximum and average number of tasks in the ready queue during the run etc.
+
+- Implement a custom number of ready queues. For example for each task region I could add an option
+  that it should have its own ready queue. Also I should be able to dedicate a number of threads
+  to work only on this queue instead with all tasks. That should help in case of a compact task in mst.
+
+- I think that the only clean way of threating token data is to explicitly define then as such. For example using attribute
+  for declaration of such data.
+
+
+
+
+		/* TASK END */
+		/* this is the condition which controls the production of an output token
+		   This should be handled by the adf runtime system - if there was a write to a token variable,
+		   then the token should be produced. Otherwise no token is produced.
+		   I have to find a better way to express this!!!
+
+		   Generally, I want the compiler to insert the code, so that the runtime is able to
+		   check if some write is to a token variable, and if so, to save its address and
+		   from then on to work with the private copy of it. It needs to associate the address
+		   with this private copy and to use this associataion to pass the token and its value
+		   after the commit.
+		*/
+
+
+
+
+OpenMP data-sharing
+===========================
+A directive that accepts data-sharing attribute clauses determines two kinds of access to
+variables used in the directive’s associated structured block: shared and private. Each
+variable referenced in the structured block has an original variable, which is the variable
+by the same name that exists in the program immediately outside the construct. Each
+reference to a shared variable in the structured block becomes a reference to the original
+variable. For each private variable referenced in the structured block, a new version of
+the original variable (of the same type and size) is created in memory for each task that
+contains code associated with the directive. Creation of the new version does not alter
+the value of the original variable. However, the impact of attempts to access the original
+variable during the region associated with the directive is unspecified; see
+Section 2.9.3.3 on page 89 for additional details. References to a private variable in the
+structured block refer to the current task’s private version of the original variable. The
+relationship between the value of the original variable and the initial or final value of the
+private version depends on the exact clause that specifies it.
+
+
+The following variables have predetermined data-sharing attributes:
+• Variables appearing in threadprivate directives are threadprivate.
+• Variables with automatic storage duration that are declared in a scope inside the
+construct are private.
+• Variables with heap allocated storage are shared.
+• Static data members are shared.
+• The loop iteration variable(s) in the associated for-loop(s) of a for or parallel
+for construct is(are) private.
+• Variables with const-qualified type having no mutable member are shared.
+• Static variables which are declared in a scope inside the construct are shared.
+
+The default option is shared!
+
+
+The data-sharing attributes of variables that are referenced in a region, but not in a
+construct, are determined as follows:
+• Static variables declared in called routines in the region are shared.
+• Variables with const-qualified type having no mutable member, and that are declared
+in called routines, are shared.
+• File-scope or namespace-scope variables referenced in called routines in the region
+are shared unless they appear in a threadprivate directive.
+• Variables with heap-allocated storage are shared.
+• Static data members are shared unless they appear in a threadprivate directive.
+• Formal arguments of called routines in the region that are passed by reference inherit
+the data-sharing attributes of the associated actual argument.
+• Other variables declared in called routines in the region are private.
+
+
+A lambda expression can access any variable that has automatic storage duration and that can be accessed in the enclosing scope.
+
+Automatic Storage
+
+
+Storage duration is the property of an object that defines the minimum potential lifetime
+of the storage (memory category) containing the object. The storage duration is determined
+by the construct used to create the object, including the storage class specifier(s).
+The most widely-used storage duration is automatic storage duration.
+Object that are allocated on the stack memory are said to have automatic storage duration
+because they are automatically allocated and deallocated.
+The following objects have automatic storage:
+• Local objects that are not explicitly declared static ,extern or thread_local
+• Local objects that are declared with the auto storage class specifier (in all dialects of C, and in all dialects of C++ except C++09)
+• Objects declared with the register storage class specifier.
+• Function parameters.
+• Temporaries.
+

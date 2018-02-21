@@ -1,0 +1,118 @@
+MAINDIR = $(PWD)
+INCDIR = $(MAINDIR)/include
+INCSTL = $(MAINDIR)/include/stm_stl
+INCATOMIC = $(MAINDIR)/include/atomic_ops
+SRCDIR = $(MAINDIR)/src
+TMMISC = $(MAINDIR)/tmmisc
+LIBDIR = $(MAINDIR)/lib
+OBJDIR = $(MAINDIR)/obj
+
+
+
+# library
+# -------------------------------------------
+TM = stm
+TMLIB = $(LIBDIR)/lib$(TM).a
+ADF = adf
+ADFLIB = $(LIBDIR)/libadf.a
+ADFLIB_DEBUG = $(LIBDIR)/libadf_debug.a
+ADFLIB_TRACE = $(LIBDIR)/libadf_trace.a
+ADFLIB_OMP = $(LIBDIR)/libadf_omp.a
+ADFLIB_TBB = $(ADFLIB_OMP)
+ADFLIB_SEQ = $(LIBDIR)/libadf_seq.a
+ADFLIB_SEQ_TRACE = $(LIBDIR)/libadf_seq_trace.a
+
+CXX = clang++
+AR = ar
+
+
+
+# flags
+# -------------------------------------------
+
+CXXFLAGS = -c -Wall -O3 -Wno-unused-but-set-variable -I$(SRCDIR) -I$(INCDIR) -I$(INCSTL)
+LDFLAGS =
+
+CXXFLAGS_DEBUG = -c -Wall -O0 -g -Wno-unused-but-set-variable -I$(SRCDIR) -I$(INCDIR) -I$(INCSTL)
+LDFLAGS_DEBUG =
+
+CXXFLAGS_TRACE = -c -Wall -O2 -g -Wno-unused-but-set-variable -I$(SRCDIR) -I$(INCDIR) -I$(INCSTL) -DDO_TRACE -I$(EXTRAE_HOME)/include
+LDFLAGS_TRACE = -L$(EXTRAE_HOME)/lib -lpttrace -L$(PAPI_HOME)/lib -lpapi -L/usr/lib -lbfd -liberty -L$(UNWIND_HOME)/lib -lunwind
+
+
+CXXFLAGS_ADF = -std=c++11 -pthread -fgnu-tm -I$(INCATOMIC) -I$(TMMISC)
+LDFLAGS_ADF = -L$(LIBDIR) -litm -ladf -lpthread
+
+CXXFLAGS_OMP = -std=c++11 -fopenmp -fgnu-tm -I$(INCATOMIC) -I$(TMMISC)
+LDFLAGS_OMP = -L$(LIBDIR) -litm -ladf_omp -fopenmp
+
+CXXFLAGS_TBB = -std=c++11 -fgnu-tm -I/opt/intel/tbb-4.1/include/ -I$(INCATOMIC) -I$(TMMISC)
+LDFLAGS_TBB = -L$(LIBDIR) -litm -ladf_omp -ltbb -lpthread
+
+CXXLAGS_SEQ=
+LDFLAGS_SEQ= -L$(LIBDIR) -ladf_seq
+
+LDFLAGS_DWARFS = -lsfftw
+
+
+
+# applications
+# -------------------------------------------
+
+APPDIR= $(MAINDIR)/apps
+DWARFDIR= $(MAINDIR)/dwarfs
+
+
+APPS_COMMON = 	$(APPDIR)/buffer/buffer         \
+		$(APPDIR)/game/game                     \
+		$(APPDIR)/lee/lee
+
+ADFAPPS = $(addsuffix _adf, $(APPS_COMMON))
+OMPAPPS = $(addsuffix _omp, $(APPS_COMMON))
+SEQAPPS = $(addsuffix _seq, $(APPS_COMMON))
+
+ADFAPPS_OPT = $(addsuffix _adf_opt, $(APPS_COMMON))
+OMPAPPS_OPT = $(addsuffix _omp_opt, $(APPS_COMMON))
+
+
+# dwarfs
+# -------------------------------------------
+
+DWARFS_COMMON = $(DWARFDIR)/sparse_algebra/sparse_algebra
+#		$(DWARFDIR)/branch_bound/branch_bound                      \
+#		$(DWARFDIR)/dense_algebra/dense_algebra                            \
+#		$(DWARFDIR)/finite_state_machine/finite_state_machine              \
+#		$(DWARFDIR)/graph_models/graph_models                              \
+#		$(DWARFDIR)/map_reduce/map_reduce                                  \
+#		$(DWARFDIR)/sparse_algebra/sparse_algebra                          \
+#		$(DWARFDIR)/spectral_methods/spectral_methods                      \
+#		$(DWARFDIR)/structured_grid/structured_grid                        \
+#		$(DWARFDIR)/unstructured_grid/unstructured_grid
+#		
+#		$(DWARFDIR)/combinatorial_logic/combinatorial_logic                \	
+
+
+ADFDWARFS = $(addsuffix _adf, $(DWARFS_COMMON))
+OMPDWARFS = $(addsuffix _omp, $(DWARFS_COMMON))
+TBBDWARFS = $(addsuffix _tbb, $(DWARFS_COMMON))
+TBB_FLOW_DWARFS = $(addsuffix _tbb_flow, $(DWARFS_COMMON))
+SEQDWARFS = $(addsuffix _seq, $(DWARFS_COMMON))
+
+ADFDWARFS_TRACE = $(addsuffix _adf_trace, $(DWARFS_COMMON))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
