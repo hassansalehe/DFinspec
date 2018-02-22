@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////
-//  ADFinspec: a lightweight non-determinism checking
+//  DFinspec: a lightweight non-determinism checking
 //          tool for ADF applications
 //
-//    Copyright (c) 2015 - 2017 Hassan Salehe Matar & MSRC at Koc University
+//    Copyright (c) 2015 - 2018 Hassan Salehe Matar
 //      Copying or using this code by any means whatsoever
 //      without consent of the owner is strictly prohibited.
 //
@@ -12,54 +12,56 @@
 
 // Defines a class to hold task identification info
 
-#ifndef LLVM_TASK_INFO_HPP
-#define LLVM_TASK_INFO_HPP
+#ifndef _PASSES_INCLUDES_TASKINFO_HPP_
+#define _PASSES_INCLUDES_TASKINFO_HPP_
 
-#include "defs.h"
-#include "MemoryActions.h"
-
-using namespace std;
+#include "defs.hpp"
+#include "MemoryActions.hpp"
 
 typedef struct TaskInfo {
-  uint threadID = 0;
-  uint taskID = 0;
-  bool active = false;
-
-  char * taskName;
+  uint threadID    =  0;
+  uint taskID      =  0;
+  bool active      =  false;
+  char *taskName;
 
   // stores pointers of signatures of functions executed by task
   // for faster acces
-  unordered_map<STRING, INTEGER> functions;
+  std::unordered_map<STRING, INTEGER>         functions;
 
   // stores memory actions performed by task.
-  unordered_map<address, MemoryActions> memoryLocations;
+  std::unordered_map<address, MemoryActions>  memoryLocations;
 
   // improve performance by buffering actions and write only once.
-  ostringstream actionBuffer;
+  std::ostringstream                          actionBuffer;
 
   /**
    * Stores the action info as performed by task.
    * The rules for storing this information are
    * explained in MemoryActions.h
    */
-  inline void saveMemoryAction(Action & action) {
-
-    MemoryActions & loc = memoryLocations[action.addr];
+  inline void saveMemoryAction(Action &action) {
+    MemoryActions &loc = memoryLocations[action.addr];
     loc.storeAction( action );
   }
 
-  inline void saveReadAction(ADDRESS & addr, INTEGER & lineNo, const INTEGER funcID) {
-
+  inline void saveReadAction(
+      ADDRESS &addr,
+      INTEGER &lineNo,
+      const INTEGER funcID) {
     MemoryActions & loc = memoryLocations[addr];
-    if( loc.hasWrite() )
-         return;
+
+    if ( loc.hasWrite() ) return;
 
     Action action( taskID, addr, 0, lineNo, funcID );
     action.isWrite = false;
     loc.storeAction( action );
   }
 
-  inline void saveWriteAction( ADDRESS addr, INTEGER value, INTEGER lineNo, INTEGER funcID) {
+  inline void saveWriteAction(
+      ADDRESS addr,
+      INTEGER value,
+      INTEGER lineNo,
+      INTEGER funcID) {
      MemoryActions & loc = memoryLocations[addr];
 
      bool isWrite = true;
@@ -71,8 +73,10 @@ typedef struct TaskInfo {
    * recorded.
    */
   void printMemoryActions() {
-    for(auto it = memoryLocations.begin(); it != memoryLocations.end(); ++it)
+    for (auto it = memoryLocations.begin();
+         it != memoryLocations.end(); ++it) {
       it->second.printActions( actionBuffer );
+    }
   }
 
   /** HELPER FUNCTIONS */
@@ -81,11 +85,12 @@ typedef struct TaskInfo {
    * returns ID if function registered before, otherwise 0.
    */
    inline INTEGER getFunctionId( const STRING funcName ) {
-    auto fd = functions.find( funcName );
-    if( fd == functions.end() ) {
-      return 0;
-    }
-    return fd->second;
+     auto fd = functions.find( funcName );
+     if (fd == functions.end()) {
+       return 0;
+     } else {
+       return fd->second;
+     }
    }
 
    /**
@@ -98,6 +103,6 @@ typedef struct TaskInfo {
 } TaskInfo;
 
 // holder of task identification information
-static unordered_map<uint, TaskInfo> taskInfos;
+static std::unordered_map<uint, TaskInfo> taskInfos;
 
 #endif // TaskInfo.h

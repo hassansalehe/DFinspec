@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////
-//  ADFinspec: a lightweight non-determinism checking
+//  DFinspec: a lightweight non-determinism checking
 //          tool for ADF applications
 //
-//    Copyright (c) 2015 - 2017 Hassan Salehe Matar & MSRC at Koc University
+//    Copyright (c) 2015 - 2018 Hassan Salehe Matar
 //      Copying or using this code by any means whatsoever
 //      without consent of the owner is strictly prohibited.
 //
@@ -13,8 +13,8 @@
 
 // This file contains common type defs
 
-#ifndef DEFS_H_ADFinspec
-#define DEFS_H_ADFinspec
+#ifndef _COMMON_DEFS_HPP_
+#define _COMMON_DEFS_HPP_
 
 #include <iostream>
 #include <fstream>
@@ -36,29 +36,28 @@
 //#include<//pthread.h>
 //#include <thread>       // std::thread
 
-using namespace std;
-
-using Void = void;
-typedef        void        VOID;
-typedef      void *        ADDRESS;
-typedef    ofstream        FILEPTR;
-typedef    long int        INTEGER;
-typedef    long int        VALUE;
-typedef const char*        STRING;
-typedef vector<int>        INTVECTOR;
-typedef    set<int>        INTSET;
-typedef unordered_set<int> UNORD_INTSET;
-typedef        bool        BOOL;
-typedef vector<string>     STRVECTOR;
-using uint    =  unsigned int;
-using ulong   =  unsigned long;
-using lint    =  long int;
-using address =  void *;
+typedef    bool                      BOOL;
+typedef    void                      VOID;
+typedef    void *                    ADDRESS;
+typedef    long int                  INTEGER;
+typedef    long int                  VALUE;
+typedef    const char*               STRING;
+typedef    std::ofstream             FILEPTR;
+typedef    std::set<int>             INTSET;
+typedef    std::vector<int>          INTVECTOR;
+typedef    std::unordered_set<int>   UNORD_INTSET;
+typedef    std::vector<std::string>  STRVECTOR;
 
 // for conflict task pairs
-typedef pair<string,string>     STRPAIR;
-typedef set<pair<int,int>>      INT_PAIRS;
-typedef map<STRPAIR, INT_PAIRS> CONFLICT_PAIRS;
+typedef    std::pair<std::string,std::string>   STRPAIR;
+typedef    std::set<std::pair<int,int>>         INT_PAIRS;
+typedef    std::map<STRPAIR, INT_PAIRS>         CONFLICT_PAIRS;
+
+using  Void     =   void;
+using  uint     =   unsigned int;
+using  ulong    =   unsigned long;
+using  lint     =   long int;
+using  address  =   void *;
 
 enum OPERATION {
   ALLOCA,
@@ -75,7 +74,7 @@ enum OPERATION {
   SHL,
 };
 
-static string OperRepresentation(OPERATION op) {
+static std::string OperRepresentation(OPERATION op) {
 
   switch(op) {
     case ALLOCA: return "ALLOCA";
@@ -94,4 +93,5 @@ static string OperRepresentation(OPERATION op) {
       return "UNKNOWN";
   }
 };
+
 #endif

@@ -2,7 +2,7 @@
 //  DFinspec: a lightweight non-determinism checking
 //          tool for shared memory DataFlow applications
 //
-//    Copyright (c) 2015 - 2017 Hassan Salehe Matar
+//    Copyright (c) 2015 - 2018 Hassan Salehe Matar
 //      Copying or using this code by any means whatsoever
 //      without consent of the owner is strictly prohibited.
 //
@@ -10,8 +10,8 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#ifndef SRC_PASSES_INCLUDES_ADFSchedulerSignatures_H
-#define SRC_PASSES_INCLUDES_ADFSchedulerSignatures_H
+#ifndef _PASSES_INCLUDES_ADFSCHEDULERSIGNATURES_HPP_
+#define _PASSES_INCLUDES_ADFSCHEDULERSIGNATURES_HPP_
 
 #include <vector>
 #include <string>
@@ -23,27 +23,26 @@ namespace dfinspec {
 /// detection runtime.
 class ADFSchedulerSignatures {
   private:
-    int curPos;
-    std::vector<std::string> signatures;
+    int                        curPos;
+    std::vector<std::string>   signatures;
 
   public:
     // Initalize the signatures
     ADFSchedulerSignatures() {
       signatures = {
-        "TASK:::operator()(token_s*) const",
-        "TERM:TerminateRuntime",
-        "INIT:InitRuntime",
-        "PASS:PassToken"
+          "TASK:::operator()(token_s*) const",
+          "TERM:TerminateRuntime",
+          "INIT:InitRuntime",
+          "PASS:PassToken"
       };
-      curPos = 0;
+      curPos    = 0;
     }
 
     // Set signature line into "holder" argument.
     // Return true if successful, false otherwise.
-    bool getline(std::string & holder) {
-      if(curPos >= signatures.size())
-        return false;
-      holder = signatures[curPos++];
+    bool getline(std::string &holder) {
+      if (curPos >= signatures.size()) return false;
+      holder = signatures[ curPos++ ];
       return true;
     }
 

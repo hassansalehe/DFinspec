@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////
-//  ADFinspec: a lightweight non-determinism checking
+//  DFinspec: a lightweight non-determinism checking
 //          tool for ADF applications
 //
-//    Copyright (c) 2015 - 2017 Hassan Salehe Matar & MSRC at Koc University
+//    Copyright (c) 2015 - 2018 Hassan Salehe Matar
 //      Copying or using this code by any means whatsoever
 //      without consent of the owner is strictly prohibited.
 //
@@ -12,51 +12,51 @@
 
 // implements the main function.
 
-#include "checker.h"  // header
-#include "validator.h"
+#include "checker.hpp"  // header
+#include "validator.hpp"
 
-using namespace std::chrono;
+int main(int argc, char * argv[]) {
 
-int main(int argc, char * argv[])
-{
-
-  if(argc != 4) {
-    cout << endl;
-    cout << "ERROR!" << endl;
-    cout << "Usage: ./ADDFinspec TraceLog.txt HBlog.txt IRlog.txt" << endl;
-    cout << endl;
+  if (argc != 4) {
+    std::cout << std::endl;
+    std::cout << "ERROR!" << std::endl;
+    std::cout << "Usage: ./ADDFinspec TraceLog.txt HBlog.txt IRlog.txt"
+              << std::endl;
+    std::cout << std::endl;
     exit(-1);
   }
 
   // take time at begin of analysis
-  high_resolution_clock::time_point t1 = high_resolution_clock::now();
+  std::chrono::high_resolution_clock::time_point t1 =
+      std::chrono::high_resolution_clock::now();
 
   Checker aChecker; // checker instance
-  string logLine;
+  std::string logLine;
 
-  ifstream HBlog(argv[2]); //  hb file
+  std::ifstream HBlog(argv[2]); //  hb file
   // check if HBlog file successfully opened
-  if(!HBlog.is_open()) {
-    cout << "ERROR!" << endl;
-    cout << "HBlog file: " << argv[2] << " could not open." << endl;
+  if (!HBlog.is_open()) {
+    std::cout << "ERROR!" << std::endl;
+    std::cout << "HBlog file: " << argv[2]
+              << " could not open." << std::endl;
     exit(-1);
   }
 
-  while( getline(HBlog, logLine) )
-  {
+  while ( getline(HBlog, logLine) ) {
     aChecker.addTaskNode(logLine);
   }
   HBlog.close();
 
-  ifstream log(argv[1]); //  log file
+  std::ifstream log(argv[1]); //  log file
   // check if trace file successfully opened
-  if(!log.is_open()) {
-    cout << "ERROR!" << endl;
-    cout << "Trace file: " << argv[1] << " could not open." << endl;
+  if (!log.is_open()) {
+    std::cout << "ERROR!" << std::endl;
+    std::cout << "Trace file: " << argv[1]
+              << " could not open." << std::endl;
     exit(-1);
   }
 
-  while( getline(log, logLine) ) {
+  while ( getline(log, logLine) ) {
     // processes log file and detects nondeterminism
     aChecker.processLogLines(logLine);
   }
@@ -70,8 +70,10 @@ int main(int argc, char * argv[])
   aChecker.checkCommutativeOperations( validator );
 
   // take time at end of analyis
-  high_resolution_clock::time_point t2 = high_resolution_clock::now();
-  auto duration = duration_cast<microseconds>( t2 - t1 ).count();
+  std::chrono::high_resolution_clock::time_point t2 =
+      std::chrono::high_resolution_clock::now();
+  auto duration = std::chrono::duration_cast<std::chrono::microseconds>
+      ( t2 - t1 ).count();
 
   // testing writes
   //aChecker.testing();
@@ -79,7 +81,7 @@ int main(int argc, char * argv[])
   aChecker.printHBGraph();
   aChecker.printHBGraphJS(); // print in JS format
 
-  cout << "Checker execution time: "<< duration/1000.0 << " milliseconds" << endl;
-
+  std::cout << "Checker execution time: "<< duration/1000.0
+            << " milliseconds" << std::endl;
   return 0;
 }

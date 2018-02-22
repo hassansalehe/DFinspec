@@ -11,7 +11,7 @@ a.out
 bin/
 build/
 .build/
-ADFinspec
+DFinspec
 flowGraph.js
 *_adf_base
 *_adf_instr

@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////
-//  ADFinspec: a lightweight non-determinism checking
+//  DFinspec: a lightweight non-determinism checking
 //          tool for ADF applications
 //
-//    Copyright (c) 2015 - 2017 Hassan Salehe Matar & MSRC at Koc University
+//    Copyright (c) 2015 - 2018 Hassan Salehe Matar
 //      Copying or using this code by any means whatsoever
 //      without consent of the owner is strictly prohibited.
 //
@@ -11,8 +11,8 @@
 /////////////////////////////////////////////////////////////////
 
 // Contains all the relevant LLVM includes for the project
-#ifndef LLVM_LIBS_INCLUDE_HPP_
-#define LLVM_LIBS_INCLUDE_HPP_
+#ifndef _PASSES_INCLUDES_LIBS_HPP_
+#define _PASSES_INCLUDES_LIBS_HPP_
 
 #include "llvm/Transforms/Instrumentation.h"
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"

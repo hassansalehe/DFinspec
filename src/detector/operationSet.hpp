@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////
-//  ADFinspec: a lightweight non-determinism checking
+//  DFinspec: a lightweight non-determinism checking
 //          tool for ADF applications
 //
-//    Copyright (c) 2015 - 2017 Hassan Salehe Matar & MSRC at Koc University
+//    Copyright (c) 2015 - 2018 Hassan Salehe Matar
 //      Copying or using this code by any means whatsoever
 //      without consent of the owner is strictly prohibited.
 //
@@ -10,14 +10,14 @@
 //
 /////////////////////////////////////////////////////////////////
 
-// Defines the OperationSet class which keeps the sequence of operations
-// on a variable to determine if the operations commute with each other.
+// Defines the OperationSet class to keep the sequence of operations
+// on a variable to determine if the operations commute.
 
-#ifndef _OPERATION_SET_HPP_
-#define _OPERATION_SET_HPP_
+#ifndef _DETECTOR_OPERATIONSET_HPP_
+#define _DETECTOR_OPERATIONSET_HPP_
 
 // includes and definitions
-#include "defs.h"
+#include "defs.hpp"
 
 class OperationSet {
   public:
@@ -35,17 +35,19 @@ class OperationSet {
     bool isCommutative(OPERATION op) {
 
      // compare with other operation
-     for(auto i = operations.begin(); i != operations.end(); i++) {
+     for (auto i = operations.begin(); i != operations.end(); i++) {
       switch(op) {
         case ADD:
         case SUB:
-          if(*i != ADD && *i != SUB)
+          if (*i != ADD && *i != SUB) {
             return false;
+          }
           break;
         case MUL:
         case DIV:
-          if(*i != MUL && *i != DIV)
+          if (*i != MUL && *i != DIV) {
             return false;
+          }
           break;
         default:
           return false;
@@ -57,10 +59,8 @@ class OperationSet {
     }
 
   private:
-  set<OPERATION> operations;
+  std::set<OPERATION> operations;
 
-
-};
+}; // end class
 
 #endif // end operationSet.h
-
