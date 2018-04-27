@@ -42,6 +42,11 @@ cd $BENCHS_DIR
 make clean
 rm ${BENCHS_DIR}/obj/adf/adf.o > /dev/null 2>&1
 
+# Create template folders for object files
+mkdir -p ${BENCHS_DIR}/obj/adf
+mkdir -p ${BENCHS_DIR}/obj/adf_debug
+mkdir -p ${BENCHS_DIR}/obj/seq
+
 clang++ -Xclang -load -Xclang $BIN_DIR/libADFTokenDetectorPass.so  -c -g -Wall -O0 -Wno-unused-but-set-variable -I${SRC} -I${INC} -I${STMSTL}  -DADF_STM -DADF -std=c++11 -pthread -I${ATOMICOPS} -I${TMMISC} ${BENCHS_DIR}/src/adf.cpp -o ${BENCHS_DIR}/obj/adf/adf.o  || { echo 'Compiling adf.cpp failed' ; exit 1; }
 
 make || { echo 'make failed' ; exit 1; }
