@@ -159,11 +159,11 @@ static llvm::RegisterStandardPasses
   llvm::LLVMContext &Ctx = M.getContext();
   INS_MemWriteFloat = M.getOrInsertFunction("INS_AdfMemWriteFloat",
 	    llvm::Type::getVoidTy(Ctx), llvm::Type::getFloatPtrTy(Ctx),
-      llvm::Type::getFloatTy(Ctx), llvm::Type::getInt8Ty(Ctx), NULL);
+      llvm::Type::getFloatTy(Ctx), llvm::Type::getInt8Ty(Ctx), nullptr);
 
   INS_MemWriteDouble = M.getOrInsertFunction("INS_AdfMemWriteDouble",
 	    llvm::Type::getVoidTy(Ctx), llvm::Type::getDoublePtrTy(Ctx),
-      llvm::Type::getDoubleTy(Ctx), llvm::Type::getInt8Ty(Ctx), NULL);
+      llvm::Type::getDoubleTy(Ctx), llvm::Type::getInt8Ty(Ctx), nullptr);
 
   for (size_t i = 0; i < kNumberOfAccessSizes; ++i) {
     const unsigned ByteSize = 1U << i;
@@ -357,9 +357,9 @@ void DFinspec::chooseInstructionsToInstrument(
 
 static bool isAtomic(llvm::Instruction *I) {
   if (llvm::LoadInst *LI = llvm::dyn_cast<llvm::LoadInst>(I))
-    return LI->isAtomic() && LI->getSynchScope() == llvm::CrossThread;
+    return LI->isAtomic() && LI->getSyncScopeID() != llvm::SyncScope::SingleThread;
   if (llvm::StoreInst *SI = llvm::dyn_cast<llvm::StoreInst>(I))
-    return SI->isAtomic() && SI->getSynchScope() == llvm::CrossThread;
+    return SI->isAtomic() && SI->getSyncScopeID() != llvm::SyncScope::SingleThread;
   if (llvm::isa<llvm::AtomicRMWInst>(I))
     return true;
   if (llvm::isa<llvm::AtomicCmpXchgInst>(I))
