@@ -15,9 +15,11 @@
 #ifndef _PASSES_INCLUDES_LOGGER_HPP_
 #define _PASSES_INCLUDES_LOGGER_HPP_
 
-#include <atomic>
-#include "defs.hpp"
 #include "TaskInfo.hpp"
+#include "defs.hpp"
+
+#include <atomic>
+#include <mutex>
 
 struct hash_function {
   size_t operator()( const std::pair<ADDRESS,INTEGER> &p ) const {

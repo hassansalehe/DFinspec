@@ -16,25 +16,21 @@
 #ifndef _COMMON_DEFS_HPP_
 #define _COMMON_DEFS_HPP_
 
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
-#include <unordered_set>
-#include <unordered_map>
 #include <algorithm>
 #include <cctype>
-#include <vector>
-#include <set>
-#include <map>
-#include <ctime>
 #include <chrono>
+#include <ctime>
+#include <fstream>
+#include <iostream>
+#include <map>
 #include <regex>
+#include <set>
 #include <sstream>
-
-#include <mutex>          // std::mutex
-//#include<//pthread.h>
-//#include <thread>       // std::thread
+#include <sstream>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
 typedef    bool                      BOOL;
 typedef    void                      VOID;
