@@ -17,10 +17,10 @@
 #define _DETECTOR_VALIDATOR_HPP_
 
 // includes and definitions
+#include "conflictReport.hpp"
 #include "defs.hpp"
 #include "instruction.hpp"
 #include "operationSet.hpp"
-#include "conflictReport.hpp"
 
 class BugValidator {
 
@@ -33,7 +33,6 @@ class BugValidator {
     bool involveSimpleOperations(std::string task1, INTEGER line1);
     bool isSafe(const std::vector<Instruction> &trace,
                 INTEGER loc, std::string operand);
-    //INTEGER getLineNumber(const std::string & statement);
 
     OperationSet operationSet;
 

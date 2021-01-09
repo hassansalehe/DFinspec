@@ -14,8 +14,8 @@
 // bugs detected are real.
 
 // includes and definitions
-#include "validator.hpp"
 #include "conflictReport.hpp"
+#include "validator.hpp"
 
 VOID BugValidator::parseTasksIR(char *IRlogName) {
   std::vector<Instruction> *currentTask = NULL;
@@ -129,8 +129,6 @@ BOOL BugValidator::involveSimpleOperations(
   // expected to be a store
   if (instr.oper == STORE) {
     return isSafe(taskBody, index, instr.operand1);
-    //bool r1 = isOnsimpleOperations(lineNumber - 1, istr.destination);
-    //bool r2 = isOnsimpleOperations(lineNumber - 1, istr.operand1);
   }
   return false;
 }
