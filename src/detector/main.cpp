@@ -20,7 +20,7 @@ int main(int argc, char * argv[]) {
   if (argc != 4) {
     std::cout << std::endl;
     std::cout << "ERROR!" << std::endl;
-    std::cout << "Usage: ./ADDFinspec TraceLog.txt HBlog.txt IRlog.txt"
+    std::cout << "Usage: ./DFchecker TraceLog.txt HBlog.txt IRlog.txt"
               << std::endl;
     std::cout << std::endl;
     exit(-1);
