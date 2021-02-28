@@ -33,7 +33,8 @@ class Instruction {
   /**
    * Default constructor
    */
-  Instruction() {}
+  Instruction() { }
+
   /**
    * This constructor takes in IIR representation of
    * an instruction and constructs an object representaion
