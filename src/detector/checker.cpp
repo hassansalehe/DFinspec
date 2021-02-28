@@ -12,7 +12,7 @@
 
 // this file implements the checking tool functionalities.
 
-#include "checker.hpp"  // header
+#include "checker.hpp"
 #include "sigManager.hpp" // for managing function names
 #include "MemoryActions.hpp"
 
