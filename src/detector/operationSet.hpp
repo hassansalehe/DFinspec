@@ -60,7 +60,6 @@ class OperationSet {
 
   private:
   std::set<OPERATION> operations;
-
-}; // end class
+};
 
 #endif // end operationSet.h
