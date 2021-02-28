@@ -10,9 +10,6 @@
 //
 /////////////////////////////////////////////////////////////////
 
-//
-//
-
 #ifndef _DETECTOR_CONFLICTREPORT_HPP_
 #define _DETECTOR_CONFLICTREPORT_HPP_
 
