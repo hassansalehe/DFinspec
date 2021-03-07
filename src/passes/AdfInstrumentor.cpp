@@ -34,6 +34,7 @@ namespace {
    bool doInitialization(llvm::Module &M) override;
    bool doFinalization(llvm::Module &M) override {
      INS::ClearSignatures();
+     return true;
    }
 
    // Instrumentation Pass identification, replacement for typeid.

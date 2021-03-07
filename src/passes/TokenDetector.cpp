@@ -28,6 +28,7 @@ struct TokenDetector : public llvm::FunctionPass {
 
   bool doInitialization(llvm::Module &M) override {
     INS::InitializeSignatures();
+    return true;
   }
 
   bool runOnFunction(llvm::Function &F) override {
