@@ -51,9 +51,9 @@ public:
    * Returns the function name identifier
    */
   INTEGER getFuncId(std::string name) {
-    for (auto i = functions.begin(); i != functions.end(); i++) {
-       if (i->second == name) {
-         return i->first;
+    for (const auto& func : functions) {
+       if (func.second == name) {
+         return func.first;
        }
      }
     return 0; // FIXME
