@@ -117,9 +117,9 @@ BOOL BugValidator::involveSimpleOperations(
   Instruction instr;
   INTEGER index = -1;
 
-  for (auto i = taskBody.begin(); i != taskBody.end(); i++) {
-     if (i->lineNo > lineNumber) break;
-     if (i->lineNo == lineNumber) instr  = *i;
+  for (const auto& inst : taskBody) {
+     if (inst.lineNo > lineNumber) break;
+     if (inst.lineNo == lineNumber) instr  = inst;
      index++;
   }
 #ifdef DEBUG
