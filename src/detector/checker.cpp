@@ -37,13 +37,12 @@ void Checker::saveTaskActions( const MemoryActions &taskActions ) {
   }
 
   std::list<MemoryActions> &AddrActions = writes[taskActions.addr];
-  for (auto lastWrt = AddrActions.begin();
-       lastWrt != AddrActions.end(); lastWrt++) {
+  for (auto& lastWrt : AddrActions) {
     // actions of same task
-    if ( taskActions.taskId == lastWrt->taskId) continue;
+    if ( taskActions.taskId == lastWrt.taskId) continue;
 
     auto HBfound =
-        serial_bags[ taskActions.taskId ]->HB.find(lastWrt->taskId);
+        serial_bags[ taskActions.taskId ]->HB.find(lastWrt.taskId);
     auto end = serial_bags[taskActions.taskId]->HB.end();
 
     if (HBfound != end) continue; // 3. there's happens-before
@@ -52,25 +51,25 @@ void Checker::saveTaskActions( const MemoryActions &taskActions ) {
 
     // check write-write case (different values written)
     // 4.1 both write to shared memory
-    if ( (taskActions.action.isWrite && lastWrt->action.isWrite) &&
-       (taskActions.action.value != lastWrt->action.value) ) {
+    if ( (taskActions.action.isWrite && lastWrt.action.isWrite) &&
+       (taskActions.action.value != lastWrt.action.value) ) {
          // write different values
       // code for recording errors
-      saveNondeterminismReport( taskActions.action, lastWrt->action );
+      saveNondeterminismReport( taskActions.action, lastWrt.action );
     }
     // 4.2 read-after-write or write-after-read conflicts
     // (a) taskActions is read-only and lastWrt is a writer
     else if ( (!taskActions.action.isWrite)
-            &&  lastWrt->action.isWrite ) {
+            &&  lastWrt.action.isWrite ) {
       // code for recording errors
-      saveNondeterminismReport(taskActions.action, lastWrt->action);
+      saveNondeterminismReport(taskActions.action, lastWrt.action);
     }
     // (b) lastWrt is read-only and taskActions is a writer
-    else if ( (!lastWrt->action.isWrite)
+    else if ( (!lastWrt.action.isWrite)
             &&  taskActions.action.isWrite ) {
             // the other task is writer.
       // code for recording errors
-      saveNondeterminismReport(taskActions.action, lastWrt->action);
+      saveNondeterminismReport(taskActions.action, lastWrt.action);
     }
   }
 
