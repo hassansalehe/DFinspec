@@ -73,9 +73,8 @@ typedef struct TaskInfo {
    * recorded.
    */
   void printMemoryActions() {
-    for (auto it = memoryLocations.begin();
-         it != memoryLocations.end(); ++it) {
-      it->second.printActions( actionBuffer );
+    for (auto& memAction : memoryLocations) {
+      memAction.second.printActions( actionBuffer );
     }
   }
 
