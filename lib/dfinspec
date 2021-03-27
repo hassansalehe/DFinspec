@@ -9,7 +9,7 @@
 
 HOME=`pwd`
 
-## Benchmarks-related directories ##
+# Benchmarks-related directories
 BENCHS_DIR=$HOME/benchmarks
 SRC=$BENCHS_DIR/src
 INC=$BENCHS_DIR/include
